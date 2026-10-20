@@ -18,8 +18,9 @@ import java.util.function.Function;
  *   <li>si no, algún hallazgo P (CPO-D) / E (ceo-d) → perdida / extraída;</li>
  *   <li>si no, algún hallazgo O → obturada.</li>
  * </ol>
- * Se usan los hallazgos visibles de la pieza ({@link EstadoPieza#hallazgosVisibles()}): una pieza ausente
- * no cuenta como cariada por una caries registrada antes de su extracción.
+ * Se usan los hallazgos visibles de la pieza ({@link EstadoOdontograma#hallazgosVisibles(int)}): una pieza
+ * ausente no cuenta como cariada por una caries registrada antes de su extracción, y los hallazgos de rango
+ * (p. ej. edéntulo total) cuentan en cada pieza que cubren.
  */
 public final class CalculadoraIndices {
 
@@ -40,9 +41,7 @@ public final class CalculadoraIndices {
         int p = 0;
         int o = 0;
         for (PiezaDental pieza : universo) {
-            List<HallazgoEvento> h = estado.pieza(pieza.fdi())
-                    .map(EstadoPieza::hallazgosVisibles)
-                    .orElse(List.of());
+            List<HallazgoEvento> h = estado.hallazgosVisibles(pieza.fdi());
             if (h.stream().anyMatch(x -> conteo.apply(x.tipo()) == ConteoIndice.C)) {
                 c++;
             } else if (h.stream().anyMatch(x -> conteo.apply(x.tipo()) == ConteoIndice.O && x.color() == ColorHallazgo.ROJO)) {

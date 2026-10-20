@@ -6,7 +6,6 @@
 package com.odontogest.dominio.tratamiento;
 
 import com.odontogest.dominio.odontograma.EstadoOdontograma;
-import com.odontogest.dominio.odontograma.EstadoPieza;
 import com.odontogest.dominio.odontograma.HallazgoEvento;
 import com.odontogest.dominio.odontograma.PiezaDental;
 import com.odontogest.dominio.odontograma.Superficie;
@@ -70,8 +69,8 @@ public final class MotorSugerencias {
     /** Hallazgos visibles de cada pieza más los de rango, sin repetir y en orden de registro. */
     private static List<HallazgoEvento> hallazgosConsiderados(EstadoOdontograma estado) {
         Set<HallazgoEvento> hallazgos = new LinkedHashSet<>();
-        for (EstadoPieza pieza : estado.piezas().values()) {
-            hallazgos.addAll(pieza.hallazgosVisibles());
+        for (int fdi : estado.piezas().keySet()) {
+            hallazgos.addAll(estado.hallazgosVisibles(fdi));
         }
         hallazgos.addAll(estado.rangos());
         List<HallazgoEvento> lista = new ArrayList<>(hallazgos);

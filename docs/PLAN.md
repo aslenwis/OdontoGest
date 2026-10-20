@@ -32,7 +32,7 @@ Se mantiene:
   - Los hallazgos registrados **no se alteran** (sin enmendaduras): en OdontoGest los hallazgos son inmutables tras el cierre y se corrigen por anulación trazable.
   - En el odontograma solo se registran **hallazgos observados**, no procedimientos planificados: por eso el plan de tratamiento es un módulo separado.
 - **Ley N° 29733** (protección de datos personales): consentimiento del paciente; los datos de salud son sensibles.
-- ⚠️ **Tarea del estudiante:** el catálogo de hallazgos de la §3.4 es representativo. Antes de la Fase 3, contrastar símbolos, siglas y colores con el Anexo de la NTS 188 publicado por el MINSA y ajustar las filas del seeder. El código no debe tener colores ni símbolos “quemados”: todo sale del catálogo `hallazgo_tipo`.
+- ✅ El catálogo de hallazgos de la §3.5 fue contrastado con el numeral 6.1 de la NTS 188 (siglas, colores y forma de dibujo de los 38 hallazgos). El código no tiene colores ni símbolos “quemados”: todo sale del catálogo `hallazgo_tipo`.
 
 ### 0.4 Elementos originales del software (argumento para INDECOPI)
 1. **Odontograma basado en eventos**: el estado de la boca es una proyección (fold) de hallazgos inmutables con capas de exclusión; permite reconstruir el odontograma en cualquier fecha y comparar inicial vs. actual.
@@ -692,9 +692,11 @@ CREATE TABLE IF NOT EXISTS hallazgo_tipo (
     siglas_opciones     TEXT,                      -- JSON ["AM","R","IV"] si el usuario debe elegir
     representacion      TEXT NOT NULL CHECK (representacion IN ('SUPERFICIE','PIEZA','ENTRE_PIEZAS','RANGO_PIEZAS')),
     simbolo             TEXT NOT NULL CHECK (simbolo IN (
-                            'RELLENO','CONTORNO_SUPERFICIE','ASPA','CIRCUNFERENCIA','LINEA_RAIZ',
-                            'FLECHA_ARRIBA','FLECHA_ABAJO','FLECHA_GIRO','LINEA_FRACTURA',
-                            'PARENTESIS','PUENTE','LLAVE','SOLO_SIGLA','RAIZ_TRIANGULO','ZIGZAG')),
+                            'RELLENO','CONTORNO_SUPERFICIE','TRAZO_FOSAS','LINEA_DESGASTE','ASPA','CUADRADO_CORONA',
+                            'LINEA_RAIZ','ESPIGO_MUNON','PULPA_CORONAL','FLECHA_EXTRUSION','FLECHA_INTRUSION',
+                            'FLECHA_GIRO','FLECHA_ZIGZAG','LINEA_FRACTURA','TRIANGULO_RAIZ','CIRCULO_NUMERO',
+                            'CIRCULOS_NUMEROS','CIRCULO_S','FLECHAS_CRUZADAS','PARENTESIS','PUENTE','LINEAS_PARALELAS',
+                            'CUADROS_APICES','ZIGZAG_APICES','LINEA_CORONAS','SOLO_SIGLA')),   -- formas de la NTS 188 §6.1
     regla_color         TEXT NOT NULL CHECK (regla_color IN ('POR_ESTADO','SIEMPRE_ROJO','SIEMPRE_AZUL')),
     grupo_exclusion     TEXT NOT NULL,             -- capa: un nuevo hallazgo de la misma capa reemplaza al anterior
     oculta_superficies  INTEGER NOT NULL DEFAULT 0 CHECK (oculta_superficies IN (0,1)),  -- p. ej. pieza ausente
@@ -957,29 +959,53 @@ Reglas del seeder demo:
 - Todos los DNI empiezan con `9` y se marcan en la UI con la etiqueta “Paciente demo” (columna derivada: `numero_historia` ≤ `HC-000060` creado por el seeder; guardar en `configuracion` la clave `seeder.ultimo_hc_demo`).
 - El seeder de la versión INDECOPI se deja activo para que el evaluador vea el sistema con datos.
 
-#### Catálogo inicial de hallazgos (⚠️ validar contra el Anexo de la NTS 188)
-| codigo | nombre | sigla | representación | símbolo | regla color | grupo exclusión | CPO-D | ceo-d |
-|---|---|---|---|---|---|---|---|---|
-| CARIES | Lesión de caries dental | — | SUPERFICIE | RELLENO | SIEMPRE_ROJO | SUPERFICIE | C | C |
-| RESTAURACION_DEFINITIVA | Restauración definitiva | AM/R/IV/IM/IE | SUPERFICIE | RELLENO | POR_ESTADO | SUPERFICIE | O | O |
-| RESTAURACION_TEMPORAL | Restauración temporal | — | SUPERFICIE | CONTORNO_SUPERFICIE | SIEMPRE_ROJO | SUPERFICIE | O | O |
-| SELLANTE | Sellante | S | SUPERFICIE | SOLO_SIGLA | POR_ESTADO | SUPERFICIE_SELLANTE | NINGUNO | NINGUNO |
-| PIEZA_AUSENTE | Pieza dentaria ausente | — | PIEZA | ASPA | SIEMPRE_AZUL | ESTADO_PIEZA (oculta superficies) | P | E |
-| REMANENTE_RADICULAR | Remanente radicular | RR | PIEZA | RAIZ_TRIANGULO | SIEMPRE_ROJO | ESTADO_PIEZA | C | E |
-| IMPLANTE | Implante dental | IMP | PIEZA | SOLO_SIGLA | POR_ESTADO | ESTADO_PIEZA | P | NINGUNO |
-| PIEZA_EN_ERUPCION | Pieza dentaria en erupción | — | PIEZA | ZIGZAG | SIEMPRE_AZUL | ESTADO_PIEZA | NINGUNO | NINGUNO |
-| CORONA_DEFINITIVA | Corona definitiva | CM/CF/CMC/CV/CLM | PIEZA | CIRCUNFERENCIA | POR_ESTADO | CORONA | O | O |
-| CORONA_TEMPORAL | Corona temporal | — | PIEZA | CIRCUNFERENCIA | SIEMPRE_ROJO | CORONA | O | O |
-| TRATAMIENTO_PULPAR | Tratamiento pulpar | TC/PC/PP | PIEZA | LINEA_RAIZ | POR_ESTADO | PULPAR | NINGUNO | NINGUNO |
-| FRACTURA | Fractura | — | PIEZA | LINEA_FRACTURA | SIEMPRE_ROJO | FRACTURA | NINGUNO | NINGUNO |
-| PIEZA_EXTRUIDA | Pieza extruida | — | PIEZA | FLECHA_ARRIBA | SIEMPRE_ROJO | POSICION_VERTICAL | NINGUNO | NINGUNO |
-| PIEZA_INTRUIDA | Pieza intruida | — | PIEZA | FLECHA_ABAJO | SIEMPRE_ROJO | POSICION_VERTICAL | NINGUNO | NINGUNO |
-| GIROVERSION | Giroversión | — | PIEZA | FLECHA_GIRO | SIEMPRE_ROJO | GIRO | NINGUNO | NINGUNO |
-| MOVILIDAD | Movilidad patológica | M1/M2/M3 | PIEZA | SOLO_SIGLA | SIEMPRE_ROJO | MOVILIDAD | NINGUNO | NINGUNO |
-| DIASTEMA | Diastema | — | ENTRE_PIEZAS | PARENTESIS | SIEMPRE_ROJO | DIASTEMA | NINGUNO | NINGUNO |
-| PROTESIS_FIJA | Prótesis fija | — | RANGO_PIEZAS | PUENTE | POR_ESTADO | PROTESIS_FIJA | NINGUNO | NINGUNO |
-| PROTESIS_REMOVIBLE | Prótesis removible | — | RANGO_PIEZAS | LLAVE | POR_ESTADO | PROTESIS_REMOVIBLE | NINGUNO | NINGUNO |
-| ORTODONCIA_FIJA | Aparato ortodóntico fijo | — | RANGO_PIEZAS | LLAVE | POR_ESTADO | ORTODONCIA | NINGUNO | NINGUNO |
+#### Catálogo de hallazgos (NTS N° 188-MINSA/DGIESP-2022, numeral 6.1 — validado)
+Orden = orden de la paleta. La pieza ausente (6.1.20) se registra como tres tipos (DEX/DNE/DAO) con el mismo
+dibujo y capa, para que solo la ausente por caries (DEX) cuente en CPO-D/ceo-d. Los hallazgos de rango cubren
+las piezas entre sus extremos (`PiezaDental.rango`): el edéntulo total cuenta como perdida en cada una.
+
+| NTS | codigo | nombre | sigla(s) | representación | símbolo | regla color | grupo exclusión | CPO-D | ceo-d |
+|---|---|---|---|---|---|---|---|---|---|
+| 6.1.16 | CARIES | Lesión de caries dental | MB/CE/CD/CDP | SUPERFICIE | RELLENO | SIEMPRE_ROJO | SUPERFICIE | C | C |
+| 6.1.33 | RESTAURACION_DEFINITIVA | Restauración definitiva | AM/R/IV/IM/IE/C | SUPERFICIE | RELLENO | POR_ESTADO | SUPERFICIE | O | O |
+| 6.1.34 | RESTAURACION_TEMPORAL | Restauración temporal | — | SUPERFICIE | CONTORNO_SUPERFICIE | SIEMPRE_ROJO | SUPERFICIE | O | O |
+| 6.1.35 | SELLANTE | Sellante | S | SUPERFICIE | TRAZO_FOSAS | POR_ESTADO | SUPERFICIE_SELLANTE | NINGUNO | NINGUNO |
+| 6.1.36 | SUPERFICIE_DESGASTADA | Superficie desgastada | DES | SUPERFICIE | LINEA_DESGASTE | SIEMPRE_ROJO | DESGASTE | NINGUNO | NINGUNO |
+| 6.1.9 | FOSAS_FISURAS_PROFUNDAS | Fosas y fisuras profundas | FFP | PIEZA | SOLO_SIGLA | SIEMPRE_AZUL | FOSAS_FISURAS | NINGUNO | NINGUNO |
+| 6.1.5 | DEFECTO_ESMALTE | Defecto de desarrollo del esmalte (DDE) | O/PE | PIEZA | SOLO_SIGLA | SIEMPRE_ROJO | ESMALTE | NINGUNO | NINGUNO |
+| 6.1.20 | PIEZA_AUSENTE_DEX | Pieza ausente por caries (DEX) | DEX | PIEZA | ASPA | SIEMPRE_AZUL | ESTADO_PIEZA (oculta superficies) | P | E |
+| 6.1.20 | PIEZA_AUSENTE_DNE | Pieza no erupcionada (DNE) | DNE | PIEZA | ASPA | SIEMPRE_AZUL | ESTADO_PIEZA (oculta superficies) | NINGUNO | NINGUNO |
+| 6.1.20 | PIEZA_AUSENTE_DAO | Pieza ausente por otras razones (DAO) | DAO | PIEZA | ASPA | SIEMPRE_AZUL | ESTADO_PIEZA (oculta superficies) | NINGUNO | NINGUNO |
+| 6.1.32 | REMANENTE_RADICULAR | Remanente radicular | RR | PIEZA | SOLO_SIGLA | SIEMPRE_ROJO | ESTADO_PIEZA | C | E |
+| 6.1.15 | IMPLANTE | Implante dental | IMP | PIEZA | SOLO_SIGLA | POR_ESTADO | ESTADO_PIEZA | P | NINGUNO |
+| 6.1.23 | PIEZA_EN_ERUPCION | Pieza dentaria en erupción | — | PIEZA | FLECHA_ZIGZAG | SIEMPRE_AZUL | ESTADO_PIEZA | NINGUNO | NINGUNO |
+| 6.1.3 | CORONA | Corona | CM/CF/CMC/CV/CLM | PIEZA | CUADRADO_CORONA | POR_ESTADO | CORONA | O | O |
+| 6.1.4 | CORONA_TEMPORAL | Corona temporal | CT | PIEZA | CUADRADO_CORONA | SIEMPRE_ROJO | CORONA | O | O |
+| 6.1.8 | ESPIGO_MUNON | Espigo-muñón | — | PIEZA | ESPIGO_MUNON | POR_ESTADO | ESPIGO | NINGUNO | NINGUNO |
+| 6.1.37 | TRATAMIENTO_CONDUCTOS | Tratamiento de conductos | TC/PC | PIEZA | LINEA_RAIZ | POR_ESTADO | PULPAR | NINGUNO | NINGUNO |
+| 6.1.27 | PULPOTOMIA | Pulpotomía | PP | PIEZA | PULPA_CORONAL | POR_ESTADO | PULPAR | NINGUNO | NINGUNO |
+| 6.1.10 | FRACTURA | Fractura dental | — | PIEZA | LINEA_FRACTURA | SIEMPRE_ROJO | FRACTURA | NINGUNO | NINGUNO |
+| 6.1.19 | MOVILIDAD | Movilidad patológica | M1/M2/M3 | PIEZA | SOLO_SIGLA | SIEMPRE_ROJO | MOVILIDAD | NINGUNO | NINGUNO |
+| 6.1.24 | PIEZA_EXTRUIDA | Pieza dentaria extruida | — | PIEZA | FLECHA_EXTRUSION | SIEMPRE_AZUL | POSICION_VERTICAL | NINGUNO | NINGUNO |
+| 6.1.25 | PIEZA_INTRUIDA | Pieza dentaria intruida | — | PIEZA | FLECHA_INTRUSION | SIEMPRE_AZUL | POSICION_VERTICAL | NINGUNO | NINGUNO |
+| 6.1.13 | GIROVERSION | Giroversión | — | PIEZA | FLECHA_GIRO | SIEMPRE_AZUL | GIRO | NINGUNO | NINGUNO |
+| 6.1.28 | POSICION_ANORMAL | Posición anormal dentaria | M/D/V/P/L | PIEZA | SOLO_SIGLA | SIEMPRE_AZUL | POSICION | NINGUNO | NINGUNO |
+| 6.1.22 | PIEZA_ECTOPICA | Pieza dentaria ectópica | E | PIEZA | SOLO_SIGLA | SIEMPRE_AZUL | ECTOPICA | NINGUNO | NINGUNO |
+| 6.1.14 | IMPACTACION | Impactación | I | PIEZA | SOLO_SIGLA | SIEMPRE_AZUL | IMPACTACION | NINGUNO | NINGUNO |
+| 6.1.17 | MACRODONCIA | Macrodoncia | MAC | PIEZA | SOLO_SIGLA | SIEMPRE_AZUL | TAMANO | NINGUNO | NINGUNO |
+| 6.1.18 | MICRODONCIA | Microdoncia | MIC | PIEZA | SOLO_SIGLA | SIEMPRE_AZUL | TAMANO | NINGUNO | NINGUNO |
+| 6.1.21 | PIEZA_CLAVIJA | Pieza dentaria en clavija | — | PIEZA | TRIANGULO_RAIZ | SIEMPRE_AZUL | CLAVIJA | NINGUNO | NINGUNO |
+| 6.1.12 | GEMINACION | Geminación | — | PIEZA | CIRCULO_NUMERO | SIEMPRE_AZUL | GEMINACION | NINGUNO | NINGUNO |
+| 6.1.6 | DIASTEMA | Diastema | — | ENTRE_PIEZAS | PARENTESIS | SIEMPRE_AZUL | DIASTEMA | NINGUNO | NINGUNO |
+| 6.1.11 | FUSION | Fusión | — | ENTRE_PIEZAS | CIRCULOS_NUMEROS | SIEMPRE_AZUL | FUSION | NINGUNO | NINGUNO |
+| 6.1.38 | TRANSPOSICION | Transposición dentaria | — | ENTRE_PIEZAS | FLECHAS_CRUZADAS | SIEMPRE_AZUL | TRANSPOSICION | NINGUNO | NINGUNO |
+| 6.1.26 | PIEZA_SUPERNUMERARIA | Pieza dentaria supernumeraria | — | ENTRE_PIEZAS | CIRCULO_S | SIEMPRE_AZUL | SUPERNUMERARIA | NINGUNO | NINGUNO |
+| 6.1.29 | PROTESIS_FIJA | Prótesis dental parcial fija | — | RANGO_PIEZAS | PUENTE | POR_ESTADO | PROTESIS_FIJA | NINGUNO | NINGUNO |
+| 6.1.31 | PROTESIS_REMOVIBLE | Prótesis dental parcial removible | — | RANGO_PIEZAS | LINEAS_PARALELAS | POR_ESTADO | PROTESIS_REMOVIBLE | NINGUNO | NINGUNO |
+| 6.1.30 | PROTESIS_COMPLETA | Prótesis dental completa | — | RANGO_PIEZAS | LINEAS_PARALELAS | POR_ESTADO | PROTESIS_COMPLETA | NINGUNO | NINGUNO |
+| 6.1.1 | APARATO_ORTODONTICO_FIJO | Aparato ortodóntico fijo | — | RANGO_PIEZAS | CUADROS_APICES | POR_ESTADO | ORTODONCIA_FIJA | NINGUNO | NINGUNO |
+| 6.1.2 | APARATO_ORTODONTICO_REMOVIBLE | Aparato ortodóntico removible | — | RANGO_PIEZAS | ZIGZAG_APICES | POR_ESTADO | ORTODONCIA_REMOVIBLE | NINGUNO | NINGUNO |
+| 6.1.7 | EDENTULO_TOTAL | Edéntulo total | — | RANGO_PIEZAS | LINEA_CORONAS | SIEMPRE_AZUL | EDENTULO (oculta superficies) | P | E |
 
 #### Tarifario demo (precios ficticios en soles)
 `CONS` Consulta y diagnóstico 50.00 (BOCA) · `RX-PA` Radiografía periapical 25.00 (PIEZA) · `PROF` Profilaxis 80.00 (BOCA) · `DEST` Destartraje 120.00 (BOCA) · `FLUOR` Fluorización 60.00 (BOCA) · `SELL` Sellante 50.00 (PIEZA) · `RES-S` Resina simple (1 sup.) 120.00 · `RES-C` Resina compuesta (≥ 2 sup.) 180.00 (PIEZA) · `IONO-T` Ionómero temporal 70.00 (PIEZA) · `PULPO` Pulpotomía 150.00 · `ENDO-U` Endodoncia unirradicular 350.00 · `ENDO-B` birradicular 450.00 · `ENDO-M` multirradicular 600.00 · `EXO` Exodoncia simple 100.00 · `EXO-RR` Remoción de remanente radicular 120.00 · `CORO-T` Corona temporal 150.00 · `CORO-MC` Corona metal-cerámica 900.00 · `PF-PZ` Prótesis fija por pieza 800.00 · `IMPL` Implante 3500.00 · `FERU` Férula 400.00 (ARCADA).
@@ -997,11 +1023,11 @@ Reglas del seeder demo:
 | RESTAURACION_TEMPORAL | — | — | 2–5 | RES-C | 2 | 33 |
 | RESTAURACION_DEFINITIVA | MALO | — | 1–1 | RES-S | 2 | 34 |
 | RESTAURACION_DEFINITIVA | MALO | — | 2–5 | RES-C | 2 | 35 |
-| TRATAMIENTO_PULPAR | MALO | UNIRRADICULAR | — | ENDO-U | 1 | 40 |
-| TRATAMIENTO_PULPAR | MALO | BIRRADICULAR | — | ENDO-B | 1 | 41 |
-| TRATAMIENTO_PULPAR | MALO | MULTIRRADICULAR | — | ENDO-M | 1 | 42 |
+| TRATAMIENTO_CONDUCTOS | MALO | UNIRRADICULAR | — | ENDO-U | 1 | 40 |
+| TRATAMIENTO_CONDUCTOS | MALO | BIRRADICULAR | — | ENDO-B | 1 | 41 |
+| TRATAMIENTO_CONDUCTOS | MALO | MULTIRRADICULAR | — | ENDO-M | 1 | 42 |
 | CORONA_TEMPORAL | — | — | — | CORO-MC | 3 | 50 |
-| CORONA_DEFINITIVA | MALO | — | — | CORO-MC | 3 | 51 |
+| CORONA | MALO | — | — | CORO-MC | 3 | 51 |
 | MOVILIDAD | — | — | — | DEST | 2 | 60 |
 
 ---
@@ -1345,7 +1371,7 @@ Complejidad: `O(n log n)` por el ordenamiento, `n` = hallazgos del paciente (dec
 Reglas derivadas:
 - Una caries en la superficie O, seguida de una restauración en O, deja vigente solo la restauración (misma capa `SUPERFICIE`).
 - Un sellante usa otra capa (`SUPERFICIE_SELLANTE`), así que convive con una restauración.
-- `PIEZA_AUSENTE` (capa `ESTADO_PIEZA`, `oculta_superficies=1`): el renderizador no dibuja superficies ni hallazgos de superficie de esa pieza, pero estos siguen en el historial.
+- `PIEZA_AUSENTE_DEX/DNE/DAO` (capa `ESTADO_PIEZA`, `oculta_superficies=1`) y `EDENTULO_TOTAL` (rango que oculta las superficies de las piezas que cubre): el renderizador no dibuja superficies ni hallazgos de superficie de esas piezas (`EstadoOdontograma.superficiesOcultas`), pero estos siguen en el historial.
 - Una restauración de 3 superficies (MOD) se registra como **un** hallazgo con bitmask `M|O|D = 7`: así el motor de sugerencias y el CPO-D lo cuentan una sola vez.
 
 ```java
@@ -1463,8 +1489,8 @@ public final class DetectorSuperficie {
 1. Fondo, recuadros vacíos y números FDI.
 2. Superficies: relleno con `PaletaOdontograma.color(hallazgo.color())` o blanco; `CONTORNO_SUPERFICIE` dibuja solo el borde grueso.
 3. Contornos de la corona y la zona radicular.
-4. Símbolos de pieza: `ASPA` (dos diagonales sobre corona y raíz), `CIRCUNFERENCIA` (círculo que envuelve la corona), `LINEA_RAIZ` (línea vertical en la raíz), `FLECHA_*`, `LINEA_FRACTURA`, `RAIZ_TRIANGULO`, `ZIGZAG`.
-5. Rangos: `PUENTE` (línea horizontal con topes sobre las coronas del rango), `LLAVE`, `PARENTESIS` entre dos piezas.
+4. Símbolos de pieza (NTS 188 §6.1; descripción de cada uno en `SimboloHallazgo`): `ASPA` (dos diagonales sobre corona y raíz), `CUADRADO_CORONA` (cuadrado que bordea la corona), `LINEA_RAIZ`, `ESPIGO_MUNON`, `PULPA_CORONAL`, `FLECHA_EXTRUSION`/`FLECHA_INTRUSION` (fuera de la pieza, dirección según la arcada), `FLECHA_GIRO` (a nivel oclusal), `FLECHA_ZIGZAG`, `LINEA_FRACTURA`, `TRIANGULO_RAIZ`, `CIRCULO_NUMERO` (alrededor del número FDI); de superficie: `TRAZO_FOSAS`, `LINEA_DESGASTE`.
+5. Rangos, a nivel de los ápices salvo indicación: `PUENTE` (línea horizontal con verticales sobre los pilares), `LINEAS_PARALELAS`, `CUADROS_APICES`, `ZIGZAG_APICES`, `LINEA_CORONAS` (sobre las coronas); entre dos piezas: `PARENTESIS`, `CIRCULOS_NUMEROS`, `CIRCULO_S` (entre ápices), `FLECHAS_CRUZADAS` (sobre los números).
 6. Siglas en el recuadro, coloreadas según el hallazgo.
 7. Superposiciones: hover (superficie con relleno semitransparente), selección pendiente (borde discontinuo), diferencias con el inicial (marco ámbar alrededor de la pieza), piezas de solo lectura atenuadas.
 
@@ -1793,7 +1819,7 @@ Cada fase termina con `mvn test` en verde, la app ejecutándose con `mvn javafx:
 | **F0 — Esqueleto** | `pom.xml`, `Launcher`, `JavaFxApplication`, `OdontoGestApplication`, `DirectorioDatos`, `application.properties`, `schema.sql` completo, conversores, `EjecutorConfig`, `TareaUi`, `Notificador`, `Refrescable`, `CargadorVistas`, `main-view` con menú vacío, `login-view`, `AutenticacionService`, `ConfiguracionSeeder`, usuario admin mínimo, `ArquitecturaTest`, `ConversoresIntegracionTest`. | La app crea `~/OdontoGest/odontogest.db` con todas las tablas; login con `admin`; tema claro/oscuro; fechas y céntimos se guardan como TEXT/INTEGER esperados. |
 | **F1 — Dominio puro** | Todo `dominio/` con tests: `PiezaDental`, `Superficie(s)`, `ProyectorOdontograma`, `DiferenciaOdontograma`, `CalculadoraIndices`, `CadenaIntegridad`, `MotorSugerencias`, `GeneradorCronograma`, `AsignadorPagosFifo`, `BuscadorHuecos`, `NumeroALetras`; `DetectorSuperficie` y `LayoutOdontograma` con tests. | Cobertura ≥ 70 % en `dominio`; casos límite de §5 cubiertos (reparto 33334/33333/33333, precedencia C>P>O, desempate de diagonales, capas de exclusión, hueco al final del bloque). |
 | **F2 — Pacientes y catálogos** | Entidades, repositorios y servicios de paciente, anamnesis, consentimiento, odontólogo, horarios, procedimientos, hallazgos, reglas; `CatalogoSeeder`; vistas `pacientes-view`, ficha con pestañas Datos y Anamnesis; `catalogos-view`; `usuarios-view`; permisos. | CRUD completo con validaciones; búsqueda paginada; HC correlativa; alerta de alergias; PDF de consentimiento de datos. |
-| **F3 — Odontograma** | Atención (abrir/cerrar), `OdontogramaService`, `IntegridadService`, `OdontogramaCanvas`, `RenderizadorOdontograma`, ViewModel, pestaña completa (§6.2), PDF de ficha odontológica. | Registrar hallazgos de los 4 tipos de representación; cerrar con hash; anular con motivo; línea de tiempo y comparación; CPO-D/ceo-d en vivo; hover fluido; PDF legible. **Antes de empezar: el estudiante valida el catálogo contra la NTS 188.** |
+| **F3 — Odontograma** | Atención (abrir/cerrar), `OdontogramaService`, `IntegridadService`, `OdontogramaCanvas`, `RenderizadorOdontograma`, ViewModel, pestaña completa (§6.2), PDF de ficha odontológica. | Registrar hallazgos de los 4 tipos de representación; cerrar con hash; anular con motivo; línea de tiempo y comparación; CPO-D/ceo-d en vivo; hover fluido; PDF legible. Catálogo ya validado contra la NTS 188 (§3.5). |
 | **F4 — Plan de tratamiento** | `PlanTratamientoService`, pestaña Plan, cronograma, presupuesto PDF, consentimiento de tratamiento. | Sugerencias coherentes con el odontograma demo; totales exactos; transiciones de estado válidas; cronograma bloqueado si hay pagos. |
 | **F5 — Caja** | `PagoService`, `CorrelativoService`, `caja-view`, pestaña Pagos, recibo PDF con monto en letras, anulación. | Vista previa FIFO; saldos correctos tras pagar y anular; recibos correlativos sin saltos. |
 | **F6 — Agenda** | `CitaService`, `AgendaSemanal`, `agenda-view`, formulario de cita, “Siguiente hueco”, flujo cita → atención. | No se pueden crear solapamientos; arrastrar mueve con validación; hueco sugerido correcto. |

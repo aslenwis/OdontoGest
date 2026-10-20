@@ -64,23 +64,58 @@ class CatalogosTest extends PruebaIntegracion {
 
     @Test
     void elSeederCargaElCatalogoDelPlan() {
-        assertThat(catalogoService.listarTipos(true)).hasSize(20);
+        assertThat(catalogoService.listarTipos(true)).hasSize(40);
         assertThat(procedimientoService.listar(true)).hasSize(20);
         assertThat(catalogoService.listarReglas()).hasSizeGreaterThanOrEqualTo(16);
 
-        HallazgoTipoDto ausente = tipo("PIEZA_AUSENTE");
+        HallazgoTipoDto ausente = tipo("PIEZA_AUSENTE_DEX");
         assertThat(ausente.ocultaSuperficies()).isTrue();
         assertThat(ausente.conteoCpod()).isEqualTo(ConteoIndice.P);
         assertThat(ausente.conteoCeod()).isEqualTo(ConteoIndice.E);
         assertThat(ausente.reglaColor()).isEqualTo(ReglaColor.SIEMPRE_AZUL);
-        assertThat(tipo("RESTAURACION_DEFINITIVA").siglasOpciones()).containsExactly("AM", "R", "IV", "IM", "IE");
+        assertThat(ausente.sigla()).isEqualTo("DEX");
+        assertThat(tipo("PIEZA_AUSENTE_DNE").conteoCpod()).as("no erupcionada no cuenta").isEqualTo(ConteoIndice.NINGUNO);
+        assertThat(tipo("RESTAURACION_DEFINITIVA").siglasOpciones()).containsExactly("AM", "R", "IV", "IM", "IE", "C");
+        assertThat(tipo("CARIES").siglasOpciones()).containsExactly("MB", "CE", "CD", "CDP");
         assertThat(tipo("SELLANTE").sigla()).isEqualTo("S");
+        assertThat(tipo("SELLANTE").simbolo()).isEqualTo(SimboloHallazgo.TRAZO_FOSAS);
+    }
+
+    @Test
+    void elCatalogoRespetaColoresYDibujosDeLaNts188() {
+        // 6.1.6, 6.1.13, 6.1.24, 6.1.25: dibujos en azul
+        for (String codigo : List.of("DIASTEMA", "GIROVERSION", "PIEZA_EXTRUIDA", "PIEZA_INTRUIDA", "FUSION",
+                "GEMINACION", "TRANSPOSICION", "PIEZA_SUPERNUMERARIA", "MACRODONCIA", "MICRODONCIA", "IMPACTACION")) {
+            assertThat(tipo(codigo).reglaColor()).as(codigo).isEqualTo(ReglaColor.SIEMPRE_AZUL);
+        }
+        // 6.1.3 y 6.1.4: cuadrado que bordea la corona; la temporal en rojo con sigla CT
+        assertThat(tipo("CORONA").simbolo()).isEqualTo(SimboloHallazgo.CUADRADO_CORONA);
+        assertThat(tipo("CORONA_TEMPORAL").sigla()).isEqualTo("CT");
+        assertThat(tipo("CORONA_TEMPORAL").reglaColor()).isEqualTo(ReglaColor.SIEMPRE_ROJO);
+        // 6.1.32: remanente radicular solo con la sigla RR en rojo
+        assertThat(tipo("REMANENTE_RADICULAR").simbolo()).isEqualTo(SimboloHallazgo.SOLO_SIGLA);
+        assertThat(tipo("REMANENTE_RADICULAR").reglaColor()).isEqualTo(ReglaColor.SIEMPRE_ROJO);
+        // 6.1.30 y 6.1.31: prótesis completa y removible con dos líneas paralelas
+        assertThat(tipo("PROTESIS_REMOVIBLE").simbolo()).isEqualTo(SimboloHallazgo.LINEAS_PARALELAS);
+        assertThat(tipo("PROTESIS_COMPLETA").simbolo()).isEqualTo(SimboloHallazgo.LINEAS_PARALELAS);
+        // 6.1.37 y 6.1.27: conductos (TC/PC) y pulpotomía (PP) comparten la capa pulpar
+        assertThat(tipo("TRATAMIENTO_CONDUCTOS").siglasOpciones()).containsExactly("TC", "PC");
+        assertThat(tipo("PULPOTOMIA").sigla()).isEqualTo("PP");
+        assertThat(tipo("PULPOTOMIA").grupoExclusion()).isEqualTo(tipo("TRATAMIENTO_CONDUCTOS").grupoExclusion());
+        // 6.1.7: edéntulo total, rango que oculta superficies y cuenta como perdida
+        HallazgoTipoDto edentulo = tipo("EDENTULO_TOTAL");
+        assertThat(edentulo.representacion()).isEqualTo(Representacion.RANGO_PIEZAS);
+        assertThat(edentulo.ocultaSuperficies()).isTrue();
+        assertThat(edentulo.conteoCpod()).isEqualTo(ConteoIndice.P);
+        // Los 26 símbolos del enum están permitidos por el CHECK del esquema (se insertan al sembrar)
+        assertThat(catalogoService.listarTipos(true)).extracting(HallazgoTipoDto::simbolo)
+                .containsAll(List.of(SimboloHallazgo.values()));
 
         assertThat(jdbc.queryForObject("SELECT precio_cent FROM procedimiento WHERE codigo = 'RES-S'", Long.class)).isEqualTo(12000L);
         assertThat(jdbc.queryForObject("SELECT forma_cobro FROM procedimiento WHERE codigo = 'FERU'", String.class)).isEqualTo("ARCADA");
 
         List<TipoHallazgoDef> definiciones = catalogoService.definiciones();
-        assertThat(definiciones).hasSize(20).extracting(TipoHallazgoDef::codigo).startsWith("CARIES", "RESTAURACION_DEFINITIVA");
+        assertThat(definiciones).hasSize(40).extracting(TipoHallazgoDef::codigo).startsWith("CARIES", "RESTAURACION_DEFINITIVA");
     }
 
     @Test
@@ -92,7 +127,7 @@ class CatalogosTest extends PruebaIntegracion {
 
         catalogoSeeder.run(new DefaultApplicationArguments());
 
-        assertThat(catalogoService.listarTipos(true)).hasSize(20);
+        assertThat(catalogoService.listarTipos(true)).hasSize(40);
         assertThat(procedimientoService.listar(true)).hasSize(20);
         assertThat(catalogoService.listarReglas()).hasSize(reglas);
     }
@@ -198,7 +233,7 @@ class CatalogosTest extends PruebaIntegracion {
     @Transactional
     void guardaYEliminaReglasConValidaciones() {
         HallazgoTipoDto fractura = tipo("FRACTURA");
-        HallazgoTipoDto pulpar = tipo("TRATAMIENTO_PULPAR");
+        HallazgoTipoDto pulpar = tipo("TRATAMIENTO_CONDUCTOS");
         long endo = procedimientoService.listar(true).stream().filter(p -> p.codigo().equals("ENDO-M")).findFirst().orElseThrow().id();
 
         assertThatThrownBy(() -> catalogoService.guardarRegla(new ReglaSugerenciaForm(null, null, EstadoHallazgo.MALO, null,
@@ -215,7 +250,7 @@ class CatalogosTest extends PruebaIntegracion {
         long id = catalogoService.guardarRegla(new ReglaSugerenciaForm(null, pulpar.id(), EstadoHallazgo.MALO, null,
                 0, 5, endo, 1, 7, true));
         ReglaSugerenciaDto regla = catalogoService.listarReglas().stream().filter(r -> r.id() == id).findFirst().orElseThrow();
-        assertThat(regla.hallazgoTipoNombre()).isEqualTo("Tratamiento pulpar");
+        assertThat(regla.hallazgoTipoNombre()).isEqualTo("Tratamiento de conductos");
         assertThat(regla.procedimientoNombre()).startsWith("ENDO-M");
 
         catalogoService.eliminarRegla(id);

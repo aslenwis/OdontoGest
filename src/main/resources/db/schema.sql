@@ -176,9 +176,11 @@ CREATE TABLE IF NOT EXISTS hallazgo_tipo (
     siglas_opciones     TEXT,                      -- JSON ["AM","R","IV"] si el usuario debe elegir
     representacion      TEXT NOT NULL CHECK (representacion IN ('SUPERFICIE','PIEZA','ENTRE_PIEZAS','RANGO_PIEZAS')),
     simbolo             TEXT NOT NULL CHECK (simbolo IN (
-                            'RELLENO','CONTORNO_SUPERFICIE','ASPA','CIRCUNFERENCIA','LINEA_RAIZ',
-                            'FLECHA_ARRIBA','FLECHA_ABAJO','FLECHA_GIRO','LINEA_FRACTURA',
-                            'PARENTESIS','PUENTE','LLAVE','SOLO_SIGLA','RAIZ_TRIANGULO','ZIGZAG')),
+                            'RELLENO','CONTORNO_SUPERFICIE','TRAZO_FOSAS','LINEA_DESGASTE','ASPA','CUADRADO_CORONA',
+                            'LINEA_RAIZ','ESPIGO_MUNON','PULPA_CORONAL','FLECHA_EXTRUSION','FLECHA_INTRUSION',
+                            'FLECHA_GIRO','FLECHA_ZIGZAG','LINEA_FRACTURA','TRIANGULO_RAIZ','CIRCULO_NUMERO',
+                            'CIRCULOS_NUMEROS','CIRCULO_S','FLECHAS_CRUZADAS','PARENTESIS','PUENTE','LINEAS_PARALELAS',
+                            'CUADROS_APICES','ZIGZAG_APICES','LINEA_CORONAS','SOLO_SIGLA')),   -- formas de la NTS 188 §6.1
     regla_color         TEXT NOT NULL CHECK (regla_color IN ('POR_ESTADO','SIEMPRE_ROJO','SIEMPRE_AZUL')),
     grupo_exclusion     TEXT NOT NULL,             -- capa: un nuevo hallazgo de la misma capa reemplaza al anterior
     oculta_superficies  INTEGER NOT NULL DEFAULT 0 CHECK (oculta_superficies IN (0,1)),  -- p. ej. pieza ausente

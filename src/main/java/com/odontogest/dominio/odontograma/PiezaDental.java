@@ -126,6 +126,20 @@ public record PiezaDental(int fdi) implements Comparable<PiezaDental> {
         return arcada() == otra.arcada();
     }
 
+    /**
+     * Piezas entre {@code a} y {@code b} (ambas incluidas) en su fila de dibujo, p. ej. 18–28 = toda la arcada
+     * superior permanente. Si están en filas distintas devuelve solo los extremos.
+     */
+    public static List<PiezaDental> rango(PiezaDental a, PiezaDental b) {
+        List<PiezaDental> fila = filaDe(a);
+        int i = fila.indexOf(a);
+        int j = fila.indexOf(b);
+        if (j < 0) {
+            return a.equals(b) ? List.of(a) : List.of(a, b);
+        }
+        return fila.subList(Math.min(i, j), Math.max(i, j) + 1);
+    }
+
     /** Permanentes en orden de dibujo: 18..11, 21..28, 48..41, 31..38. */
     public static List<PiezaDental> permanentes() {
         return PERMANENTES;

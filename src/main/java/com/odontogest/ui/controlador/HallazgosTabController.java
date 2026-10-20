@@ -92,7 +92,7 @@ public class HallazgosTabController extends ListadoEditable<HallazgoTipoDto> {
     @Override
     protected void abrirFormulario(HallazgoTipoDto t) {
         TextField codigo = new TextField(t == null ? "" : t.codigo());
-        codigo.setPromptText("PIEZA_AUSENTE");
+        codigo.setPromptText("PIEZA_AUSENTE_DEX");
         TextField nombre = new TextField(t == null ? "" : t.nombre());
         TextField sigla = new TextField(t == null || t.sigla() == null ? "" : t.sigla());
         TextField opciones = new TextField(t == null ? "" : String.join(", ", t.siglasOpciones()));

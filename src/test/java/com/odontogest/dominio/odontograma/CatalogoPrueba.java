@@ -28,18 +28,18 @@ public final class CatalogoPrueba {
             SimboloHallazgo.RELLENO, ReglaColor.POR_ESTADO, "SUPERFICIE", false, O, O);
     public static final TipoHallazgoDef RESTAURACION_TEMPORAL = tipo(3, "RESTAURACION_TEMPORAL",
             Representacion.SUPERFICIE, SimboloHallazgo.CONTORNO_SUPERFICIE, ReglaColor.SIEMPRE_ROJO, "SUPERFICIE", false, O, O);
-    public static final TipoHallazgoDef SELLANTE = tipo(4, "SELLANTE", Representacion.SUPERFICIE, SimboloHallazgo.SOLO_SIGLA,
+    public static final TipoHallazgoDef SELLANTE = tipo(4, "SELLANTE", Representacion.SUPERFICIE, SimboloHallazgo.TRAZO_FOSAS,
             ReglaColor.POR_ESTADO, "SUPERFICIE_SELLANTE", false, NINGUNO, NINGUNO);
     public static final TipoHallazgoDef PIEZA_AUSENTE = tipo(5, "PIEZA_AUSENTE", Representacion.PIEZA, SimboloHallazgo.ASPA,
             ReglaColor.SIEMPRE_AZUL, "ESTADO_PIEZA", true, P, E);
     public static final TipoHallazgoDef REMANENTE_RADICULAR = tipo(6, "REMANENTE_RADICULAR", Representacion.PIEZA,
-            SimboloHallazgo.RAIZ_TRIANGULO, ReglaColor.SIEMPRE_ROJO, "ESTADO_PIEZA", false, C, E);
+            SimboloHallazgo.SOLO_SIGLA, ReglaColor.SIEMPRE_ROJO, "ESTADO_PIEZA", false, C, E);
     public static final TipoHallazgoDef IMPLANTE = tipo(7, "IMPLANTE", Representacion.PIEZA, SimboloHallazgo.SOLO_SIGLA,
             ReglaColor.POR_ESTADO, "ESTADO_PIEZA", false, P, NINGUNO);
     public static final TipoHallazgoDef CORONA_DEFINITIVA = tipo(9, "CORONA_DEFINITIVA", Representacion.PIEZA,
-            SimboloHallazgo.CIRCUNFERENCIA, ReglaColor.POR_ESTADO, "CORONA", false, O, O);
+            SimboloHallazgo.CUADRADO_CORONA, ReglaColor.POR_ESTADO, "CORONA", false, O, O);
     public static final TipoHallazgoDef CORONA_TEMPORAL = tipo(10, "CORONA_TEMPORAL", Representacion.PIEZA,
-            SimboloHallazgo.CIRCUNFERENCIA, ReglaColor.SIEMPRE_ROJO, "CORONA", false, O, O);
+            SimboloHallazgo.CUADRADO_CORONA, ReglaColor.SIEMPRE_ROJO, "CORONA", false, O, O);
     public static final TipoHallazgoDef TRATAMIENTO_PULPAR = tipo(11, "TRATAMIENTO_PULPAR", Representacion.PIEZA,
             SimboloHallazgo.LINEA_RAIZ, ReglaColor.POR_ESTADO, "PULPAR", false, NINGUNO, NINGUNO);
     public static final TipoHallazgoDef FRACTURA = tipo(12, "FRACTURA", Representacion.PIEZA, SimboloHallazgo.LINEA_FRACTURA,
@@ -47,9 +47,13 @@ public final class CatalogoPrueba {
     public static final TipoHallazgoDef MOVILIDAD = tipo(16, "MOVILIDAD", Representacion.PIEZA, SimboloHallazgo.SOLO_SIGLA,
             ReglaColor.SIEMPRE_ROJO, "MOVILIDAD", false, NINGUNO, NINGUNO);
     public static final TipoHallazgoDef DIASTEMA = tipo(17, "DIASTEMA", Representacion.ENTRE_PIEZAS, SimboloHallazgo.PARENTESIS,
-            ReglaColor.SIEMPRE_ROJO, "DIASTEMA", false, NINGUNO, NINGUNO);
+            ReglaColor.SIEMPRE_AZUL, "DIASTEMA", false, NINGUNO, NINGUNO);
     public static final TipoHallazgoDef PROTESIS_FIJA = tipo(18, "PROTESIS_FIJA", Representacion.RANGO_PIEZAS, SimboloHallazgo.PUENTE,
             ReglaColor.POR_ESTADO, "PROTESIS_FIJA", false, NINGUNO, NINGUNO);
+    public static final TipoHallazgoDef PIEZA_NO_ERUPCIONADA = tipo(19, "PIEZA_AUSENTE_DNE", Representacion.PIEZA, SimboloHallazgo.ASPA,
+            ReglaColor.SIEMPRE_AZUL, "ESTADO_PIEZA", true, NINGUNO, NINGUNO);
+    public static final TipoHallazgoDef EDENTULO_TOTAL = tipo(40, "EDENTULO_TOTAL", Representacion.RANGO_PIEZAS,
+            SimboloHallazgo.LINEA_CORONAS, ReglaColor.SIEMPRE_AZUL, "EDENTULO", true, P, E);
 
     /** Fecha base: los eventos de prueba se ordenan por minutos a partir de aquí. */
     public static final LocalDateTime T0 = LocalDateTime.of(2026, 3, 2, 9, 0);

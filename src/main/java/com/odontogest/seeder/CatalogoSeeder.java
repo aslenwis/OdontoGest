@@ -58,8 +58,9 @@ import static com.odontogest.modelo.CategoriaProcedimiento.PROTESIS;
  * siempre y es idempotente: inserta por código solo lo que falta. Las reglas se cargan únicamente en el
  * primer arranque (cuando el catálogo de hallazgos estaba vacío), para no recrear reglas que el usuario borró.
  * <p>
- * ⚠️ El catálogo de hallazgos es representativo: validarlo contra el Anexo de la NTS N° 188-MINSA/DGIESP-2022
- * antes de la Fase 3 y ajustar estas filas.
+ * El catálogo de hallazgos sigue el numeral 6.1 de la NTS N° 188-MINSA/DGIESP-2022: siglas, colores y forma de
+ * dibujo. Decisiones propias: la pieza ausente se separa en DEX/DNE/DAO para que solo la extraída por caries cuente
+ * en el CPO-D/ceo-d, y el edéntulo total cuenta como pieza perdida en cada pieza que cubre.
  */
 @Component
 @Order(2)
@@ -80,27 +81,48 @@ public class CatalogoSeeder implements ApplicationRunner {
                              String procedimiento, int fase, int prioridad) {
     }
 
+    /** NTS N° 188-MINSA/DGIESP-2022, numeral 6.1, en el orden de la paleta (al final de cada fila, el numeral). */
     static final List<TipoDemo> TIPOS = List.of(
-            new TipoDemo("CARIES", "Lesión de caries dental", null, null, SUPERFICIE, SimboloHallazgo.RELLENO, SIEMPRE_ROJO, "SUPERFICIE", false, C, C),
-            new TipoDemo("RESTAURACION_DEFINITIVA", "Restauración definitiva", null, "[\"AM\",\"R\",\"IV\",\"IM\",\"IE\"]", SUPERFICIE, SimboloHallazgo.RELLENO, POR_ESTADO, "SUPERFICIE", false, O, O),
-            new TipoDemo("RESTAURACION_TEMPORAL", "Restauración temporal", null, null, SUPERFICIE, SimboloHallazgo.CONTORNO_SUPERFICIE, SIEMPRE_ROJO, "SUPERFICIE", false, O, O),
-            new TipoDemo("SELLANTE", "Sellante", "S", null, SUPERFICIE, SimboloHallazgo.SOLO_SIGLA, POR_ESTADO, "SUPERFICIE_SELLANTE", false, NINGUNO, NINGUNO),
-            new TipoDemo("PIEZA_AUSENTE", "Pieza dentaria ausente", null, null, PIEZA, SimboloHallazgo.ASPA, SIEMPRE_AZUL, "ESTADO_PIEZA", true, P, E),
-            new TipoDemo("REMANENTE_RADICULAR", "Remanente radicular", "RR", null, PIEZA, SimboloHallazgo.RAIZ_TRIANGULO, SIEMPRE_ROJO, "ESTADO_PIEZA", false, C, E),
-            new TipoDemo("IMPLANTE", "Implante dental", "IMP", null, PIEZA, SimboloHallazgo.SOLO_SIGLA, POR_ESTADO, "ESTADO_PIEZA", false, P, NINGUNO),
-            new TipoDemo("PIEZA_EN_ERUPCION", "Pieza dentaria en erupción", null, null, PIEZA, SimboloHallazgo.ZIGZAG, SIEMPRE_AZUL, "ESTADO_PIEZA", false, NINGUNO, NINGUNO),
-            new TipoDemo("CORONA_DEFINITIVA", "Corona definitiva", null, "[\"CM\",\"CF\",\"CMC\",\"CV\",\"CLM\"]", PIEZA, SimboloHallazgo.CIRCUNFERENCIA, POR_ESTADO, "CORONA", false, O, O),
-            new TipoDemo("CORONA_TEMPORAL", "Corona temporal", null, null, PIEZA, SimboloHallazgo.CIRCUNFERENCIA, SIEMPRE_ROJO, "CORONA", false, O, O),
-            new TipoDemo("TRATAMIENTO_PULPAR", "Tratamiento pulpar", null, "[\"TC\",\"PC\",\"PP\"]", PIEZA, SimboloHallazgo.LINEA_RAIZ, POR_ESTADO, "PULPAR", false, NINGUNO, NINGUNO),
-            new TipoDemo("FRACTURA", "Fractura", null, null, PIEZA, SimboloHallazgo.LINEA_FRACTURA, SIEMPRE_ROJO, "FRACTURA", false, NINGUNO, NINGUNO),
-            new TipoDemo("PIEZA_EXTRUIDA", "Pieza extruida", null, null, PIEZA, SimboloHallazgo.FLECHA_ARRIBA, SIEMPRE_ROJO, "POSICION_VERTICAL", false, NINGUNO, NINGUNO),
-            new TipoDemo("PIEZA_INTRUIDA", "Pieza intruida", null, null, PIEZA, SimboloHallazgo.FLECHA_ABAJO, SIEMPRE_ROJO, "POSICION_VERTICAL", false, NINGUNO, NINGUNO),
-            new TipoDemo("GIROVERSION", "Giroversión", null, null, PIEZA, SimboloHallazgo.FLECHA_GIRO, SIEMPRE_ROJO, "GIRO", false, NINGUNO, NINGUNO),
-            new TipoDemo("MOVILIDAD", "Movilidad patológica", null, "[\"M1\",\"M2\",\"M3\"]", PIEZA, SimboloHallazgo.SOLO_SIGLA, SIEMPRE_ROJO, "MOVILIDAD", false, NINGUNO, NINGUNO),
-            new TipoDemo("DIASTEMA", "Diastema", null, null, ENTRE_PIEZAS, SimboloHallazgo.PARENTESIS, SIEMPRE_ROJO, "DIASTEMA", false, NINGUNO, NINGUNO),
-            new TipoDemo("PROTESIS_FIJA", "Prótesis fija", null, null, RANGO_PIEZAS, SimboloHallazgo.PUENTE, POR_ESTADO, "PROTESIS_FIJA", false, NINGUNO, NINGUNO),
-            new TipoDemo("PROTESIS_REMOVIBLE", "Prótesis removible", null, null, RANGO_PIEZAS, SimboloHallazgo.LLAVE, POR_ESTADO, "PROTESIS_REMOVIBLE", false, NINGUNO, NINGUNO),
-            new TipoDemo("ORTODONCIA_FIJA", "Aparato ortodóntico fijo", null, null, RANGO_PIEZAS, SimboloHallazgo.LLAVE, POR_ESTADO, "ORTODONCIA", false, NINGUNO, NINGUNO));
+            new TipoDemo("CARIES", "Lesión de caries dental", null, "[\"MB\",\"CE\",\"CD\",\"CDP\"]", SUPERFICIE, SimboloHallazgo.RELLENO, SIEMPRE_ROJO, "SUPERFICIE", false, C, C),   // 6.1.16
+            new TipoDemo("RESTAURACION_DEFINITIVA", "Restauración definitiva", null, "[\"AM\",\"R\",\"IV\",\"IM\",\"IE\",\"C\"]", SUPERFICIE, SimboloHallazgo.RELLENO, POR_ESTADO, "SUPERFICIE", false, O, O),   // 6.1.33
+            new TipoDemo("RESTAURACION_TEMPORAL", "Restauración temporal", null, null, SUPERFICIE, SimboloHallazgo.CONTORNO_SUPERFICIE, SIEMPRE_ROJO, "SUPERFICIE", false, O, O),   // 6.1.34
+            new TipoDemo("SELLANTE", "Sellante", "S", null, SUPERFICIE, SimboloHallazgo.TRAZO_FOSAS, POR_ESTADO, "SUPERFICIE_SELLANTE", false, NINGUNO, NINGUNO),   // 6.1.35
+            new TipoDemo("SUPERFICIE_DESGASTADA", "Superficie desgastada", "DES", null, SUPERFICIE, SimboloHallazgo.LINEA_DESGASTE, SIEMPRE_ROJO, "DESGASTE", false, NINGUNO, NINGUNO),   // 6.1.36
+            new TipoDemo("FOSAS_FISURAS_PROFUNDAS", "Fosas y fisuras profundas", "FFP", null, PIEZA, SimboloHallazgo.SOLO_SIGLA, SIEMPRE_AZUL, "FOSAS_FISURAS", false, NINGUNO, NINGUNO),   // 6.1.9
+            new TipoDemo("DEFECTO_ESMALTE", "Defecto de desarrollo del esmalte (DDE)", null, "[\"O\",\"PE\"]", PIEZA, SimboloHallazgo.SOLO_SIGLA, SIEMPRE_ROJO, "ESMALTE", false, NINGUNO, NINGUNO),   // 6.1.5
+            new TipoDemo("PIEZA_AUSENTE_DEX", "Pieza ausente por caries (DEX)", "DEX", null, PIEZA, SimboloHallazgo.ASPA, SIEMPRE_AZUL, "ESTADO_PIEZA", true, P, E),   // 6.1.20
+            new TipoDemo("PIEZA_AUSENTE_DNE", "Pieza no erupcionada (DNE)", "DNE", null, PIEZA, SimboloHallazgo.ASPA, SIEMPRE_AZUL, "ESTADO_PIEZA", true, NINGUNO, NINGUNO),   // 6.1.20
+            new TipoDemo("PIEZA_AUSENTE_DAO", "Pieza ausente por otras razones (DAO)", "DAO", null, PIEZA, SimboloHallazgo.ASPA, SIEMPRE_AZUL, "ESTADO_PIEZA", true, NINGUNO, NINGUNO),   // 6.1.20
+            new TipoDemo("REMANENTE_RADICULAR", "Remanente radicular", "RR", null, PIEZA, SimboloHallazgo.SOLO_SIGLA, SIEMPRE_ROJO, "ESTADO_PIEZA", false, C, E),   // 6.1.32
+            new TipoDemo("IMPLANTE", "Implante dental", "IMP", null, PIEZA, SimboloHallazgo.SOLO_SIGLA, POR_ESTADO, "ESTADO_PIEZA", false, P, NINGUNO),   // 6.1.15
+            new TipoDemo("PIEZA_EN_ERUPCION", "Pieza dentaria en erupción", null, null, PIEZA, SimboloHallazgo.FLECHA_ZIGZAG, SIEMPRE_AZUL, "ESTADO_PIEZA", false, NINGUNO, NINGUNO),   // 6.1.23
+            new TipoDemo("CORONA", "Corona", null, "[\"CM\",\"CF\",\"CMC\",\"CV\",\"CLM\"]", PIEZA, SimboloHallazgo.CUADRADO_CORONA, POR_ESTADO, "CORONA", false, O, O),   // 6.1.3
+            new TipoDemo("CORONA_TEMPORAL", "Corona temporal", "CT", null, PIEZA, SimboloHallazgo.CUADRADO_CORONA, SIEMPRE_ROJO, "CORONA", false, O, O),   // 6.1.4
+            new TipoDemo("ESPIGO_MUNON", "Espigo-muñón", null, null, PIEZA, SimboloHallazgo.ESPIGO_MUNON, POR_ESTADO, "ESPIGO", false, NINGUNO, NINGUNO),   // 6.1.8
+            new TipoDemo("TRATAMIENTO_CONDUCTOS", "Tratamiento de conductos", null, "[\"TC\",\"PC\"]", PIEZA, SimboloHallazgo.LINEA_RAIZ, POR_ESTADO, "PULPAR", false, NINGUNO, NINGUNO),   // 6.1.37
+            new TipoDemo("PULPOTOMIA", "Pulpotomía", "PP", null, PIEZA, SimboloHallazgo.PULPA_CORONAL, POR_ESTADO, "PULPAR", false, NINGUNO, NINGUNO),   // 6.1.27
+            new TipoDemo("FRACTURA", "Fractura dental", null, null, PIEZA, SimboloHallazgo.LINEA_FRACTURA, SIEMPRE_ROJO, "FRACTURA", false, NINGUNO, NINGUNO),   // 6.1.10
+            new TipoDemo("MOVILIDAD", "Movilidad patológica", null, "[\"M1\",\"M2\",\"M3\"]", PIEZA, SimboloHallazgo.SOLO_SIGLA, SIEMPRE_ROJO, "MOVILIDAD", false, NINGUNO, NINGUNO),   // 6.1.19
+            new TipoDemo("PIEZA_EXTRUIDA", "Pieza dentaria extruida", null, null, PIEZA, SimboloHallazgo.FLECHA_EXTRUSION, SIEMPRE_AZUL, "POSICION_VERTICAL", false, NINGUNO, NINGUNO),   // 6.1.24
+            new TipoDemo("PIEZA_INTRUIDA", "Pieza dentaria intruida", null, null, PIEZA, SimboloHallazgo.FLECHA_INTRUSION, SIEMPRE_AZUL, "POSICION_VERTICAL", false, NINGUNO, NINGUNO),   // 6.1.25
+            new TipoDemo("GIROVERSION", "Giroversión", null, null, PIEZA, SimboloHallazgo.FLECHA_GIRO, SIEMPRE_AZUL, "GIRO", false, NINGUNO, NINGUNO),   // 6.1.13
+            new TipoDemo("POSICION_ANORMAL", "Posición anormal dentaria", null, "[\"M\",\"D\",\"V\",\"P\",\"L\"]", PIEZA, SimboloHallazgo.SOLO_SIGLA, SIEMPRE_AZUL, "POSICION", false, NINGUNO, NINGUNO),   // 6.1.28
+            new TipoDemo("PIEZA_ECTOPICA", "Pieza dentaria ectópica", "E", null, PIEZA, SimboloHallazgo.SOLO_SIGLA, SIEMPRE_AZUL, "ECTOPICA", false, NINGUNO, NINGUNO),   // 6.1.22
+            new TipoDemo("IMPACTACION", "Impactación", "I", null, PIEZA, SimboloHallazgo.SOLO_SIGLA, SIEMPRE_AZUL, "IMPACTACION", false, NINGUNO, NINGUNO),   // 6.1.14
+            new TipoDemo("MACRODONCIA", "Macrodoncia", "MAC", null, PIEZA, SimboloHallazgo.SOLO_SIGLA, SIEMPRE_AZUL, "TAMANO", false, NINGUNO, NINGUNO),   // 6.1.17
+            new TipoDemo("MICRODONCIA", "Microdoncia", "MIC", null, PIEZA, SimboloHallazgo.SOLO_SIGLA, SIEMPRE_AZUL, "TAMANO", false, NINGUNO, NINGUNO),   // 6.1.18
+            new TipoDemo("PIEZA_CLAVIJA", "Pieza dentaria en clavija", null, null, PIEZA, SimboloHallazgo.TRIANGULO_RAIZ, SIEMPRE_AZUL, "CLAVIJA", false, NINGUNO, NINGUNO),   // 6.1.21
+            new TipoDemo("GEMINACION", "Geminación", null, null, PIEZA, SimboloHallazgo.CIRCULO_NUMERO, SIEMPRE_AZUL, "GEMINACION", false, NINGUNO, NINGUNO),   // 6.1.12
+            new TipoDemo("DIASTEMA", "Diastema", null, null, ENTRE_PIEZAS, SimboloHallazgo.PARENTESIS, SIEMPRE_AZUL, "DIASTEMA", false, NINGUNO, NINGUNO),   // 6.1.6
+            new TipoDemo("FUSION", "Fusión", null, null, ENTRE_PIEZAS, SimboloHallazgo.CIRCULOS_NUMEROS, SIEMPRE_AZUL, "FUSION", false, NINGUNO, NINGUNO),   // 6.1.11
+            new TipoDemo("TRANSPOSICION", "Transposición dentaria", null, null, ENTRE_PIEZAS, SimboloHallazgo.FLECHAS_CRUZADAS, SIEMPRE_AZUL, "TRANSPOSICION", false, NINGUNO, NINGUNO),   // 6.1.38
+            new TipoDemo("PIEZA_SUPERNUMERARIA", "Pieza dentaria supernumeraria", null, null, ENTRE_PIEZAS, SimboloHallazgo.CIRCULO_S, SIEMPRE_AZUL, "SUPERNUMERARIA", false, NINGUNO, NINGUNO),   // 6.1.26
+            new TipoDemo("PROTESIS_FIJA", "Prótesis dental parcial fija", null, null, RANGO_PIEZAS, SimboloHallazgo.PUENTE, POR_ESTADO, "PROTESIS_FIJA", false, NINGUNO, NINGUNO),   // 6.1.29
+            new TipoDemo("PROTESIS_REMOVIBLE", "Prótesis dental parcial removible", null, null, RANGO_PIEZAS, SimboloHallazgo.LINEAS_PARALELAS, POR_ESTADO, "PROTESIS_REMOVIBLE", false, NINGUNO, NINGUNO),   // 6.1.31
+            new TipoDemo("PROTESIS_COMPLETA", "Prótesis dental completa", null, null, RANGO_PIEZAS, SimboloHallazgo.LINEAS_PARALELAS, POR_ESTADO, "PROTESIS_COMPLETA", false, NINGUNO, NINGUNO),   // 6.1.30
+            new TipoDemo("APARATO_ORTODONTICO_FIJO", "Aparato ortodóntico fijo", null, null, RANGO_PIEZAS, SimboloHallazgo.CUADROS_APICES, POR_ESTADO, "ORTODONCIA_FIJA", false, NINGUNO, NINGUNO),   // 6.1.1
+            new TipoDemo("APARATO_ORTODONTICO_REMOVIBLE", "Aparato ortodóntico removible", null, null, RANGO_PIEZAS, SimboloHallazgo.ZIGZAG_APICES, POR_ESTADO, "ORTODONCIA_REMOVIBLE", false, NINGUNO, NINGUNO),   // 6.1.2
+            new TipoDemo("EDENTULO_TOTAL", "Edéntulo total", null, null, RANGO_PIEZAS, SimboloHallazgo.LINEA_CORONAS, SIEMPRE_AZUL, "EDENTULO", true, P, E));   // 6.1.7
 
     static final List<ProcedimientoDemo> PROCEDIMIENTOS = List.of(
             new ProcedimientoDemo("CONS", "Consulta y diagnóstico", DIAGNOSTICO, "50.00", BOCA, 30),
@@ -135,11 +157,11 @@ public class CatalogoSeeder implements ApplicationRunner {
             new ReglaDemo("RESTAURACION_TEMPORAL", null, null, 2, 5, "RES-C", 2, 33),
             new ReglaDemo("RESTAURACION_DEFINITIVA", EstadoHallazgo.MALO, null, 1, 1, "RES-S", 2, 34),
             new ReglaDemo("RESTAURACION_DEFINITIVA", EstadoHallazgo.MALO, null, 2, 5, "RES-C", 2, 35),
-            new ReglaDemo("TRATAMIENTO_PULPAR", EstadoHallazgo.MALO, TipoRadicular.UNIRRADICULAR, 0, 5, "ENDO-U", 1, 40),
-            new ReglaDemo("TRATAMIENTO_PULPAR", EstadoHallazgo.MALO, TipoRadicular.BIRRADICULAR, 0, 5, "ENDO-B", 1, 41),
-            new ReglaDemo("TRATAMIENTO_PULPAR", EstadoHallazgo.MALO, TipoRadicular.MULTIRRADICULAR, 0, 5, "ENDO-M", 1, 42),
+            new ReglaDemo("TRATAMIENTO_CONDUCTOS", EstadoHallazgo.MALO, TipoRadicular.UNIRRADICULAR, 0, 5, "ENDO-U", 1, 40),
+            new ReglaDemo("TRATAMIENTO_CONDUCTOS", EstadoHallazgo.MALO, TipoRadicular.BIRRADICULAR, 0, 5, "ENDO-B", 1, 41),
+            new ReglaDemo("TRATAMIENTO_CONDUCTOS", EstadoHallazgo.MALO, TipoRadicular.MULTIRRADICULAR, 0, 5, "ENDO-M", 1, 42),
             new ReglaDemo("CORONA_TEMPORAL", null, null, 0, 5, "CORO-MC", 3, 50),
-            new ReglaDemo("CORONA_DEFINITIVA", EstadoHallazgo.MALO, null, 0, 5, "CORO-MC", 3, 51),
+            new ReglaDemo("CORONA", EstadoHallazgo.MALO, null, 0, 5, "CORO-MC", 3, 51),
             new ReglaDemo("MOVILIDAD", null, null, 0, 5, "DEST", 2, 60));
 
     private final HallazgoTipoRepository hallazgoTipoRepository;

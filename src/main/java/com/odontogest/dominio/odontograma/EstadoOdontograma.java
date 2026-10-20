@@ -91,6 +91,34 @@ public final class EstadoOdontograma {
         return vigentes;
     }
 
+    /** Hallazgos de rango vigentes que incluyen la pieza (p. ej. edéntulo total 18–28 cubre la 14). */
+    public List<HallazgoEvento> rangosQueCubren(int fdi) {
+        PiezaDental pieza = PiezaDental.de(fdi);
+        return rangos.stream()
+                .filter(r -> PiezaDental.rango(r.pieza(), r.piezaFin()).contains(pieza))
+                .toList();
+    }
+
+    /** La pieza no muestra superficies: por un hallazgo propio (pieza ausente) o por un rango (edéntulo total). */
+    public boolean superficiesOcultas(int fdi) {
+        return pieza(fdi).map(EstadoPieza::superficiesOcultas).orElse(false)
+                || rangosQueCubren(fdi).stream().anyMatch(r -> r.tipo().ocultaSuperficies());
+    }
+
+    /**
+     * Hallazgos que se dibujan y cuentan para la pieza (índices y sugerencias): los propios, sin los de
+     * superficie si la pieza las oculta, más los rangos que la cubren.
+     */
+    public List<HallazgoEvento> hallazgosVisibles(int fdi) {
+        boolean ocultas = superficiesOcultas(fdi);
+        List<HallazgoEvento> visibles = new ArrayList<>();
+        pieza(fdi).ifPresent(p -> p.hallazgos().stream()
+                .filter(h -> !(ocultas && h.esDeSuperficie()))
+                .forEach(visibles::add));
+        visibles.addAll(rangosQueCubren(fdi));
+        return List.copyOf(visibles);
+    }
+
     public Optional<HallazgoEvento> enSuperficie(int fdi, Superficie superficie, String capa) {
         return Optional.ofNullable(vigentes.get(new ClaveCapa(fdi, fdi, superficie, capa)));
     }

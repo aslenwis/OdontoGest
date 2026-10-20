@@ -165,6 +165,12 @@ class MotorSugerenciasTest {
     }
 
     @Test
+    void cariesBajoEdentuloTotalNoGeneraRestauracion() {
+        List<ItemSugerido> items = sugerir(sup(CARIES, 16, 0, Superficie.O), rango(EDENTULO_TOTAL, 18, 28, 10, null));
+        assertThat(items).extracting(ItemSugerido::piezaFdi).containsOnlyNulls();
+    }
+
+    @Test
     void reglaConProcedimientoInexistenteFalla() {
         List<ReglaSugerenciaDef> reglas = List.of(new ReglaSugerenciaDef(1, null, null, null, 0, 5, 999, 1, 1));
         assertThatThrownBy(() -> motor.sugerir(EstadoOdontograma.vacio(), reglas, TARIFARIO))
