@@ -8,8 +8,7 @@ package com.odontogest.dominio.odontograma;
 /**
  * Superficie de la corona dental con su bit en la máscara persistida (rango 0–31).
  * <p>
- * O se rotula "I" (incisal) en piezas anteriores y L se rotula "P" (palatino) en superiores;
- * ese rotulado depende de la pieza y se agrega en la Fase 1 junto con {@code PiezaDental}.
+ * O se rotula "I" (incisal) en piezas anteriores y L se rotula "P" (palatino) en piezas superiores.
  */
 public enum Superficie {
     O(1), M(2), D(4), V(8), L(16);
@@ -18,5 +17,25 @@ public enum Superficie {
 
     Superficie(int bit) {
         this.bit = bit;
+    }
+
+    /** Sigla visible para la pieza: O/I, M, D, V, L/P. */
+    public String etiqueta(PiezaDental pieza) {
+        return switch (this) {
+            case O -> pieza.esAnterior() ? "I" : "O";
+            case L -> pieza.arcada() == Arcada.SUPERIOR ? "P" : "L";
+            default -> name();
+        };
+    }
+
+    /** Nombre completo para la pieza, p. ej. "Oclusal", "Incisal", "Palatino". */
+    public String nombre(PiezaDental pieza) {
+        return switch (this) {
+            case O -> pieza.esAnterior() ? "Incisal" : "Oclusal";
+            case M -> "Mesial";
+            case D -> "Distal";
+            case V -> "Vestibular";
+            case L -> pieza.arcada() == Arcada.SUPERIOR ? "Palatino" : "Lingual";
+        };
     }
 }

@@ -5,6 +5,7 @@
  */
 package com.odontogest.ui.soporte;
 
+import com.odontogest.dominio.comun.ReglaDominioException;
 import com.odontogest.excepcion.IntegracionException;
 import com.odontogest.excepcion.NegocioException;
 import com.odontogest.excepcion.PermisoDenegadoException;
@@ -80,7 +81,8 @@ public class TareaUi {
     /** Tratamiento por defecto de errores; los callbacks propios pueden delegar aquí. */
     public void manejarError(Throwable error) {
         Throwable causa = causaConocida(error);
-        if (causa instanceof NegocioException || causa instanceof PermisoDenegadoException) {
+        if (causa instanceof NegocioException || causa instanceof ReglaDominioException
+                || causa instanceof PermisoDenegadoException) {
             notificador.advertencia(causa.getMessage());
         } else if (causa instanceof ConstraintViolationException cve) {
             notificador.advertencia(cve.getConstraintViolations().stream()
@@ -97,7 +99,7 @@ public class TareaUi {
     /** Busca en la cadena de causas una excepción con mensaje para el usuario. */
     private static Throwable causaConocida(Throwable error) {
         for (Throwable t = error; t != null; t = t.getCause()) {
-            if (t instanceof NegocioException || t instanceof PermisoDenegadoException
+            if (t instanceof NegocioException || t instanceof ReglaDominioException || t instanceof PermisoDenegadoException
                     || t instanceof IntegracionException || t instanceof ConstraintViolationException) {
                 return t;
             }

@@ -16,7 +16,7 @@ Proyecto del curso de Ingeniería de Software, destinado a registro ante INDECOP
 
 ## Comandos
 - Ejecutar en desarrollo: `mvn javafx:run` (o `mvn spring-boot:run`).
-- Pruebas: `mvn test`
+- Pruebas: `mvn test` (incluye JaCoCo: reporte en `target/site/jacoco/index.html`; falla si `dominio` < 70 % de instrucciones)
 - JAR ejecutable: `mvn clean package` → `target/odontogest.jar`
 - Distribución Windows sin Java instalado: `mvn clean package -Pempaquetar` (ejecutar en Windows) → `target/dist/OdontoGest/`
 
