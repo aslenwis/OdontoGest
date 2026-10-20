@@ -1,0 +1,54 @@
+/*
+ * OdontoGest - estilos generales. Usa las variables de color de AtlantaFX (-color-*),
+ * por eso funcionan igual con PrimerLight y PrimerDark.
+ */
+
+/* ---------------------------------------------------------------- Login */
+.login-fondo {
+    -fx-background-color: -color-bg-subtle;
+}
+
+.login-tarjeta {
+    -fx-background-color: -color-bg-default;
+    -fx-background-radius: 12;
+    -fx-border-color: -color-border-default;
+    -fx-border-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.12), 24, 0, 0, 6);
+}
+
+.login-marca {
+    -fx-text-fill: -color-fg-default;
+    -fx-graphic-text-gap: 10;
+}
+
+.login-icono {
+    -fx-icon-color: -color-accent-emphasis;
+}
+
+.login-etiqueta {
+    -fx-font-weight: bold;
+    -fx-padding: 6 0 0 0;
+}
+
+/* ---------------------------------------------------------------- Ventana principal */
+.sidebar {
+    -fx-background-color: -color-bg-subtle;
+    -fx-border-color: transparent -color-border-default transparent transparent;
+    -fx-border-width: 0 1 0 0;
+}
+
+.sidebar-marca {
+    -fx-text-fill: -color-fg-default;
+    -fx-graphic-text-gap: 8;
+    -fx-padding: 0 0 8 4;
+}
+
+.barra-superior {
+    -fx-background-color: -color-bg-default;
+    -fx-border-color: transparent transparent -color-border-default transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.contenido {
+    -fx-background-color: -color-bg-default;
+}

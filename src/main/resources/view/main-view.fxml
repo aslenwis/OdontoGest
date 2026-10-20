@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import atlantafx.base.controls.ModalPane?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<StackPane fx:id="raiz" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.odontogest.ui.controlador.MainController">
+
+    <BorderPane>
+        <left>
+            <VBox styleClass="sidebar" prefWidth="230" spacing="8">
+                <padding><Insets top="16" right="12" bottom="16" left="12"/></padding>
+
+                <Label text="OdontoGest" styleClass="title-3, sidebar-marca">
+                    <graphic><FontIcon iconLiteral="fth-activity" iconSize="22" styleClass="login-icono"/></graphic>
+                </Label>
+                <Separator/>
+
+                <!-- Los módulos se agregan a partir de la Fase 2 -->
+                <VBox fx:id="menu" spacing="4" VBox.vgrow="ALWAYS"/>
+
+                <Separator/>
+                <Button fx:id="btnTema" maxWidth="Infinity" alignment="CENTER_LEFT" styleClass="flat"
+                        onAction="#onAlternarTema"/>
+            </VBox>
+        </left>
+
+        <top>
+            <HBox styleClass="barra-superior" alignment="CENTER_LEFT" spacing="12">
+                <padding><Insets top="10" right="16" bottom="10" left="20"/></padding>
+                <Label fx:id="lblTitulo" text="Inicio" styleClass="title-4"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <FontIcon iconLiteral="fth-user" iconSize="18"/>
+                <VBox alignment="CENTER_LEFT">
+                    <Label fx:id="lblUsuario" styleClass="text-bold"/>
+                    <Label fx:id="lblRol" styleClass="text-muted, text-small"/>
+                </VBox>
+                <Button text="Cerrar sesión" styleClass="flat" onAction="#onCerrarSesion">
+                    <graphic><FontIcon iconLiteral="fth-log-out"/></graphic>
+                </Button>
+            </HBox>
+        </top>
+
+        <center>
+            <StackPane fx:id="contenido" styleClass="contenido">
+                <VBox alignment="CENTER" spacing="8">
+                    <FontIcon iconLiteral="fth-activity" iconSize="48" styleClass="login-icono"/>
+                    <Label fx:id="lblBienvenida" styleClass="title-2"/>
+                    <Label text="Seleccione un módulo del menú lateral." styleClass="text-muted"/>
+                </VBox>
+            </StackPane>
+        </center>
+    </BorderPane>
+
+    <VBox fx:id="zonaToasts" spacing="8" maxWidth="380" maxHeight="-Infinity" pickOnBounds="false"
+          StackPane.alignment="TOP_RIGHT">
+        <StackPane.margin><Insets top="64" right="16"/></StackPane.margin>
+    </VBox>
+
+    <ModalPane fx:id="modal"/>
+</StackPane>
