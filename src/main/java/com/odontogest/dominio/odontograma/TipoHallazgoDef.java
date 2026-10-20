@@ -13,18 +13,19 @@ import java.util.Objects;
  * salen de aquí: el código no tiene reglas clínicas "quemadas".
  *
  * @param siglasOpciones   siglas entre las que el usuario debe elegir (vacía si no aplica)
- * @param simbolo          nombre del símbolo de dibujo (columna {@code simbolo}, p. ej. {@code ASPA})
+ * @param simbolo          forma de dibujo (columna {@code simbolo})
  * @param grupoExclusion   capa: un hallazgo nuevo de la misma capa reemplaza al anterior
  * @param ocultaSuperficies la pieza deja de mostrar sus superficies (p. ej. pieza ausente)
  */
 public record TipoHallazgoDef(
         long id, String codigo, String nombre, String sigla, List<String> siglasOpciones,
-        Representacion representacion, String simbolo, ReglaColor reglaColor, String grupoExclusion,
+        Representacion representacion, SimboloHallazgo simbolo, ReglaColor reglaColor, String grupoExclusion,
         boolean ocultaSuperficies, ConteoIndice conteoCpod, ConteoIndice conteoCeod) {
 
     public TipoHallazgoDef {
         Objects.requireNonNull(codigo, "codigo");
         Objects.requireNonNull(representacion, "representacion");
+        Objects.requireNonNull(simbolo, "simbolo");
         Objects.requireNonNull(reglaColor, "reglaColor");
         Objects.requireNonNull(grupoExclusion, "grupoExclusion");
         siglasOpciones = siglasOpciones == null ? List.of() : List.copyOf(siglasOpciones);

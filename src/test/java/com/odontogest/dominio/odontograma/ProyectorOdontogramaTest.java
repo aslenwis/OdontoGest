@@ -202,13 +202,13 @@ class ProyectorOdontogramaTest {
 
     @Test
     void elCatalogoRechazaComponentesDeIndiceIncoherentes() {
-        assertThatThrownBy(() -> new TipoHallazgoDef(1, "X", "X", null, null, Representacion.PIEZA, "ASPA",
+        assertThatThrownBy(() -> new TipoHallazgoDef(1, "X", "X", null, null, Representacion.PIEZA, SimboloHallazgo.ASPA,
                 ReglaColor.SIEMPRE_AZUL, "C", false, ConteoIndice.E, ConteoIndice.NINGUNO))
                 .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> new TipoHallazgoDef(1, "X", "X", null, null, Representacion.PIEZA, "ASPA",
+        assertThatThrownBy(() -> new TipoHallazgoDef(1, "X", "X", null, null, Representacion.PIEZA, SimboloHallazgo.ASPA,
                 ReglaColor.SIEMPRE_AZUL, "C", false, ConteoIndice.NINGUNO, ConteoIndice.P))
                 .isInstanceOf(IllegalArgumentException.class);
-        TipoHallazgoDef sinConteos = new TipoHallazgoDef(1, "X", "X", null, null, Representacion.PIEZA, "ASPA",
+        TipoHallazgoDef sinConteos = new TipoHallazgoDef(1, "X", "X", null, null, Representacion.PIEZA, SimboloHallazgo.ASPA,
                 ReglaColor.SIEMPRE_AZUL, "C", false, null, null);
         assertThat(sinConteos.conteoCpod()).isEqualTo(ConteoIndice.NINGUNO);
         assertThat(sinConteos.siglasOpciones()).isEmpty();

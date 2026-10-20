@@ -9,6 +9,7 @@ import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
+import jakarta.persistence.Entity;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
@@ -19,10 +20,20 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 @AnalyzeClasses(packages = "com.odontogest", importOptions = ImportOption.DoNotIncludeTests.class)
 class ArquitecturaTest {
 
+    /*
+     * La UI sí puede usar los enums de modelo (TipoDocumento, Sexo, Rol...), que son valores, no entidades:
+     * lo prohibido son las entidades JPA (riesgo de LazyInitializationException) y los repositorios.
+     */
     @ArchTest
-    static final ArchRule ui_no_usa_persistencia_ni_entidades = noClasses()
+    static final ArchRule ui_no_usa_persistencia = noClasses()
             .that().resideInAPackage("com.odontogest.ui..")
-            .should().dependOnClassesThat().resideInAnyPackage("com.odontogest.persistencia..", "com.odontogest.modelo..")
+            .should().dependOnClassesThat().resideInAPackage("com.odontogest.persistencia..")
+            .because("los controladores pasan siempre por los servicios");
+
+    @ArchTest
+    static final ArchRule ui_no_usa_entidades = noClasses()
+            .that().resideInAPackage("com.odontogest.ui..")
+            .should().dependOnClassesThat().areAnnotatedWith(Entity.class)
             .because("los controladores solo intercambian DTO record con los servicios");
 
     @ArchTest
@@ -44,7 +55,18 @@ class ArquitecturaTest {
     @ArchTest
     static final ArchRule dto_no_expone_entidades = noClasses()
             .that().resideInAPackage("com.odontogest.servicio.dto..")
-            .should().dependOnClassesThat().resideInAPackage("com.odontogest.modelo..");
+            .should().dependOnClassesThat().areAnnotatedWith(Entity.class);
+
+    @ArchTest
+    static final ArchRule entidades_en_modelo = classes()
+            .that().areAnnotatedWith(Entity.class)
+            .should().resideInAPackage("com.odontogest.modelo..");
+
+    @ArchTest
+    static final ArchRule documentos_solo_usan_dto = noClasses()
+            .that().resideInAPackage("com.odontogest.documento..")
+            .should().dependOnClassesThat().resideInAnyPackage("com.odontogest.persistencia..", "com.odontogest.ui..")
+            .orShould().dependOnClassesThat().areAnnotatedWith(Entity.class);
 
     @ArchTest
     static final ArchRule backend_no_usa_javafx = noClasses()

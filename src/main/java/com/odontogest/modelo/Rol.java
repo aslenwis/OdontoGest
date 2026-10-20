@@ -9,5 +9,11 @@ package com.odontogest.modelo;
  * Rol de un usuario del sistema (columna {@code usuario.rol}).
  */
 public enum Rol {
-    ADMIN, ODONTOLOGO, RECEPCION
+    ADMIN("Administrador"), ODONTOLOGO("Odontólogo"), RECEPCION("Recepción");
+
+    public final String etiqueta;
+
+    Rol(String etiqueta) {
+        this.etiqueta = etiqueta;
+    }
 }

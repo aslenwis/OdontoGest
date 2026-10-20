@@ -1,0 +1,17 @@
+Yo, {FIRMANTE}, identificado(a) con {DOCUMENTO_FIRMANTE}, en calidad de {CALIDAD_FIRMANTE}, declaro que {CLINICA} (RUC {RUC}), con domicilio en {DIRECCION_CLINICA}, me ha informado de manera previa, expresa e inequívoca sobre el tratamiento de los datos personales de {PACIENTE} (historia clínica {HISTORIA}), conforme a la Ley N° 29733, Ley de Protección de Datos Personales, y su Reglamento.
+
+1. Datos que se recopilan: datos de identificación y de contacto, y datos de salud (anamnesis, odontograma, diagnósticos, tratamientos, radiografías y fotografías clínicas). Los datos de salud son datos sensibles y reciben protección especial.
+
+2. Finalidad: brindar la atención odontológica, elaborar y conservar la historia clínica, gestionar citas, presupuestos y pagos y, solo si el paciente lo autoriza, enviar recordatorios de citas.
+
+3. Banco de datos y conservación: la información se registra en el banco de datos de pacientes de {CLINICA} y se conserva durante el plazo que establece la normativa sobre historias clínicas, con medidas de seguridad que impiden su acceso no autorizado.
+
+4. Destinatarios: los datos no se ceden a terceros, salvo obligación legal o requerimiento de una autoridad competente.
+
+5. Derechos del titular: se pueden ejercer los derechos de información, acceso, rectificación, cancelación y oposición (derechos ARCO) presentando una solicitud en {DIRECCION_CLINICA} o al correo {EMAIL_CLINICA}. Este consentimiento puede revocarse en cualquier momento, sin efecto retroactivo.
+
+6. Consecuencias de no otorgar el consentimiento: los datos de identificación y de salud son necesarios para la atención; sin ellos no es posible elaborar la historia clínica.
+
+Habiendo sido informado(a) de lo anterior, OTORGO mi consentimiento libre, previo, expreso e informado para el tratamiento de los datos personales descritos.
+
+Fecha: {FECHA}

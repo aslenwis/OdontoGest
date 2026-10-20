@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.odontogest.ui.controlador.AnamnesisController"
+            fitToWidth="true" styleClass="edge-to-edge">
+    <VBox spacing="14" maxWidth="900">
+        <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+        <GridPane hgap="16" vgap="10">
+            <columnConstraints>
+                <ColumnConstraints percentWidth="50"/>
+                <ColumnConstraints percentWidth="50"/>
+            </columnConstraints>
+            <Label text="Alergias" styleClass="text-bold" GridPane.rowIndex="0"/>
+            <TextArea fx:id="txtAlergias" prefRowCount="3" wrapText="true"
+                      promptText="Medicamentos, látex, anestésicos…" GridPane.rowIndex="1"/>
+            <Label text="Medicación actual" styleClass="text-bold" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+            <TextArea fx:id="txtMedicacion" prefRowCount="3" wrapText="true" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+            <Label text="Antecedentes médicos" styleClass="text-bold" GridPane.rowIndex="2"/>
+            <TextArea fx:id="txtAntecedentes" prefRowCount="3" wrapText="true" GridPane.rowIndex="3"/>
+            <Label text="Hábitos" styleClass="text-bold" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+            <TextArea fx:id="txtHabitos" prefRowCount="3" wrapText="true"
+                      promptText="Bruxismo, onicofagia, respiración bucal…" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+        </GridPane>
+
+        <Label text="Enfermedades sistémicas" styleClass="text-bold"/>
+        <FlowPane fx:id="panelEnfermedades" hgap="18" vgap="10"/>
+
+        <HBox spacing="24" alignment="CENTER_LEFT">
+            <CheckBox fx:id="chkFuma" text="Fuma"/>
+            <CheckBox fx:id="chkGestante" text="Gestante"/>
+            <Label text="Presión arterial"/>
+            <TextField fx:id="txtPresion" promptText="120/80" prefWidth="100"/>
+            <Label text="mmHg" styleClass="text-muted"/>
+        </HBox>
+
+        <Label text="Observaciones" styleClass="text-bold"/>
+        <TextArea fx:id="txtObservaciones" prefRowCount="3" wrapText="true"/>
+
+        <HBox spacing="8" alignment="CENTER_LEFT">
+            <Label fx:id="lblActualizado" styleClass="text-muted, text-small"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="btnGuardar" text="Guardar anamnesis" styleClass="accent" onAction="#onGuardar">
+                <graphic><FontIcon iconLiteral="fth-save"/></graphic>
+            </Button>
+        </HBox>
+    </VBox>
+</ScrollPane>

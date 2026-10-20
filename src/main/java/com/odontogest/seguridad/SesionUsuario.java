@@ -6,6 +6,7 @@
 package com.odontogest.seguridad;
 
 import com.odontogest.excepcion.PermisoDenegadoException;
+import com.odontogest.modelo.Rol;
 import com.odontogest.servicio.dto.UsuarioSesion;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +16,6 @@ import java.util.Optional;
  * Usuario con sesión iniciada (bean singleton: la aplicación es monousuario por instancia).
  * <p>
  * Se escribe desde hilos de fondo y se lee desde el hilo de UI, por eso el campo es {@code volatile}.
- * La matriz de permisos ({@code tiene}/{@code exigir}) se agrega en la Fase 2.
  */
 @Component
 public class SesionUsuario {
@@ -43,6 +43,20 @@ public class SesionUsuario {
         UsuarioSesion u = actual;
         if (u == null) {
             throw new PermisoDenegadoException("No hay una sesión activa. Inicie sesión nuevamente.");
+        }
+        return u;
+    }
+
+    public boolean tiene(Permiso permiso) {
+        UsuarioSesion u = actual;
+        return u != null && permiso.permite(Rol.valueOf(u.rol()));
+    }
+
+    /** Verifica el permiso y devuelve el usuario actual. */
+    public UsuarioSesion exigir(Permiso permiso) {
+        UsuarioSesion u = exigirUsuario();
+        if (!permiso.permite(Rol.valueOf(u.rol()))) {
+            throw new PermisoDenegadoException("No tiene permiso para " + permiso.descripcion + ".");
         }
         return u;
     }

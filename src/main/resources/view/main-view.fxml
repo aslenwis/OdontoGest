@@ -25,7 +25,7 @@
                 </Label>
                 <Separator/>
 
-                <!-- Los módulos se agregan a partir de la Fase 2 -->
+                <!-- Lo llena MainController según los permisos del usuario -->
                 <VBox fx:id="menu" spacing="4" VBox.vgrow="ALWAYS"/>
 
                 <Separator/>
@@ -44,6 +44,9 @@
                     <Label fx:id="lblUsuario" styleClass="text-bold"/>
                     <Label fx:id="lblRol" styleClass="text-muted, text-small"/>
                 </VBox>
+                <Button text="Contraseña" styleClass="flat" onAction="#onCambiarPassword">
+                    <graphic><FontIcon iconLiteral="fth-key"/></graphic>
+                </Button>
                 <Button text="Cerrar sesión" styleClass="flat" onAction="#onCerrarSesion">
                     <graphic><FontIcon iconLiteral="fth-log-out"/></graphic>
                 </Button>
@@ -52,7 +55,7 @@
 
         <center>
             <StackPane fx:id="contenido" styleClass="contenido">
-                <VBox alignment="CENTER" spacing="8">
+                <VBox fx:id="bienvenida" alignment="CENTER" spacing="8">
                     <FontIcon iconLiteral="fth-activity" iconSize="48" styleClass="login-icono"/>
                     <Label fx:id="lblBienvenida" styleClass="title-2"/>
                     <Label text="Seleccione un módulo del menú lateral." styleClass="text-muted"/>

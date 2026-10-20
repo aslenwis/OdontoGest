@@ -7,6 +7,7 @@ package com.odontogest;
 
 import com.odontogest.servicio.ConfiguracionService;
 import com.odontogest.ui.soporte.CargadorVistas;
+import com.odontogest.ui.soporte.Exportador;
 import com.odontogest.ui.soporte.Tema;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -56,6 +57,7 @@ public class JavaFxApplication extends Application {
             return;
         }
         temaInicial.aplicar();
+        context.getBean(Exportador.class).setHostServices(getHostServices());
         context.getBean(CargadorVistas.class).mostrarLogin(stage);
     }
 

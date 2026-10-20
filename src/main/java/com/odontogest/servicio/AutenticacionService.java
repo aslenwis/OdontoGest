@@ -77,7 +77,8 @@ public class AutenticacionService {
         usuario.setUltimoAcceso(ahora);
 
         UsuarioSesion sesion = new UsuarioSesion(usuario.getId(), usuario.getUsername(),
-                usuario.getNombreCompleto(), usuario.getRol().name(), usuario.getOdontologoId());
+                usuario.getNombreCompleto(), usuario.getRol().name(),
+                usuario.getOdontologo() == null ? null : usuario.getOdontologo().getId());
         sesionUsuario.iniciar(sesion);
         eventos.publishEvent(new SesionIniciada(sesion));
         log.info("Inicio de sesión: {} ({})", sesion.username(), sesion.rol());

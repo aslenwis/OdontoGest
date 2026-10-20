@@ -8,6 +8,8 @@ package com.odontogest;
 import com.odontogest.config.DirectorioDatos;
 import javafx.application.Application;
 
+import java.util.Locale;
+
 /**
  * Punto de entrada del ejecutable.
  * <p>
@@ -20,6 +22,8 @@ public final class Launcher {
     }
 
     public static void main(String[] args) {
+        // Interfaz en español: nombres de meses y días en DatePicker, fechas largas en PDF.
+        Locale.setDefault(Locale.forLanguageTag("es-PE"));
         DirectorioDatos.inicializar();
         // Fase 8: RestauracionPendiente.aplicarSiExiste(home) antes de abrir la BD.
         Application.launch(JavaFxApplication.class, args);

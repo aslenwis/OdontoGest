@@ -12,7 +12,6 @@ import com.odontogest.modelo.Usuario;
 import com.odontogest.persistencia.repositorio.UsuarioRepository;
 import com.odontogest.seguridad.SesionUsuario;
 import com.odontogest.servicio.dto.UsuarioSesion;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,11 +33,6 @@ class AutenticacionServiceTest extends PruebaIntegracion {
     @Autowired private UsuarioRepository usuarioRepository;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private SesionUsuario sesionUsuario;
-
-    @AfterEach
-    void cerrarSesion() {
-        sesionUsuario.cerrar();
-    }
 
     @Test
     void adminDemoIniciaSesion() {

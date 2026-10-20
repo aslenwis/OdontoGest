@@ -9,9 +9,12 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -47,9 +50,10 @@ public class Usuario {
     @Column(name = "rol", nullable = false)
     private Rol rol;
 
-    /** Fase 2: pasa a ser {@code @ManyToOne Odontologo} cuando exista la entidad. */
-    @Column(name = "odontologo_id")
-    private Long odontologoId;
+    /** Obligatorio para el rol ODONTOLOGO (CHECK en el esquema). */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "odontologo_id")
+    private Odontologo odontologo;
 
     @Column(name = "activo", nullable = false)
     private boolean activo = true;

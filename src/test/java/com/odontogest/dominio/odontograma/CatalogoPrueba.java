@@ -21,34 +21,34 @@ import static com.odontogest.dominio.odontograma.ConteoIndice.P;
  */
 public final class CatalogoPrueba {
 
-    public static final TipoHallazgoDef CARIES = tipo(1, "CARIES", Representacion.SUPERFICIE, "RELLENO",
+    public static final TipoHallazgoDef CARIES = tipo(1, "CARIES", Representacion.SUPERFICIE, SimboloHallazgo.RELLENO,
             ReglaColor.SIEMPRE_ROJO, "SUPERFICIE", false, C, C);
     public static final TipoHallazgoDef RESTAURACION = new TipoHallazgoDef(2, "RESTAURACION_DEFINITIVA",
             "Restauración definitiva", null, List.of("AM", "R", "IV", "IM", "IE"), Representacion.SUPERFICIE,
-            "RELLENO", ReglaColor.POR_ESTADO, "SUPERFICIE", false, O, O);
+            SimboloHallazgo.RELLENO, ReglaColor.POR_ESTADO, "SUPERFICIE", false, O, O);
     public static final TipoHallazgoDef RESTAURACION_TEMPORAL = tipo(3, "RESTAURACION_TEMPORAL",
-            Representacion.SUPERFICIE, "CONTORNO_SUPERFICIE", ReglaColor.SIEMPRE_ROJO, "SUPERFICIE", false, O, O);
-    public static final TipoHallazgoDef SELLANTE = tipo(4, "SELLANTE", Representacion.SUPERFICIE, "SOLO_SIGLA",
+            Representacion.SUPERFICIE, SimboloHallazgo.CONTORNO_SUPERFICIE, ReglaColor.SIEMPRE_ROJO, "SUPERFICIE", false, O, O);
+    public static final TipoHallazgoDef SELLANTE = tipo(4, "SELLANTE", Representacion.SUPERFICIE, SimboloHallazgo.SOLO_SIGLA,
             ReglaColor.POR_ESTADO, "SUPERFICIE_SELLANTE", false, NINGUNO, NINGUNO);
-    public static final TipoHallazgoDef PIEZA_AUSENTE = tipo(5, "PIEZA_AUSENTE", Representacion.PIEZA, "ASPA",
+    public static final TipoHallazgoDef PIEZA_AUSENTE = tipo(5, "PIEZA_AUSENTE", Representacion.PIEZA, SimboloHallazgo.ASPA,
             ReglaColor.SIEMPRE_AZUL, "ESTADO_PIEZA", true, P, E);
     public static final TipoHallazgoDef REMANENTE_RADICULAR = tipo(6, "REMANENTE_RADICULAR", Representacion.PIEZA,
-            "RAIZ_TRIANGULO", ReglaColor.SIEMPRE_ROJO, "ESTADO_PIEZA", false, C, E);
-    public static final TipoHallazgoDef IMPLANTE = tipo(7, "IMPLANTE", Representacion.PIEZA, "SOLO_SIGLA",
+            SimboloHallazgo.RAIZ_TRIANGULO, ReglaColor.SIEMPRE_ROJO, "ESTADO_PIEZA", false, C, E);
+    public static final TipoHallazgoDef IMPLANTE = tipo(7, "IMPLANTE", Representacion.PIEZA, SimboloHallazgo.SOLO_SIGLA,
             ReglaColor.POR_ESTADO, "ESTADO_PIEZA", false, P, NINGUNO);
     public static final TipoHallazgoDef CORONA_DEFINITIVA = tipo(9, "CORONA_DEFINITIVA", Representacion.PIEZA,
-            "CIRCUNFERENCIA", ReglaColor.POR_ESTADO, "CORONA", false, O, O);
+            SimboloHallazgo.CIRCUNFERENCIA, ReglaColor.POR_ESTADO, "CORONA", false, O, O);
     public static final TipoHallazgoDef CORONA_TEMPORAL = tipo(10, "CORONA_TEMPORAL", Representacion.PIEZA,
-            "CIRCUNFERENCIA", ReglaColor.SIEMPRE_ROJO, "CORONA", false, O, O);
+            SimboloHallazgo.CIRCUNFERENCIA, ReglaColor.SIEMPRE_ROJO, "CORONA", false, O, O);
     public static final TipoHallazgoDef TRATAMIENTO_PULPAR = tipo(11, "TRATAMIENTO_PULPAR", Representacion.PIEZA,
-            "LINEA_RAIZ", ReglaColor.POR_ESTADO, "PULPAR", false, NINGUNO, NINGUNO);
-    public static final TipoHallazgoDef FRACTURA = tipo(12, "FRACTURA", Representacion.PIEZA, "LINEA_FRACTURA",
+            SimboloHallazgo.LINEA_RAIZ, ReglaColor.POR_ESTADO, "PULPAR", false, NINGUNO, NINGUNO);
+    public static final TipoHallazgoDef FRACTURA = tipo(12, "FRACTURA", Representacion.PIEZA, SimboloHallazgo.LINEA_FRACTURA,
             ReglaColor.SIEMPRE_ROJO, "FRACTURA", false, NINGUNO, NINGUNO);
-    public static final TipoHallazgoDef MOVILIDAD = tipo(16, "MOVILIDAD", Representacion.PIEZA, "SOLO_SIGLA",
+    public static final TipoHallazgoDef MOVILIDAD = tipo(16, "MOVILIDAD", Representacion.PIEZA, SimboloHallazgo.SOLO_SIGLA,
             ReglaColor.SIEMPRE_ROJO, "MOVILIDAD", false, NINGUNO, NINGUNO);
-    public static final TipoHallazgoDef DIASTEMA = tipo(17, "DIASTEMA", Representacion.ENTRE_PIEZAS, "PARENTESIS",
+    public static final TipoHallazgoDef DIASTEMA = tipo(17, "DIASTEMA", Representacion.ENTRE_PIEZAS, SimboloHallazgo.PARENTESIS,
             ReglaColor.SIEMPRE_ROJO, "DIASTEMA", false, NINGUNO, NINGUNO);
-    public static final TipoHallazgoDef PROTESIS_FIJA = tipo(18, "PROTESIS_FIJA", Representacion.RANGO_PIEZAS, "PUENTE",
+    public static final TipoHallazgoDef PROTESIS_FIJA = tipo(18, "PROTESIS_FIJA", Representacion.RANGO_PIEZAS, SimboloHallazgo.PUENTE,
             ReglaColor.POR_ESTADO, "PROTESIS_FIJA", false, NINGUNO, NINGUNO);
 
     /** Fecha base: los eventos de prueba se ordenan por minutos a partir de aquí. */
@@ -59,7 +59,7 @@ public final class CatalogoPrueba {
     private CatalogoPrueba() {
     }
 
-    private static TipoHallazgoDef tipo(long id, String codigo, Representacion r, String simbolo, ReglaColor color,
+    private static TipoHallazgoDef tipo(long id, String codigo, Representacion r, SimboloHallazgo simbolo, ReglaColor color,
                                         String capa, boolean oculta, ConteoIndice cpod, ConteoIndice ceod) {
         return new TipoHallazgoDef(id, codigo, codigo, null, List.of(), r, simbolo, color, capa, oculta, cpod, ceod);
     }

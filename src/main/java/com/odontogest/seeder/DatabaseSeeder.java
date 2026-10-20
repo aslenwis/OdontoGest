@@ -5,6 +5,7 @@
  */
 package com.odontogest.seeder;
 
+import com.odontogest.modelo.Odontologo;
 import com.odontogest.persistencia.repositorio.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,11 +16,13 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * Orquestador de los datos de demostración ({@code app.seeder.enabled=true}).
  * <p>
- * Idempotente: si la tabla {@code usuario} ya tiene filas no hace nada. En la Fase 0 solo crea
- * el usuario administrador; odontólogos, pacientes y datos clínicos se agregan en las fases siguientes.
+ * Idempotente: si la tabla {@code usuario} ya tiene filas no hace nada. Crea los odontólogos con su
+ * horario y los usuarios demo; pacientes y datos clínicos se agregan en la Fase 9.
  */
 @Component
 @Order(3)
@@ -30,6 +33,7 @@ public class DatabaseSeeder implements ApplicationRunner {
 
     private final UsuarioRepository usuarioRepository;
     private final UsuarioSeeder usuarioSeeder;
+    private final OdontologoSeeder odontologoSeeder;
 
     @Override
     @Transactional
@@ -38,6 +42,7 @@ public class DatabaseSeeder implements ApplicationRunner {
             return;
         }
         log.info("Base de datos vacía: cargando datos de demostración");
-        usuarioSeeder.sembrar();
+        List<Odontologo> odontologos = odontologoSeeder.sembrar();
+        usuarioSeeder.sembrar(odontologos.get(0));
     }
 }

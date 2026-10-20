@@ -52,3 +52,97 @@
 .contenido {
     -fx-background-color: -color-bg-default;
 }
+
+/* ---------------------------------------------------------------- Menú lateral */
+.menu-item {
+    -fx-background-color: transparent;
+    -fx-background-radius: 6;
+    -fx-alignment: center-left;
+    -fx-padding: 8 12 8 12;
+    -fx-graphic-text-gap: 10;
+    -fx-text-fill: -color-fg-default;
+}
+
+.menu-item:hover {
+    -fx-background-color: -color-bg-default;
+}
+
+.menu-item:selected {
+    -fx-background-color: -color-accent-subtle;
+    -fx-text-fill: -color-accent-fg;
+}
+
+.menu-item:selected .ikonli-font-icon {
+    -fx-icon-color: -color-accent-fg;
+}
+
+/* ---------------------------------------------------------------- Formularios y panel lateral */
+.panel-lateral {
+    -fx-background-color: -color-bg-default;
+    -fx-border-color: transparent transparent transparent -color-border-default;
+    -fx-border-width: 0 0 0 1;
+}
+
+.formulario-seccion {
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-fg-muted;
+    -fx-padding: 8 0 0 0;
+}
+
+.seccion-apoderado {
+    -fx-background-color: -color-warning-subtle;
+    -fx-background-radius: 8;
+}
+
+.tarjeta {
+    -fx-background-color: -color-bg-subtle;
+    -fx-background-radius: 10;
+    -fx-border-color: -color-border-default;
+    -fx-border-radius: 10;
+}
+
+/* ---------------------------------------------------------------- Ficha del paciente */
+.ficha-cabecera {
+    -fx-background-color: -color-bg-subtle;
+    -fx-border-color: transparent transparent -color-border-default transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.avatar {
+    -fx-background-color: -color-accent-emphasis;
+    -fx-background-radius: 28;
+    -fx-min-width: 56;
+    -fx-min-height: 56;
+    -fx-max-width: 56;
+    -fx-max-height: 56;
+}
+
+.avatar-texto {
+    -fx-text-fill: -color-fg-emphasis;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+/* Alergias: alerta roja visible en la cabecera (RF-PAC-04) */
+.etiqueta-alerta {
+    -fx-background-color: -color-danger-emphasis;
+    -fx-text-fill: -color-fg-emphasis;
+    -fx-background-radius: 4;
+    -fx-padding: 3 8 3 8;
+    -fx-font-weight: bold;
+}
+
+.etiqueta-alerta .ikonli-font-icon {
+    -fx-icon-color: -color-fg-emphasis;
+}
+
+.etiqueta-aviso {
+    -fx-background-color: -color-warning-subtle;
+    -fx-text-fill: -color-warning-fg;
+    -fx-background-radius: 4;
+    -fx-padding: 3 8 3 8;
+}
+
+.etiqueta-aviso .ikonli-font-icon {
+    -fx-icon-color: -color-warning-fg;
+}

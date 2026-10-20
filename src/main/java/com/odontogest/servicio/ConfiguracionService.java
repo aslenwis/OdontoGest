@@ -9,6 +9,7 @@ import com.odontogest.excepcion.NegocioException;
 import com.odontogest.modelo.Configuracion;
 import com.odontogest.modelo.TipoConfiguracion;
 import com.odontogest.persistencia.repositorio.ConfiguracionRepository;
+import com.odontogest.servicio.dto.DatosClinica;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +47,12 @@ public class ConfiguracionService {
 
     public boolean booleano(String clave) {
         return Boolean.parseBoolean(texto(clave).trim());
+    }
+
+    /** Datos de la clínica para las cabeceras de los PDF. */
+    public DatosClinica datosClinica() {
+        return new DatosClinica(texto("clinica.nombre"), texto("clinica.ruc"), texto("clinica.direccion"),
+                texto("clinica.telefono"), texto("clinica.email"));
     }
 
     /**
