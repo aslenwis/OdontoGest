@@ -28,6 +28,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 /**
  * Ficha del paciente: cabecera con identificación, alertas (alergias en rojo, consentimiento de datos
  * pendiente), saldo pendiente y "Nueva atención"; pestañas Datos, Anamnesis, Odontograma, Plan, Atenciones y
@@ -51,6 +53,7 @@ public class PacienteFichaController {
     @FXML private Label lblInactivo;
     @FXML private TabPane pestanas;
     @FXML private Button btnNuevaAtencion;
+    @FXML private Button btnNuevaCita;
     @FXML private Label lblSaldo;
 
     private ChangeListener<PacienteDetalle> oyente;
@@ -60,6 +63,9 @@ public class PacienteFichaController {
         boolean atiende = sesionUsuario.tiene(Permiso.ATENCION_GESTIONAR);
         btnNuevaAtencion.setVisible(atiende);
         btnNuevaAtencion.setManaged(atiende);
+        boolean agenda = sesionUsuario.tiene(Permiso.AGENDA_GESTIONAR);
+        btnNuevaCita.setVisible(agenda);
+        btnNuevaCita.setManaged(agenda);
         if (oyente != null) {
             pacienteActivo.pacienteProperty().removeListener(oyente);
         }
@@ -132,6 +138,14 @@ public class PacienteFichaController {
         }
         pestanas.getTabs().stream().filter(t -> id.equals(t.getId())).findFirst()
                 .ifPresent(t -> pestanas.getSelectionModel().select(t));
+    }
+
+    @FXML
+    private void onNuevaCita() {
+        PacienteDetalle p = pacienteActivo.get();
+        if (p != null) {
+            eventos.publishEvent(new NavegarA(MainController.VISTA_AGENDA, Map.of("pacienteId", p.id())));
+        }
     }
 
     @FXML

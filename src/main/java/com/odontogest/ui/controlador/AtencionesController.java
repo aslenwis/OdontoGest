@@ -118,6 +118,11 @@ public class AtencionesController {
         recargar(null);
     }
 
+    /** Vuelve a leer las atenciones del paciente activo (la agenda la llama tras "Atender ahora"). */
+    public void refrescar() {
+        recargar(null);
+    }
+
     /** Recarga la línea de tiempo y selecciona la atención indicada (o la primera). */
     private void recargar(Long seleccionar) {
         PacienteDetalle p = pacienteActivo.get();

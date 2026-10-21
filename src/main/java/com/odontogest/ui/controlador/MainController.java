@@ -57,6 +57,7 @@ public class MainController {
     public static final String VISTA_PACIENTES = "pacientes-view";
     public static final String VISTA_FICHA = "paciente-ficha-view";
     public static final String VISTA_CAJA = "caja-view";
+    public static final String VISTA_AGENDA = "agenda-view";
 
     /** Entrada del menú lateral; {@code permiso == null} = visible para todos. */
     private record ItemMenu(String vista, String titulo, Ikon icono, Permiso permiso) {
@@ -64,6 +65,7 @@ public class MainController {
 
     private static final List<ItemMenu> MENU = List.of(
             new ItemMenu(null, "Inicio", Feather.HOME, null),
+            new ItemMenu(VISTA_AGENDA, "Agenda", Feather.CALENDAR, Permiso.AGENDA_GESTIONAR),
             new ItemMenu(VISTA_PACIENTES, "Pacientes", Feather.USERS, Permiso.PACIENTE_VER),
             new ItemMenu(VISTA_CAJA, "Caja", Feather.DOLLAR_SIGN, Permiso.PAGO_REGISTRAR),
             new ItemMenu("catalogos-view", "Catálogos", Feather.BOOK_OPEN, Permiso.CATALOGOS_EDITAR),
@@ -79,6 +81,7 @@ public class MainController {
     private final PacienteActivo pacienteActivo;
     private final PacienteFichaController fichaController;
     private final CajaController cajaController;
+    private final AgendaController agendaController;
 
     @FXML private StackPane raiz;
     @FXML private ModalPane modal;
@@ -170,6 +173,11 @@ public class MainController {
             }
         } else if (VISTA_PACIENTES.equals(evento.vista())) {
             mostrar(VISTA_PACIENTES, "Pacientes");
+        } else if (VISTA_AGENDA.equals(evento.vista()) && sesionUsuario.tiene(Permiso.AGENDA_GESTIONAR)) {
+            mostrar(VISTA_AGENDA, "Agenda");
+            if (evento.parametros().get("pacienteId") instanceof Number n) {
+                agendaController.nuevaCitaPara(n.longValue());
+            }
         } else if (VISTA_CAJA.equals(evento.vista()) && sesionUsuario.tiene(Permiso.PAGO_REGISTRAR)) {
             mostrar(VISTA_CAJA, "Caja");
             if (evento.parametros().get("pacienteId") instanceof Number n) {

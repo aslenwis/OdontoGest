@@ -1683,6 +1683,14 @@ devolver vacío
 ```
 Complejidad `O(D · k log k)` con `k` citas por día.
 
+**Reglas de agenda implementadas (Fase 6, `CitaService`):**
+- Ocupan el horario las citas `PROGRAMADA`, `CONFIRMADA` y `ATENDIDA`; `CANCELADA` y `NO_ASISTIO` lo liberan. Las consultas de solapamiento reciben `excluirId = -1` para una cita nueva (en lugar de `:excluirId IS NULL`, que complica el enlace de un `Long` nulo).
+- Duración múltiplo de `agenda.intervalo_min` (15), entre 15 y 240 min; la hora de inicio cae en la grilla; no se programa ni se mueve una cita hacia el pasado (editar solo motivo y notas de una cita pasada sí se permite).
+- Transiciones: `PROGRAMADA ⇄ CONFIRMADA`; ambas → `CANCELADA` o `NO_ASISTIO` (esta solo cuando la cita ya empezó); `ATENDIDA` la fija `AtencionService.cerrar` para la atención abierta con "Atender ahora" (`atencion.cita_id`). Una cita con atención abierta no se cancela ni se mueve.
+- "Atender ahora" (`AtencionService.abrirDesdeCita`) solo para citas pendientes del día; usa el motivo de la cita y su odontólogo (o el del usuario si es odontólogo).
+- El siguiente hueco evita también las otras citas del paciente cuando se indica.
+- La UI (`AgendaSemanal`) muestra lunes a sábado (y domingo si hay horario o citas ese día), arrastra con paso de la grilla y, si el servicio rechaza el movimiento, recarga y la cita vuelve a su lugar.
+
 #### 5.2.6 Recordatorios
 `RecordatorioScheduler` (`ScheduledExecutorService`, cada 15 min, primer intento 1 min después del arranque):
 1. Si `recordatorio.habilitado = false` o falta SMTP → no hace nada.

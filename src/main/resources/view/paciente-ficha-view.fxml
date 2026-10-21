@@ -42,6 +42,9 @@
                 <Label text="Saldo pendiente" styleClass="text-muted, text-small"/>
                 <Label fx:id="lblSaldo" styleClass="ficha-saldo"/>
             </VBox>
+            <Button fx:id="btnNuevaCita" text="Nueva cita" onAction="#onNuevaCita">
+                <graphic><FontIcon iconLiteral="fth-calendar"/></graphic>
+            </Button>
             <Button fx:id="btnNuevaAtencion" text="Nueva atención" styleClass="accent" onAction="#onNuevaAtencion">
                 <graphic><FontIcon iconLiteral="fth-clipboard"/></graphic>
             </Button>

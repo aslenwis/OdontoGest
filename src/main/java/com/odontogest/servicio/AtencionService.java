@@ -7,6 +7,7 @@ package com.odontogest.servicio;
 
 import com.odontogest.excepcion.NegocioException;
 import com.odontogest.modelo.Atencion;
+import com.odontogest.modelo.Cita;
 import com.odontogest.modelo.EstadoAtencion;
 import com.odontogest.modelo.Odontograma;
 import com.odontogest.modelo.Odontologo;
@@ -14,6 +15,7 @@ import com.odontogest.modelo.Paciente;
 import com.odontogest.modelo.Rol;
 import com.odontogest.modelo.TipoOdontograma;
 import com.odontogest.persistencia.repositorio.AtencionRepository;
+import com.odontogest.persistencia.repositorio.CitaRepository;
 import com.odontogest.persistencia.repositorio.HallazgoRepository;
 import com.odontogest.persistencia.repositorio.OdontogramaRepository;
 import com.odontogest.persistencia.repositorio.OdontologoRepository;
@@ -29,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -38,7 +41,8 @@ import java.util.Optional;
 /**
  * Atenciones del paciente (RF-ATE-01, RF-ATE-03, RF-ATE-04). Abrir una atención abre también su odontograma en
  * borrador; un paciente tiene como máximo una atención abierta. Para cerrarla, su odontograma debe estar firmado
- * (una evolución sin hallazgos se descarta automáticamente).
+ * (una evolución sin hallazgos se descarta automáticamente). Una atención abierta desde una cita (RF-AGE-05) deja la
+ * cita como ATENDIDA al cerrarse.
  */
 @Service
 @RequiredArgsConstructor
@@ -54,6 +58,8 @@ public class AtencionService {
     private final OdontogramaRepository odontogramaRepository;
     private final HallazgoRepository hallazgoRepository;
     private final OdontogramaService odontogramaService;
+    private final CitaRepository citaRepository;
+    private final CitaService citaService;
     private final SesionUsuario sesionUsuario;
 
     public List<AtencionResumen> listarPorPaciente(long pacienteId) {
@@ -74,6 +80,35 @@ public class AtencionService {
     /** Abre la atención y su odontograma en borrador; devuelve el id de la atención. */
     @Transactional
     public long abrir(AtencionForm form) {
+        return abrir(form, null);
+    }
+
+    /**
+     * "Atender ahora" desde la agenda (RF-AGE-05): abre la atención del paciente de la cita con su odontólogo y su
+     * motivo. Solo para citas pendientes del día.
+     *
+     * @return id de la atención
+     */
+    @Transactional
+    public long abrirDesdeCita(long citaId) {
+        sesionUsuario.exigir(Permiso.ATENCION_GESTIONAR);
+        Cita cita = citaRepository.findById(citaId)
+                .orElseThrow(() -> new NegocioException("La cita ya no existe en la base de datos."));
+        if (!cita.getEstado().activa()) {
+            throw new NegocioException("La cita está " + cita.getEstado().etiqueta().toLowerCase() + ": no se puede atender.");
+        }
+        if (!cita.getInicio().toLocalDate().equals(LocalDate.now())) {
+            throw new NegocioException("Solo se atienden las citas del día; esta es del " + FECHA.format(cita.getInicio()) + ".");
+        }
+        if (!atencionRepository.findByCitaIdIn(List.of(citaId)).isEmpty()) {
+            throw new NegocioException("La cita ya tiene una atención abierta.");
+        }
+        AtencionForm form = new AtencionForm(null, cita.getPaciente().getId(), cita.getOdontologo().getId(), cita.getMotivo(),
+                null, null, null, null);
+        return abrir(form, citaId);
+    }
+
+    private long abrir(AtencionForm form, Long citaId) {
         UsuarioSesion usuario = sesionUsuario.exigir(Permiso.ATENCION_GESTIONAR);
         Paciente paciente = pacienteRepository.findById(form.pacienteId())
                 .orElseThrow(() -> new NegocioException("El paciente ya no existe en la base de datos."));
@@ -106,6 +141,7 @@ public class AtencionService {
         a.setDiagnostico(Validador.limpioMultilinea(form.diagnostico()));
         a.setObservaciones(Validador.limpioMultilinea(form.observaciones()));
         a.setEstado(EstadoAtencion.ABIERTA);
+        a.setCitaId(citaId);
         Atencion guardada = atencionRepository.save(a);
         odontogramaService.abrirBorrador(guardada.getId(), form.denticion());
         log.info("Atención {} abierta para {}", guardada.getId(), paciente.getNumeroHistoria());
@@ -146,6 +182,9 @@ public class AtencionService {
         }
         a.setEstado(EstadoAtencion.CERRADA);
         a.setCerradaEn(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+        if (a.getCitaId() != null) {
+            citaService.marcarAtendida(a.getCitaId());
+        }
         return detalle(a);
     }
 
