@@ -23,6 +23,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +50,7 @@ public class DatosPacienteController {
     private final SesionUsuario sesionUsuario;
 
     @FXML private StackPane contenedorFormulario;
+    @FXML private HBox barraAcciones;
     @FXML private Label lblEstadoConsentimiento;
     @FXML private Button btnPdfConsentimiento;
     @FXML private Button btnRegistrarFirma;
@@ -65,6 +68,10 @@ public class DatosPacienteController {
             pacienteActivo.recargar();
         }, null);
         contenedorFormulario.getChildren().setAll(vista.raiz());
+        HBox pie = formulario.extraerPie();
+        HBox.setHgrow(pie, Priority.ALWAYS);
+        pie.setMaxWidth(640);
+        barraAcciones.getChildren().setAll(pie);
 
         boolean puedeEditar = sesionUsuario.tiene(Permiso.PACIENTE_EDITAR);
         btnRegistrarFirma.setDisable(!puedeEditar);

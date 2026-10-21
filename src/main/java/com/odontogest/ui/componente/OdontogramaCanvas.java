@@ -44,7 +44,7 @@ public class OdontogramaCanvas extends Region {
     public OdontogramaCanvas() {
         getChildren().add(canvas);
         getStyleClass().add("odontograma-canvas");
-        setMinSize(400, 300);
+        setMinSize(400, 220);
         canvas.addEventHandler(MouseEvent.MOUSE_MOVED, e -> notificar(e, false));
         canvas.addEventHandler(MouseEvent.MOUSE_EXITED, e -> {
             if (oyente != null) {

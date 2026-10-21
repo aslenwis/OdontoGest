@@ -24,6 +24,8 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Scope;
@@ -61,6 +63,7 @@ public class PacienteFormController {
     @FXML private TextField txtContactoTelefono;
     @FXML private CheckBox chkRecordatorios;
     @FXML private VBox seccionApoderado;
+    @FXML private HBox pie;
     @FXML private TextField txtApoderadoNombre;
     @FXML private TextField txtApoderadoDocumento;
     @FXML private ComboBox<String> cmbParentesco;
@@ -98,6 +101,15 @@ public class PacienteFormController {
      * @param alGuardar  recibe el id guardado
      * @param alCancelar {@code null} oculta el botón Cancelar (formulario incrustado en la ficha)
      */
+    /**
+     * Saca los botones Guardar/Cancelar del formulario para ponerlos en una barra fija fuera del desplazamiento
+     * (así se ven aunque la pantalla sea baja).
+     */
+    public HBox extraerPie() {
+        ((Pane) pie.getParent()).getChildren().remove(pie);
+        return pie;
+    }
+
     public void configurar(PacienteDetalle existente, LongConsumer alGuardar, Runnable alCancelar) {
         this.alGuardar = alGuardar;
         this.alCancelar = alCancelar;

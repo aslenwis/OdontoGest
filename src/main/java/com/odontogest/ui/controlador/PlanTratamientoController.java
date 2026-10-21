@@ -12,6 +12,7 @@ import com.odontogest.dominio.finanzas.Frecuencia;
 import com.odontogest.dominio.odontograma.PiezaDental;
 import com.odontogest.dominio.odontograma.Superficie;
 import com.odontogest.dominio.tratamiento.FormaCobro;
+import com.odontogest.evento.PagoRegistrado;
 import com.odontogest.evento.PlanCambiado;
 import com.odontogest.modelo.EstadoPlan;
 import com.odontogest.modelo.Rol;
@@ -31,8 +32,9 @@ import com.odontogest.servicio.dto.PlanResumen;
 import com.odontogest.servicio.dto.ProcedimientoDto;
 import com.odontogest.servicio.dto.UsuarioSesion;
 import com.odontogest.ui.soporte.Exportador;
-import com.odontogest.ui.soporte.Formularios;
 import com.odontogest.ui.soporte.Formularios.Opcion;
+import com.odontogest.ui.soporte.Formularios;
+import com.odontogest.ui.soporte.HiloUi;
 import com.odontogest.ui.soporte.Notificador;
 import com.odontogest.ui.soporte.PacienteActivo;
 import com.odontogest.ui.soporte.TareaUi;
@@ -68,6 +70,7 @@ import lombok.RequiredArgsConstructor;
 import org.kordamp.ikonli.feather.Feather;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
+import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -80,6 +83,10 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static com.odontogest.ui.soporte.Formularios.ESTADO_ALERTA;
+import static com.odontogest.ui.soporte.Formularios.ESTADO_OK;
+import static com.odontogest.ui.soporte.Formularios.ESTADO_PELIGRO;
 
 /**
  * Pestaña "Plan" de la ficha (RF-PLN-01 a RF-PLN-06): planes del paciente, procedimientos agrupados por fase con
@@ -213,6 +220,17 @@ public class PlanTratamientoController {
         tareaUi.ejecutar(() -> planService.obtener(id), this::mostrar);
     }
 
+    /** Un cobro o una anulación cambian lo pagado de las cuotas. */
+    @TransactionalEventListener(fallbackExecution = true)
+    public void alRegistrarPago(PagoRegistrado e) {
+        HiloUi.ejecutar(() -> {
+            PacienteDetalle p = pacienteActivo.get();
+            if (cmbPlanes != null && p != null && p.id() == e.pacienteId()) {
+                recargar(null);
+            }
+        });
+    }
+
     /** Otra pestaña (Atenciones) cambió un plan del paciente. */
     @EventListener
     public void alCambiarPlan(PlanCambiado e) {
@@ -225,11 +243,7 @@ public class PlanTratamientoController {
                 recargar(null);
             }
         };
-        if (Platform.isFxApplicationThread()) {
-            r.run();
-        } else {
-            Platform.runLater(r);
-        }
+        HiloUi.ejecutar(r);
     }
 
     /** Muestra el plan actualizado y avisa a las demás pestañas. */
@@ -344,17 +358,23 @@ public class PlanTratamientoController {
         if (p == null) {
             return raizArbol;
         }
+        if (p.items().isEmpty()) {
+            return raizArbol;            // la tabla muestra su mensaje de "sin procedimientos"
+        }
         Map<Integer, List<PlanItemDto>> porFase = p.items().stream()
                 .collect(Collectors.groupingBy(PlanItemDto::fase, TreeMap::new, Collectors.toList()));
-        porFase.forEach((fase, items) -> {
+        // Las cuatro fases siempre a la vista (RF-PLN-02), también las que aún no tienen procedimientos.
+        for (int fase = 1; fase <= 4; fase++) {
+            List<PlanItemDto> items = porFase.getOrDefault(fase, List.of());
             BigDecimal subtotal = items.stream().map(PlanItemDto::total).reduce(BigDecimal.ZERO, BigDecimal::add);
-            TreeItem<Fila> grupo = new TreeItem<>(new Fila(PlanItemDto.nombreFase(fase), subtotal, null));
+            String titulo = PlanItemDto.nombreFase(fase) + (items.isEmpty() ? "  —  sin procedimientos" : "");
+            TreeItem<Fila> grupo = new TreeItem<>(new Fila(titulo, subtotal, null));
             grupo.setExpanded(true);
             for (PlanItemDto i : items) {
                 grupo.getChildren().add(new TreeItem<>(new Fila(null, null, i)));
             }
             raizArbol.getChildren().add(grupo);
-        });
+        }
         return raizArbol;
     }
 
@@ -445,14 +465,14 @@ public class PlanTratamientoController {
             @Override
             protected void updateItem(String texto, boolean vacio) {
                 super.updateItem(texto, vacio);
-                getStyleClass().removeAll(Styles.SUCCESS, Styles.DANGER, Styles.WARNING);
+                getStyleClass().removeAll(ESTADO_OK, ESTADO_ALERTA, ESTADO_PELIGRO);
                 setText(vacio ? null : texto);
                 CuotaDto cuota = vacio || getTableRow() == null ? null : getTableRow().getItem();
                 if (cuota != null) {
                     switch (cuota.estado()) {
-                        case PAGADA -> getStyleClass().add(Styles.SUCCESS);
-                        case VENCIDA -> getStyleClass().add(Styles.DANGER);
-                        case PARCIAL -> getStyleClass().add(Styles.WARNING);
+                        case PAGADA -> getStyleClass().add(ESTADO_OK);
+                        case VENCIDA -> getStyleClass().add(ESTADO_PELIGRO);
+                        case PARCIAL -> getStyleClass().add(ESTADO_ALERTA);
                         default -> {
                         }
                     }

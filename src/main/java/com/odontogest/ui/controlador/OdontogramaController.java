@@ -5,6 +5,7 @@
  */
 package com.odontogest.ui.controlador;
 
+import atlantafx.base.controls.CustomTextField;
 import atlantafx.base.theme.Styles;
 import com.odontogest.dominio.odontograma.Denticion;
 import com.odontogest.dominio.odontograma.EstadoHallazgo;
@@ -49,7 +50,6 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ComboBox;
@@ -60,7 +60,6 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputControl;
-import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
@@ -79,10 +78,12 @@ import org.springframework.stereotype.Component;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.text.Normalizer;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -124,7 +125,8 @@ public class OdontogramaController {
     @FXML private Button btnPdf;
     @FXML private Label lblEstado;
     @FXML private Button btnSeleccion;
-    @FXML private Accordion paleta;
+    @FXML private CustomTextField txtBuscarHallazgo;
+    @FXML private ListView<EntradaPaleta> lstPaleta;
     @FXML private RadioButton rbBueno;
     @FXML private RadioButton rbMalo;
     @FXML private Label lblPendiente;
@@ -147,7 +149,8 @@ public class OdontogramaController {
 
     private final ToggleGroup grupoDenticion = new ToggleGroup();
     private final ToggleGroup grupoEstado = new ToggleGroup();
-    private final List<ListView<HallazgoTipoDto>> listasPaleta = new ArrayList<>();
+    /** Catálogo activo de hallazgos (se lee una vez por carga de la vista). */
+    private List<HallazgoTipoDto> tiposPaleta = List.of();
     private final RenderizadorOdontograma renderizador = new RenderizadorOdontograma();
     private ChangeListener<PacienteDetalle> oyentePaciente;
     /** El ViewModel es singleton: sus oyentes se registran una sola vez (usan los campos actuales del controlador). */
@@ -175,7 +178,8 @@ public class OdontogramaController {
         (vm.estadoActivo.get() == EstadoHallazgo.MALO ? rbMalo : rbBueno).setSelected(true);
         grupoEstado.selectedToggleProperty().addListener((obs, a, b) ->
                 vm.estadoActivo.set(b == rbMalo ? EstadoHallazgo.MALO : EstadoHallazgo.BUENO));
-        listasPaleta.clear();
+        tiposPaleta = List.of();
+        configurarPaleta();
         grupoDenticion.selectedToggleProperty().addListener((obs, a, b) -> {
             if (!actualizando && b != null) {
                 cambiarDenticion((Denticion) b.getUserData());
@@ -218,7 +222,7 @@ public class OdontogramaController {
             return;
         }
         LocalDateTime hasta = vm.fechaVista.get();
-        boolean primeraVez = listasPaleta.isEmpty();
+        boolean primeraVez = tiposPaleta.isEmpty();
         tareaUi.ejecutar(() -> new Carga(odontogramaService.obtenerVista(p.id(), hasta),
                 odontogramaService.listarPorPaciente(p.id()), atencionService.abierta(p.id()),
                 integridadService.verificar(p.id()), primeraVez ? catalogoService.listarTipos(false) : List.of()), this::aplicar);
@@ -226,7 +230,8 @@ public class OdontogramaController {
 
     private void aplicar(Carga carga) {
         if (!carga.tipos().isEmpty()) {
-            construirPaleta(carga.tipos());
+            tiposPaleta = carga.tipos();
+            filtrarPaleta();
         }
         resumenes = carga.resumenes();
         atencionAbierta = carga.atencion();
@@ -258,7 +263,8 @@ public class OdontogramaController {
             rbPermanente.setDisable(!editable);
             rbDecidua.setDisable(!editable);
             rbMixta.setDisable(!editable);
-            paleta.setDisable(!editable);
+            lstPaleta.setDisable(!editable);
+            txtBuscarHallazgo.setDisable(!editable);
             btnSeleccion.setDisable(!editable);
             btnCerrar.setDisable(!editable);
             btnPdf.setDisable(!hayOdontograma);
@@ -275,6 +281,7 @@ public class OdontogramaController {
             btnGuardarTextos.setDisable(!editable);
 
             lblEstado.setText(estadoTexto(v));
+            lblEstado.setTooltip(new Tooltip(lblEstado.getText()));
             lblCpod.setText("CPO-D: " + indice(v.indices().cpod(), "C", "P", "O"));
             lblCpod.setTooltip(new Tooltip(v.indices().excluyeTercerasMolares()
                     ? "Sin terceras molares (configuración). Nivel según la referencia OMS a los 12 años."
@@ -348,7 +355,7 @@ public class OdontogramaController {
         vm.herramienta.addListener((obs, a, b) -> {
             actualizarIndicaciones();
             if (b == null) {
-                listasPaleta.forEach(l -> l.getSelectionModel().clearSelection());
+                lstPaleta.getSelectionModel().clearSelection();
             }
         });
         vm.superficiesPendientes.addListener((SetChangeListener<Superficie>) c -> actualizarIndicaciones());
@@ -368,42 +375,76 @@ public class OdontogramaController {
         vm.modoComparar.addListener((obs, a, b) -> redibujar.run());
     }
 
-    private void construirPaleta(List<HallazgoTipoDto> tipos) {
-        paleta.getPanes().clear();
-        listasPaleta.clear();
-        Map<Representacion, List<HallazgoTipoDto>> porGrupo = tipos.stream()
-                .collect(Collectors.groupingBy(HallazgoTipoDto::representacion, () -> new EnumMap<>(Representacion.class), Collectors.toList()));
-        porGrupo.forEach((representacion, lista) -> {
-            ListView<HallazgoTipoDto> lv = new ListView<>();
-            lv.getItems().setAll(lista);
-            lv.setCellFactory(l -> new CeldaTipo());
-            lv.getSelectionModel().selectedItemProperty().addListener((obs, a, b) -> {
-                if (b != null) {
-                    listasPaleta.stream().filter(x -> x != lv).forEach(x -> x.getSelectionModel().clearSelection());
-                    vm.herramienta.set(b);
-                }
-            });
-            listasPaleta.add(lv);
-            TitledPane tp = new TitledPane(GRUPOS.get(representacion) + " (" + lista.size() + ")", lv);
-            paleta.getPanes().add(tp);
-        });
-        if (!paleta.getPanes().isEmpty()) {
-            paleta.setExpandedPane(paleta.getPanes().get(0));
-        }
+    /** Fila de la paleta: encabezado de grupo ({@code tipo == null}) o tipo de hallazgo. */
+    private record EntradaPaleta(String grupo, HallazgoTipoDto tipo) {
     }
 
-    /** Celda de la paleta: muestra dibujada del símbolo + nombre. */
-    private final class CeldaTipo extends ListCell<HallazgoTipoDto> {
+    /**
+     * Paleta: buscador y una sola lista con encabezados por representación. Una lista con desplazamiento propio no
+     * se comprime como los paneles de un Accordion cuando la ventana es baja.
+     */
+    private void configurarPaleta() {
+        lstPaleta.setCellFactory(l -> new CeldaPaleta());
+        lstPaleta.getSelectionModel().selectedItemProperty().addListener((obs, a, b) -> {
+            if (b != null && b.tipo() != null && b.tipo() != vm.herramienta.get()) {
+                vm.herramienta.set(b.tipo());
+            }
+        });
+        txtBuscarHallazgo.textProperty().addListener((obs, a, b) -> filtrarPaleta());
+    }
+
+    private void filtrarPaleta() {
+        String filtro = txtBuscarHallazgo.getText() == null ? "" : normalizar(txtBuscarHallazgo.getText().trim());
+        Map<Representacion, List<HallazgoTipoDto>> porGrupo = tiposPaleta.stream()
+                .filter(t -> filtro.isEmpty() || coincide(t, filtro))
+                .collect(Collectors.groupingBy(HallazgoTipoDto::representacion, () -> new EnumMap<>(Representacion.class),
+                        Collectors.toList()));
+        List<EntradaPaleta> entradas = new ArrayList<>();
+        porGrupo.forEach((representacion, lista) -> {
+            entradas.add(new EntradaPaleta(GRUPOS.get(representacion) + " (" + lista.size() + ")", null));
+            lista.forEach(t -> entradas.add(new EntradaPaleta(null, t)));
+        });
+        lstPaleta.getItems().setAll(entradas);
+        lstPaleta.setPlaceholder(new Label("Ningún hallazgo coincide."));
+        HallazgoTipoDto actual = vm.herramienta.get();
+        entradas.stream().filter(e -> e.tipo() != null && actual != null && e.tipo().id() == actual.id()).findFirst()
+                .ifPresent(e -> lstPaleta.getSelectionModel().select(e));
+    }
+
+    private static boolean coincide(HallazgoTipoDto t, String filtro) {
+        if (normalizar(t.nombre()).contains(filtro) || normalizar(t.codigo()).contains(filtro)) {
+            return true;
+        }
+        return (t.sigla() != null && normalizar(t.sigla()).contains(filtro))
+                || t.siglasOpciones().stream().anyMatch(s -> normalizar(s).contains(filtro));
+    }
+
+    private static String normalizar(String texto) {
+        return Normalizer.normalize(texto, Normalizer.Form.NFD).replaceAll("\\p{M}", "").toLowerCase(Locale.ROOT);
+    }
+
+    /** Celda de la paleta: encabezado de grupo (no seleccionable) o muestra dibujada del símbolo + nombre. */
+    private final class CeldaPaleta extends ListCell<EntradaPaleta> {
         private final Canvas muestra = new Canvas(28, 28);
 
         @Override
-        protected void updateItem(HallazgoTipoDto t, boolean vacio) {
-            super.updateItem(t, vacio);
-            if (vacio || t == null) {
+        protected void updateItem(EntradaPaleta e, boolean vacio) {
+            super.updateItem(e, vacio);
+            getStyleClass().remove("paleta-grupo");
+            setDisable(false);
+            if (vacio || e == null) {
                 setText(null);
                 setGraphic(null);
                 return;
             }
+            if (e.tipo() == null) {
+                getStyleClass().add("paleta-grupo");
+                setDisable(true);
+                setGraphic(null);
+                setText(e.grupo());
+                return;
+            }
+            HallazgoTipoDto t = e.tipo();
             renderizador.muestra(muestra.getGraphicsContext2D(), definicion(t), 28,
                     Tema.actual() == Tema.OSCURO ? PaletaOdontograma.oscura() : PaletaOdontograma.clara());
             setGraphic(muestra);

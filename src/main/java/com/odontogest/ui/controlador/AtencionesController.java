@@ -25,6 +25,7 @@ import com.odontogest.servicio.dto.OdontologoDto;
 import com.odontogest.servicio.dto.PacienteDetalle;
 import com.odontogest.servicio.dto.UsuarioSesion;
 import com.odontogest.ui.soporte.Formularios;
+import com.odontogest.ui.soporte.HiloUi;
 import com.odontogest.ui.soporte.Notificador;
 import com.odontogest.ui.soporte.PacienteActivo;
 import com.odontogest.ui.soporte.TareaUi;
@@ -206,21 +207,13 @@ public class AtencionesController {
                 cargarItems();
             }
         };
-        if (Platform.isFxApplicationThread()) {
-            r.run();
-        } else {
-            Platform.runLater(r);
-        }
+        HiloUi.ejecutar(r);
     }
 
     /** Desde la cabecera de la ficha o la pestaña Odontograma. */
     @EventListener
     public void alSolicitarNuevaAtencion(SolicitudNuevaAtencion solicitud) {
-        if (Platform.isFxApplicationThread()) {
-            onNueva();
-        } else {
-            Platform.runLater(this::onNueva);
-        }
+        HiloUi.ejecutar(this::onNueva);
     }
 
     @FXML

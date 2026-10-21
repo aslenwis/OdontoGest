@@ -17,7 +17,7 @@
             fx:controller="com.odontogest.ui.controlador.PacienteFichaController">
     <top>
         <HBox styleClass="ficha-cabecera" spacing="16" alignment="CENTER_LEFT">
-            <padding><Insets top="14" right="20" bottom="14" left="20"/></padding>
+            <padding><Insets top="8" right="20" bottom="8" left="20"/></padding>
             <Button styleClass="button-icon, flat" onAction="#onVolver">
                 <graphic><FontIcon iconLiteral="fth-arrow-left"/></graphic>
             </Button>
@@ -38,6 +38,10 @@
                 </FlowPane>
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
+            <VBox alignment="CENTER_RIGHT" spacing="2">
+                <Label text="Saldo pendiente" styleClass="text-muted, text-small"/>
+                <Label fx:id="lblSaldo" styleClass="ficha-saldo"/>
+            </VBox>
             <Button fx:id="btnNuevaAtencion" text="Nueva atención" styleClass="accent" onAction="#onNuevaAtencion">
                 <graphic><FontIcon iconLiteral="fth-clipboard"/></graphic>
             </Button>
@@ -59,6 +63,9 @@
             </Tab>
             <Tab text="Atenciones" id="atenciones">
                 <fx:include source="paciente-atenciones-tab.fxml"/>
+            </Tab>
+            <Tab text="Pagos" id="pagos">
+                <fx:include source="paciente-pagos-tab.fxml"/>
             </Tab>
         </TabPane>
     </center>

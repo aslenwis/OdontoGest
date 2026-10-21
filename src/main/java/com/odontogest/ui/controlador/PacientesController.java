@@ -25,6 +25,7 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.input.KeyCode;
 import javafx.util.Duration;
+import javafx.scene.layout.HBox;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
@@ -120,7 +121,8 @@ public class PacientesController implements Refrescable {
             notificador.exito("Paciente registrado.");
             eventos.publishEvent(new NavegarA(MainController.VISTA_FICHA, Map.of("pacienteId", id)));
         }, notificador::cerrarPanel);
-        notificador.abrirPanel(Formularios.panelLateral("Nuevo paciente", vista.raiz()));
+        HBox pie = formulario.extraerPie();
+        notificador.abrirPanel(Formularios.panelLateral("Nuevo paciente", vista.raiz(), pie));
         formulario.enfocar();
     }
 

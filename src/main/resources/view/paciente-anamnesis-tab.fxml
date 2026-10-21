@@ -5,6 +5,7 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -15,9 +16,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<ScrollPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.odontogest.ui.controlador.AnamnesisController"
-            fitToWidth="true" styleClass="edge-to-edge">
+<!-- Anamnesis: campos desplazables y el botón Guardar en una barra fija abajo. -->
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.odontogest.ui.controlador.AnamnesisController">
+<center>
+<ScrollPane fitToWidth="true" styleClass="edge-to-edge">
     <VBox spacing="14" maxWidth="900">
         <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
 
@@ -51,13 +54,17 @@
 
         <Label text="Observaciones" styleClass="text-bold"/>
         <TextArea fx:id="txtObservaciones" prefRowCount="3" wrapText="true"/>
-
-        <HBox spacing="8" alignment="CENTER_LEFT">
-            <Label fx:id="lblActualizado" styleClass="text-muted, text-small"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Button fx:id="btnGuardar" text="Guardar anamnesis" styleClass="accent" onAction="#onGuardar">
-                <graphic><FontIcon iconLiteral="fth-save"/></graphic>
-            </Button>
-        </HBox>
     </VBox>
 </ScrollPane>
+</center>
+<bottom>
+    <HBox spacing="8" alignment="CENTER_LEFT" styleClass="barra-acciones">
+        <padding><Insets top="8" right="20" bottom="8" left="20"/></padding>
+        <Label fx:id="lblActualizado" styleClass="text-muted, text-small"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnGuardar" text="Guardar anamnesis" styleClass="accent" onAction="#onGuardar">
+            <graphic><FontIcon iconLiteral="fth-save"/></graphic>
+        </Button>
+    </HBox>
+</bottom>
+</BorderPane>

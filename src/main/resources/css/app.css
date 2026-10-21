@@ -194,3 +194,60 @@
     -fx-background-color: -color-bg-subtle;
     -fx-font-weight: bold;
 }
+
+/* ---------------------------------------------------------------- Caja y pagos */
+.caja-saldo {
+    -fx-font-size: 1.2em;
+    -fx-font-weight: bold;
+}
+
+.ficha-saldo {
+    -fx-font-size: 1.25em;
+    -fx-font-weight: bold;
+}
+
+.ficha-saldo-deuda {
+    -fx-text-fill: -color-danger-fg;
+}
+
+.tarjeta-cuenta {
+    -fx-background-color: -color-bg-subtle;
+    -fx-background-radius: 8;
+    -fx-border-color: -color-border-default;
+    -fx-border-radius: 8;
+    -fx-padding: 8 16 8 16;
+    -fx-min-width: 140;
+}
+
+.tarjeta-cuenta-valor {
+    -fx-font-size: 1.3em;
+    -fx-font-weight: bold;
+}
+
+/* Estados en celdas de tabla (las clases de color de AtlantaFX no se aplican a .table-cell). */
+.table-cell.estado-ok {
+    -fx-text-fill: -color-success-fg;
+}
+
+.table-cell.estado-alerta {
+    -fx-text-fill: -color-warning-fg;
+}
+
+.table-cell.estado-peligro {
+    -fx-text-fill: -color-danger-fg;
+}
+
+/* Paleta de hallazgos: encabezados de grupo dentro de la lista. */
+.paleta-hallazgos .list-cell.paleta-grupo {
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-fg-muted;
+    -fx-background-color: -color-bg-subtle;
+    -fx-opacity: 1;
+}
+
+/* Barra fija con los botones de guardar debajo de un área desplazable. */
+.barra-acciones {
+    -fx-background-color: -color-bg-subtle;
+    -fx-border-color: -color-border-default transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}

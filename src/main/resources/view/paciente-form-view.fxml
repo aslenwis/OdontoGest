@@ -81,7 +81,7 @@
         </GridPane>
     </VBox>
 
-    <HBox spacing="8" alignment="CENTER_RIGHT">
+    <HBox fx:id="pie" spacing="8" alignment="CENTER_RIGHT">
         <Button fx:id="btnCancelar" text="Cancelar" cancelButton="true" onAction="#onCancelar"/>
         <Button fx:id="btnGuardar" text="Guardar" styleClass="accent" onAction="#onGuardar">
             <graphic><FontIcon iconLiteral="fth-save"/></graphic>

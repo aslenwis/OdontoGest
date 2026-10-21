@@ -26,4 +26,15 @@ public interface PlanItemRepository extends JpaRepository<PlanItem, Long> {
             SELECT i FROM PlanItem i JOIN FETCH i.procedimiento JOIN FETCH i.plan
             WHERE i.plan.id IN :planIds ORDER BY i.plan.id, i.fase, i.orden, i.id""")
     List<PlanItem> listarPorPlanes(Collection<Long> planIds);
+
+    /**
+     * Hallazgos que ya tienen tratamiento en otro plan del paciente (cualquier estado salvo anulado; ítems no
+     * cancelados): el motor de sugerencias no los vuelve a proponer.
+     */
+    @Query("""
+            SELECT DISTINCT i.hallazgoId FROM PlanItem i
+            WHERE i.plan.paciente.id = :pacienteId AND i.plan.id <> :excepto AND i.hallazgoId IS NOT NULL
+              AND i.plan.estado <> com.odontogest.modelo.EstadoPlan.ANULADO
+              AND i.estado <> com.odontogest.modelo.EstadoPlanItem.CANCELADO""")
+    List<Long> hallazgosEnOtrosPlanes(long pacienteId, long excepto);
 }

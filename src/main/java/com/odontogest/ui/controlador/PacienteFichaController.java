@@ -6,11 +6,17 @@
 package com.odontogest.ui.controlador;
 
 import com.odontogest.evento.NavegarA;
+import com.odontogest.evento.PagoRegistrado;
+import com.odontogest.evento.PlanCambiado;
 import com.odontogest.evento.SolicitudNuevaAtencion;
 import com.odontogest.seguridad.Permiso;
 import com.odontogest.seguridad.SesionUsuario;
+import com.odontogest.servicio.PagoService;
 import com.odontogest.servicio.dto.PacienteDetalle;
+import com.odontogest.ui.soporte.Formularios;
+import com.odontogest.ui.soporte.HiloUi;
 import com.odontogest.ui.soporte.PacienteActivo;
+import com.odontogest.ui.soporte.TareaUi;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -18,12 +24,14 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TabPane;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
+import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.stereotype.Component;
 
 /**
  * Ficha del paciente: cabecera con identificación, alertas (alergias en rojo, consentimiento de datos
- * pendiente) y "Nueva atención"; pestañas Datos, Anamnesis, Odontograma y Atenciones, que siguen a
- * {@link PacienteActivo}.
+ * pendiente), saldo pendiente y "Nueva atención"; pestañas Datos, Anamnesis, Odontograma, Plan, Atenciones y
+ * Pagos, que siguen a {@link PacienteActivo}.
  */
 @Component
 @RequiredArgsConstructor
@@ -32,6 +40,8 @@ public class PacienteFichaController {
     private final PacienteActivo pacienteActivo;
     private final ApplicationEventPublisher eventos;
     private final SesionUsuario sesionUsuario;
+    private final PagoService pagoService;
+    private final TareaUi tareaUi;
 
     @FXML private Label lblIniciales;
     @FXML private Label lblNombre;
@@ -41,6 +51,7 @@ public class PacienteFichaController {
     @FXML private Label lblInactivo;
     @FXML private TabPane pestanas;
     @FXML private Button btnNuevaAtencion;
+    @FXML private Label lblSaldo;
 
     private ChangeListener<PacienteDetalle> oyente;
 
@@ -65,6 +76,7 @@ public class PacienteFichaController {
             visible(lblAlergias, false);
             visible(lblConsentimiento, false);
             visible(lblInactivo, false);
+            lblSaldo.setText("");
             return;
         }
         if (pestanas.getSelectionModel().getSelectedIndex() < 0) {
@@ -79,9 +91,41 @@ public class PacienteFichaController {
         lblConsentimiento.setText("Falta consentimiento de datos personales");
         visible(lblConsentimiento, p.consentimientoDatosEn() == null);
         visible(lblInactivo, !p.activo());
+        cargarSaldo(p.id());
     }
 
-    /** Muestra la pestaña con ese id ("datos", "anamnesis", "odontograma", "plan", "atenciones"). */
+    private void cargarSaldo(long pacienteId) {
+        tareaUi.ejecutar(() -> pagoService.saldo(pacienteId), saldo -> {
+            PacienteDetalle p = pacienteActivo.get();
+            if (p != null && p.id() == pacienteId) {
+                lblSaldo.setText(Formularios.soles(saldo));
+                lblSaldo.getStyleClass().remove("ficha-saldo-deuda");
+                if (saldo.signum() > 0) {
+                    lblSaldo.getStyleClass().add("ficha-saldo-deuda");
+                }
+            }
+        });
+    }
+
+    /** Un cobro, una anulación o un plan aceptado cambian el saldo. */
+    @TransactionalEventListener(fallbackExecution = true)
+    public void alRegistrarPago(PagoRegistrado e) {
+        HiloUi.ejecutar(() -> refrescarSaldo(e.pacienteId()));
+    }
+
+    @EventListener
+    public void alCambiarPlan(PlanCambiado e) {
+        HiloUi.ejecutar(() -> refrescarSaldo(e.pacienteId()));
+    }
+
+    private void refrescarSaldo(long pacienteId) {
+        PacienteDetalle p = pacienteActivo.get();
+        if (lblSaldo != null && p != null && p.id() == pacienteId) {
+            cargarSaldo(pacienteId);
+        }
+    }
+
+    /** Muestra la pestaña con ese id ("datos", "anamnesis", "odontograma", "plan", "atenciones", "pagos"). */
     public void seleccionarPestana(String id) {
         if (pestanas == null || id == null) {
             return;

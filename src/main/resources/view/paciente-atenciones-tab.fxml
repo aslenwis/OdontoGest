@@ -5,6 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.HBox?>
@@ -23,6 +24,8 @@
         </Button>
         <ListView fx:id="lstAtenciones" VBox.vgrow="ALWAYS" styleClass="lista-ajustable"/>
     </VBox>
+    <BorderPane>
+    <center>
     <ScrollPane fitToWidth="true" styleClass="edge-to-edge">
         <VBox fx:id="panelDetalle" spacing="10">
             <padding><Insets top="14" right="18" bottom="14" left="18"/></padding>
@@ -39,7 +42,12 @@
             <Label text="Procedimientos del plan realizados en esta atención" styleClass="text-bold"/>
             <Label fx:id="lblItems" styleClass="text-muted, text-small" wrapText="true"/>
             <VBox fx:id="boxItems" spacing="6"/>
-            <HBox spacing="8" alignment="CENTER_LEFT">
+        </VBox>
+    </ScrollPane>
+    </center>
+    <bottom>
+            <HBox fx:id="barraAcciones" spacing="8" alignment="CENTER_LEFT" styleClass="barra-acciones">
+                <padding><Insets top="8" right="18" bottom="8" left="18"/></padding>
                 <Button fx:id="btnOdontograma" text="Ir al odontograma" onAction="#onIrOdontograma">
                     <graphic><FontIcon iconLiteral="fth-grid"/></graphic>
                 </Button>
@@ -51,6 +59,6 @@
                     <graphic><FontIcon iconLiteral="fth-save"/></graphic>
                 </Button>
             </HBox>
-        </VBox>
-    </ScrollPane>
+    </bottom>
+    </BorderPane>
 </SplitPane>

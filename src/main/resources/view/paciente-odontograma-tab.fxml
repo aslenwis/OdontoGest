@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import atlantafx.base.controls.CustomTextField?>
 <?import com.odontogest.ui.componente.OdontogramaCanvas?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
@@ -22,8 +24,10 @@
 
 <!-- Pestaña Odontograma (PLAN §6.2): línea de tiempo arriba, paleta a la izquierda, lienzo al centro,
      inspector a la derecha y especificaciones/índices abajo. -->
-<BorderPane fx:id="raiz" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.odontogest.ui.controlador.OdontogramaController">
+<!-- En ventanas bajas la pestaña se desplaza en lugar de recortar el panel inferior. -->
+<ScrollPane fitToWidth="true" fitToHeight="true" styleClass="edge-to-edge" xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.odontogest.ui.controlador.OdontogramaController">
+<BorderPane fx:id="raiz">
     <top>
         <ToolBar>
             <ComboBox fx:id="cmbMomento" prefWidth="200" promptText="Sin odontograma"/>
@@ -56,12 +60,18 @@
             <Button fx:id="btnSeleccion" text="Modo selección (Esc)" maxWidth="Infinity" onAction="#onModoSeleccion">
                 <graphic><FontIcon iconLiteral="fth-mouse-pointer"/></graphic>
             </Button>
-            <Accordion fx:id="paleta" VBox.vgrow="ALWAYS"/>
-            <Separator/>
-            <Label text="Estado del hallazgo" styleClass="text-bold"/>
-            <HBox spacing="12">
-                <RadioButton fx:id="rbBueno" text="Bueno (B)"/>
-                <RadioButton fx:id="rbMalo" text="Malo (M)"/>
+            <CustomTextField fx:id="txtBuscarHallazgo" promptText="Buscar hallazgo o sigla…">
+                <left><FontIcon iconLiteral="fth-search"/></left>
+            </CustomTextField>
+            <ListView fx:id="lstPaleta" VBox.vgrow="ALWAYS" minHeight="96" styleClass="paleta-hallazgos"/>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Estado" styleClass="text-bold"/>
+                <RadioButton fx:id="rbBueno" text="Bueno">
+                    <tooltip><Tooltip text="Atajo: B"/></tooltip>
+                </RadioButton>
+                <RadioButton fx:id="rbMalo" text="Malo">
+                    <tooltip><Tooltip text="Atajo: M"/></tooltip>
+                </RadioButton>
             </HBox>
             <Label fx:id="lblPendiente" wrapText="true" styleClass="text-muted, text-small"/>
             <Button fx:id="btnRegistrar" text="Registrar (Enter)" maxWidth="Infinity" styleClass="accent" onAction="#onRegistrar">
@@ -118,14 +128,17 @@
                 <TextArea fx:id="txtObservaciones" prefRowCount="2" wrapText="true"/>
             </VBox>
             <VBox spacing="6" prefWidth="360" minWidth="320">
-                <Label fx:id="lblEstado" wrapText="true" styleClass="text-bold"/>
+                <Label fx:id="lblEstado" styleClass="text-bold"/>
                 <Label fx:id="lblCpod" styleClass="text-bold"/>
                 <Label fx:id="lblCeod" styleClass="text-bold"/>
-                <Label fx:id="lblIntegridad" wrapText="true" styleClass="text-small"/>
-                <Button fx:id="btnGuardarTextos" text="Guardar especificaciones" onAction="#onGuardarTextos">
-                    <graphic><FontIcon iconLiteral="fth-save"/></graphic>
-                </Button>
+                <HBox spacing="8" alignment="CENTER_LEFT">
+                    <Label fx:id="lblIntegridad" wrapText="true" styleClass="text-small" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                    <Button fx:id="btnGuardarTextos" text="Guardar textos" minWidth="-Infinity" onAction="#onGuardarTextos">
+                        <graphic><FontIcon iconLiteral="fth-save"/></graphic>
+                    </Button>
+                </HBox>
             </VBox>
         </HBox>
     </bottom>
 </BorderPane>
+</ScrollPane>

@@ -23,7 +23,7 @@
 
 <!-- Pestaña Plan (PLAN §6.1): arriba el plan (selector, estado y transiciones), las acciones de edición y los
      procedimientos agrupados por fase; abajo totales, observaciones y cronograma de cuotas. -->
-<SplitPane fx:id="raiz" orientation="VERTICAL" dividerPositions="0.56" xmlns="http://javafx.com/javafx/21"
+<SplitPane fx:id="raiz" orientation="VERTICAL" dividerPositions="0.62" xmlns="http://javafx.com/javafx/21"
            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.odontogest.ui.controlador.PlanTratamientoController">
     <VBox minHeight="220">
         <ToolBar>
@@ -63,7 +63,7 @@
         </TreeTableView>
     </VBox>
 
-    <HBox spacing="14" minHeight="170">
+    <HBox spacing="14" minHeight="150">
         <padding><Insets top="10" right="12" bottom="10" left="12"/></padding>
         <VBox spacing="6" prefWidth="250" minWidth="230">
             <Label text="Totales" styleClass="text-bold"/>
@@ -79,7 +79,7 @@
         </VBox>
         <VBox spacing="6" prefWidth="290" minWidth="240">
             <Label text="Observaciones" styleClass="text-bold"/>
-            <TextArea fx:id="txtObservaciones" prefRowCount="3" wrapText="true" VBox.vgrow="ALWAYS"/>
+            <TextArea fx:id="txtObservaciones" prefRowCount="2" wrapText="true" VBox.vgrow="ALWAYS"/>
             <Button fx:id="btnGuardarCabecera" text="Guardar descuento y observaciones" onAction="#onGuardarCabecera">
                 <graphic><FontIcon iconLiteral="fth-save"/></graphic>
             </Button>

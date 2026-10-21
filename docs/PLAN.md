@@ -1639,6 +1639,12 @@ si restante > 0 → NegocioException("El monto excede el saldo pendiente en S/ x
 
 Anulación: marca `anulado = 1`, resta las aplicaciones de cada cuota y conserva las filas de `pago_aplicacion` para trazabilidad.
 
+**Reglas de caja implementadas (Fase 5, `PagoService`):**
+- Se cobran las cuotas de los planes `ACEPTADO`, `EN_CURSO` y `FINALIZADO` del paciente; el FIFO recorre las cuotas de todos esos planes (a igual vencimiento, primero el plan más antiguo). `pago.plan_id` se llena solo si todo el pago cayó en un plan.
+- Recibo `R-00000001` con `CorrelativoService.siguienteRecibo()` dentro de la transacción del cobro: un cobro rechazado (monto excesivo, sin medio de pago) no consume número.
+- Anular exige `PAGO_ANULAR` y un motivo de al menos 10 caracteres; un pago anulado no se reactiva. Las cuotas recuperan su saldo y el plan conserva su estado.
+- `PagoRegistrado(pacienteId, pagoId, numeroRecibo, anulado)` se publica al cobrar y al anular; los oyentes de UI usan `@TransactionalEventListener(fallbackExecution = true)` (refrescan después del commit) y `HiloUi.ejecutar`, que nunca hace fallar al servicio si JavaFX no está iniciado.
+
 Estado de una cuota (derivado, no almacenado): `PAGADA` si `pagado = monto`; `VENCIDA` si `vencimiento < hoy` y `pagado < monto`; `PARCIAL` si `0 < pagado < monto`; si no, `PENDIENTE`.
 
 `CorrelativoService.siguiente(serie)`: `UPDATE correlativo SET ultimo = ultimo + 1 WHERE serie = ?` seguido de `SELECT ultimo`, en la misma transacción. Con una sola conexión no hay carrera posible.

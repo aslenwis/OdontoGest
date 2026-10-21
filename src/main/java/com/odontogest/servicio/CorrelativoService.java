@@ -36,4 +36,9 @@ public class CorrelativoService {
     public String siguienteHistoriaClinica() {
         return String.format("HC-%06d", siguiente(SERIE_HISTORIA));
     }
+
+    @Transactional(propagation = Propagation.MANDATORY)
+    public String siguienteRecibo() {
+        return String.format("R-%08d", siguiente(SERIE_RECIBO));
+    }
 }

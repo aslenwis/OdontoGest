@@ -47,6 +47,10 @@ public final class Formularios {
     public static final DateTimeFormatter FECHA_HORA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     public static final DateTimeFormatter HORA = DateTimeFormatter.ofPattern("HH:mm");
     public static final double ANCHO_PANEL = 460;
+    /** Clases de celda de tabla para estados (verde, ámbar, rojo); ver {@code app.css}. */
+    public static final String ESTADO_OK = "estado-ok";
+    public static final String ESTADO_ALERTA = "estado-alerta";
+    public static final String ESTADO_PELIGRO = "estado-peligro";
 
     /** Opción de un ComboBox con texto propio; permite el valor {@code null} ("Cualquiera", "General"). */
     public record Opcion<T>(String etiqueta, T valor) {

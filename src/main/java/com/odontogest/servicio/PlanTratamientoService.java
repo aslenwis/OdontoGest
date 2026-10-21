@@ -82,7 +82,8 @@ import java.util.stream.Collectors;
  *   <li>Ítems, precios y descuentos solo se editan en BORRADOR; los totales se recalculan con
  *       {@link CalculadoraTotales} en cada cambio.</li>
  *   <li>Las sugerencias salen del último odontograma <b>firmado</b> ({@link MotorSugerencias}); no se repite un
- *       procedimiento que ya está en el plan para la misma pieza.</li>
+ *       procedimiento que ya está en el plan para la misma pieza, ni se propone un hallazgo que ya tiene tratamiento
+ *       en otro plan no anulado (aunque siga en el odontograma porque no se registró la evolución).</li>
  *   <li>Transiciones: ver {@link EstadoPlan}. Aceptar registra el consentimiento informado de tratamiento; si el plan
  *       no tiene cronograma se crea una cuota única (pago al contado) para que la caja pueda cobrarlo.</li>
  *   <li>El cronograma ({@link GeneradorCronograma}) se puede regenerar mientras ninguna cuota tenga pagos.</li>
@@ -215,7 +216,8 @@ public class PlanTratamientoService {
         PlanTratamiento p = editable(planId);
         int agregados = agregarSugerencias(p);
         if (agregados == 0) {
-            throw new NegocioException("No hay sugerencias nuevas: los procedimientos sugeridos ya están en el plan.");
+            throw new NegocioException("No hay sugerencias nuevas: los procedimientos sugeridos ya están en este plan "
+                    + "o los hallazgos ya tienen tratamiento en otro plan.");
         }
         return dto(p);
     }
@@ -507,8 +509,13 @@ public class PlanTratamientoService {
         Map<Long, Procedimiento> procedimientos = reglas.stream().map(ReglaSugerencia::getProcedimiento).distinct()
                 .collect(Collectors.toMap(Procedimiento::getId, Function.identity(), (a, b) -> a));
         int orden = siguienteOrden(p.getId());
+        Set<Long> tratadosEnOtrosPlanes = new HashSet<>(
+                itemRepository.hallazgosEnOtrosPlanes(p.getPaciente().getId(), p.getId()));
         int agregados = 0;
         for (ItemSugerido s : sugeridos) {
+            if (s.origenHallazgoId() != null && tratadosEnOtrosPlanes.contains(s.origenHallazgoId())) {
+                continue;           // ya planificado o realizado en otro plan
+            }
             if (!enPlan.add(s.procedimientoId() + "@" + s.piezaFdi())) {
                 continue;
             }

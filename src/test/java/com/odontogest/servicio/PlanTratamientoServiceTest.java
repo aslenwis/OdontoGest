@@ -133,7 +133,21 @@ class PlanTratamientoServiceTest extends PruebaIntegracion {
         assertThat(p.total()).isEqualByComparingTo("1150.00");
 
         assertThatThrownBy(() -> planService.sugerir(p.id()))
-                .isInstanceOf(NegocioException.class).hasMessageContaining("ya están en el plan");
+                .isInstanceOf(NegocioException.class).hasMessageContaining("ya están en este plan");
+    }
+
+    @Test
+    void unHallazgoYaTratadoEnOtroPlanNoSeVuelveASugerir() {
+        PlanDto primero = planSugerido();
+        PlanDto segundo = planService.obtener(planService.crear(pacienteId, null, true));
+        assertThat(segundo.items()).as("solo las reglas generales: los hallazgos ya están en el primer plan")
+                .extracting(PlanItemDto::procedimientoCodigo).containsExactly("CONS", "PROF");
+
+        planService.cambiarEstado(primero.id(), EstadoPlan.ANULADO);
+        PlanDto conSugerencias = planService.sugerir(segundo.id());
+        assertThat(conSugerencias.items()).as("al anular el primer plan, sus hallazgos vuelven a sugerirse")
+                .extracting(PlanItemDto::procedimientoCodigo)
+                .containsExactly("CONS", "ENDO-M", "EXO-RR", "RES-C", "RES-S", "PROF");
     }
 
     @Test
