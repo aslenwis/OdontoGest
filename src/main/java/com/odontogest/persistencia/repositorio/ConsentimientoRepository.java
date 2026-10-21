@@ -20,4 +20,7 @@ public interface ConsentimientoRepository extends JpaRepository<Consentimiento, 
     List<Consentimiento> findByPacienteIdOrderByAceptadoEnDesc(Long pacienteId);
 
     Optional<Consentimiento> findFirstByPacienteIdAndTipoOrderByAceptadoEnDesc(Long pacienteId, TipoConsentimiento tipo);
+
+    /** Consentimiento informado de tratamiento firmado para un plan. */
+    Optional<Consentimiento> findFirstByPlanIdAndTipoOrderByAceptadoEnDesc(Long planId, TipoConsentimiento tipo);
 }

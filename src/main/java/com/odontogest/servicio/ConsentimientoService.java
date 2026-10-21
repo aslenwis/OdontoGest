@@ -26,9 +26,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Consentimientos del paciente (RF-PAC-05). Fase 2: consentimiento para el tratamiento de datos personales
- * (Ley N° 29733) imprimible en PDF y registro de su firma. El consentimiento informado de tratamiento se
- * agrega en la Fase 4 junto con el plan.
+ * Consentimientos del paciente (RF-PAC-05): consentimiento para el tratamiento de datos personales (Ley N° 29733)
+ * imprimible en PDF y registro de su firma. El consentimiento informado de tratamiento se imprime y registra al
+ * aceptar el plan ({@code PlanTratamientoService.aceptar}).
  */
 @Service
 @RequiredArgsConstructor

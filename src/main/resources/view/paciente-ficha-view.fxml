@@ -54,6 +54,9 @@
             <Tab text="Odontograma" id="odontograma">
                 <fx:include source="paciente-odontograma-tab.fxml"/>
             </Tab>
+            <Tab text="Plan" id="plan">
+                <fx:include source="paciente-plan-tab.fxml"/>
+            </Tab>
             <Tab text="Atenciones" id="atenciones">
                 <fx:include source="paciente-atenciones-tab.fxml"/>
             </Tab>

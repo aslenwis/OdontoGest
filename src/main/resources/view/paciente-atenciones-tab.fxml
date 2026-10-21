@@ -12,7 +12,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<!-- Pestaña Atenciones (RF-ATE): línea de tiempo a la izquierda y detalle de la atención a la derecha. -->
+<!-- Pestaña Atenciones (RF-ATE): línea de tiempo a la izquierda y detalle de la atención a la derecha, con los
+     procedimientos del plan que se marcan como realizados (RF-ATE-02). -->
 <SplitPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="com.odontogest.ui.controlador.AtencionesController" dividerPositions="0.32">
     <VBox spacing="8" minWidth="260">
@@ -20,7 +21,7 @@
         <Button fx:id="btnNueva" text="Nueva atención" styleClass="accent" maxWidth="Infinity" onAction="#onNueva">
             <graphic><FontIcon iconLiteral="fth-plus"/></graphic>
         </Button>
-        <ListView fx:id="lstAtenciones" VBox.vgrow="ALWAYS"/>
+        <ListView fx:id="lstAtenciones" VBox.vgrow="ALWAYS" styleClass="lista-ajustable"/>
     </VBox>
     <ScrollPane fitToWidth="true" styleClass="edge-to-edge">
         <VBox fx:id="panelDetalle" spacing="10">
@@ -35,6 +36,9 @@
             <TextArea fx:id="txtDiagnostico" prefRowCount="3" wrapText="true"/>
             <Label text="Observaciones" styleClass="text-bold"/>
             <TextArea fx:id="txtObservaciones" prefRowCount="2" wrapText="true"/>
+            <Label text="Procedimientos del plan realizados en esta atención" styleClass="text-bold"/>
+            <Label fx:id="lblItems" styleClass="text-muted, text-small" wrapText="true"/>
+            <VBox fx:id="boxItems" spacing="6"/>
             <HBox spacing="8" alignment="CENTER_LEFT">
                 <Button fx:id="btnOdontograma" text="Ir al odontograma" onAction="#onIrOdontograma">
                     <graphic><FontIcon iconLiteral="fth-grid"/></graphic>

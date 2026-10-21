@@ -1616,6 +1616,13 @@ Test obligatorio: `total = 100000` (S/ 1 000.00), `inicial = 0`, `n = 3` → `33
 
 Regenerar el cronograma solo está permitido si ninguna cuota tiene pagos.
 
+**Reglas del plan implementadas (Fase 4, `PlanTratamientoService`):**
+- Ítems, precios y descuentos se editan solo en `BORRADOR`; los totales se recalculan con `CalculadoraTotales` en cada cambio. Un cambio que deja el descuento global por encima del subtotal se rechaza (no se ajusta en silencio).
+- Las sugerencias usan el **último odontograma firmado** (los hallazgos del borrador aún pueden eliminarse y `plan_item.hallazgo_id` apunta a ellos); no se repite un procedimiento que ya está en el plan para la misma pieza. `plan_tratamiento.odontograma_id` guarda ese odontograma.
+- Transiciones (`EstadoPlan`): `BORRADOR → PROPUESTO` (al menos un ítem y total > 0); `PROPUESTO → BORRADOR` (borra el cronograma; sin pagos); `PROPUESTO → ACEPTADO` solo con `aceptar(planId, firmadoPor)`, que registra el consentimiento informado de tratamiento (`consentimiento.tipo = TRATAMIENTO`, `plan_id`); `ACEPTADO → EN_CURSO` manual o al marcar el primer procedimiento realizado; `EN_CURSO → FINALIZADO` con todos los ítems realizados; `ANULADO` desde cualquier estado no final, sin pagos.
+- El cronograma se genera en `PROPUESTO`, `ACEPTADO` o `EN_CURSO` (el total ya no cambia). Si el plan se acepta sin cronograma se crea una cuota única N° 0 por el total con vencimiento hoy, para que la caja (Fase 5) pueda cobrarlo.
+- RF-ATE-02: en la pestaña Atenciones se marcan como realizados los ítems de planes aceptados o en curso (`plan_item.atencion_id`, `realizado_en`); solo se desmarca en la misma atención y mientras esté abierta.
+
 #### 5.2.4 Aplicación de pagos FIFO (`AsignadorPagosFifo`)
 ```java
 public List<Aplicacion> asignar(long montoCent, List<SaldoCuota> pendientes);

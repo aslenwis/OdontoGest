@@ -152,6 +152,28 @@ public class OdontogramaService {
         return indices(proyector.proyectar(d.eventos(null), null));
     }
 
+    /** Último odontograma firmado del paciente y el estado de la boca que resulta de lo firmado. */
+    record EstadoFirmado(long odontogramaId, EstadoOdontograma estado) {
+    }
+
+    /**
+     * Estado para el motor de sugerencias del plan: solo hallazgos de odontogramas cerrados (los del borrador aún
+     * pueden eliminarse) con las anulaciones registradas hasta ahora.
+     */
+    Optional<EstadoFirmado> estadoFirmado(long pacienteId) {
+        Datos d = cargar(pacienteId);
+        Optional<Odontograma> ultimo = d.odontogramas().stream().filter(o -> !o.esBorrador())
+                .max(Comparator.comparing(Odontograma::getCerradoEn).thenComparing(Odontograma::getId));
+        if (ultimo.isEmpty()) {
+            return Optional.empty();
+        }
+        List<HallazgoEvento> firmados = d.hallazgos().stream()
+                .filter(h -> !h.getOdontograma().esBorrador())
+                .map(h -> evento(h, d.tipos().get(h.getHallazgoTipo().getId()), d.anuladoHasta(h.getId(), null)))
+                .toList();
+        return Optional.of(new EstadoFirmado(ultimo.get().getId(), proyector.proyectar(firmados, null)));
+    }
+
     /** Ficha odontológica en PDF (RF-ODO-10); la imagen del odontograma la dibuja la UI. */
     public byte[] pdfFicha(long pacienteId, LocalDateTime hasta, byte[] imagenPng) {
         OdontogramaVista vista = obtenerVista(pacienteId, hasta);

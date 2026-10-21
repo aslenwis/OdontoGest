@@ -46,7 +46,7 @@ public class Consentimiento {
     @Column(name = "tipo", nullable = false)
     private TipoConsentimiento tipo;
 
-    /** Fase 4: pasa a {@code @ManyToOne PlanTratamiento}. */
+    /** Plan al que se refiere un consentimiento de tratamiento ({@code null} en el de datos personales). */
     @Column(name = "plan_id")
     private Long planId;
 

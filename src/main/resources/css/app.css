@@ -175,3 +175,22 @@
     -fx-cell-size: 24;
     -fx-padding: 6 8 6 8;
 }
+
+/* ---------------------------------------------------------------- Plan de tratamiento */
+.plan-estado {
+    -fx-font-weight: bold;
+    -fx-padding: 2 10 2 10;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: -color-border-default;
+}
+
+.plan-total {
+    -fx-font-size: 1.35em;
+    -fx-font-weight: bold;
+}
+
+.plan-fila-fase {
+    -fx-background-color: -color-bg-subtle;
+    -fx-font-weight: bold;
+}

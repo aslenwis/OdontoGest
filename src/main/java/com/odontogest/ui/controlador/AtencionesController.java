@@ -8,6 +8,7 @@ package com.odontogest.ui.controlador;
 import atlantafx.base.theme.Styles;
 import com.odontogest.dominio.odontograma.Denticion;
 import com.odontogest.evento.NavegarA;
+import com.odontogest.evento.PlanCambiado;
 import com.odontogest.evento.SolicitudNuevaAtencion;
 import com.odontogest.modelo.EstadoAtencion;
 import com.odontogest.modelo.Rol;
@@ -15,9 +16,11 @@ import com.odontogest.seguridad.Permiso;
 import com.odontogest.seguridad.SesionUsuario;
 import com.odontogest.servicio.AtencionService;
 import com.odontogest.servicio.OdontologoService;
+import com.odontogest.servicio.PlanTratamientoService;
 import com.odontogest.servicio.dto.AtencionDetalle;
 import com.odontogest.servicio.dto.AtencionForm;
 import com.odontogest.servicio.dto.AtencionResumen;
+import com.odontogest.servicio.dto.ItemAtencionDto;
 import com.odontogest.servicio.dto.OdontologoDto;
 import com.odontogest.servicio.dto.PacienteDetalle;
 import com.odontogest.servicio.dto.UsuarioSesion;
@@ -29,6 +32,7 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -47,7 +51,7 @@ import java.util.Map;
 
 /**
  * Pestaña "Atenciones" de la ficha (RF-ATE-01, RF-ATE-03, RF-ATE-04): línea de tiempo de atenciones, datos
- * clínicos editables mientras la atención está abierta y cierre. Abrir una atención abre su odontograma en borrador.
+ * clínicos editables mientras la atención está abierta, procedimientos del plan realizados (RF-ATE-02) y cierre. Abrir una atención abre su odontograma en borrador.
  */
 @Component
 @RequiredArgsConstructor
@@ -55,6 +59,7 @@ public class AtencionesController {
 
     private final AtencionService atencionService;
     private final OdontologoService odontologoService;
+    private final PlanTratamientoService planService;
     private final OdontogramaController odontogramaController;
     private final PacienteActivo pacienteActivo;
     private final TareaUi tareaUi;
@@ -74,9 +79,13 @@ public class AtencionesController {
     @FXML private Button btnOdontograma;
     @FXML private Button btnCerrar;
     @FXML private Button btnGuardar;
+    @FXML private Label lblItems;
+    @FXML private VBox boxItems;
 
     private ChangeListener<PacienteDetalle> oyente;
     private AtencionDetalle actual;
+    /** Este controlador está publicando {@link PlanCambiado}. */
+    private boolean avisando;
 
     @FXML
     public void initialize() {
@@ -144,6 +153,64 @@ public class AtencionesController {
         btnGuardar.setDisable(!editable);
         btnCerrar.setDisable(!editable);
         btnOdontograma.setDisable(!hay);
+        cargarItems();
+    }
+
+    /** Procedimientos de los planes aceptados del paciente que se pueden marcar en la atención mostrada. */
+    private void cargarItems() {
+        AtencionDetalle a = actual;
+        if (a == null) {
+            mostrarItems(null, List.of());
+            return;
+        }
+        tareaUi.ejecutar(() -> planService.itemsParaAtencion(a.id()), lista -> mostrarItems(a, lista));
+    }
+
+    private void mostrarItems(AtencionDetalle a, List<ItemAtencionDto> items) {
+        if (a != actual) {
+            return;   // llegó tarde: ya se muestra otra atención
+        }
+        boxItems.getChildren().clear();
+        boolean puede = sesionUsuario.tiene(Permiso.ATENCION_GESTIONAR);
+        for (ItemAtencionDto i : items) {
+            CheckBox c = new CheckBox(i.descripcion() + "  ·  " + i.fase());
+            c.setWrapText(true);
+            c.setSelected(i.realizadoAqui());
+            c.setDisable(!i.editable() || !puede);
+            c.setOnAction(e -> {
+                boolean realizado = c.isSelected();
+                tareaUi.ejecutar(c, () -> planService.marcarEnAtencion(a.id(), i.itemId(), realizado), lista -> {
+                    mostrarItems(a, lista);
+                    avisarCambioDePlan(a.pacienteId());
+                }, error -> {
+                    tareaUi.manejarError(error);
+                    cargarItems();
+                });
+            });
+            boxItems.getChildren().add(c);
+        }
+        lblItems.setText(a == null ? "" : items.isEmpty()
+                ? "El paciente no tiene planes aceptados con procedimientos pendientes."
+                : a.abierta() ? "Marque los procedimientos realizados hoy; el primero pasa el plan a «en curso»."
+                : "Atención cerrada: solo lectura.");
+    }
+
+    /** La pestaña Plan aceptó, anuló o modificó un plan: refresca la lista de procedimientos. */
+    @EventListener
+    public void alCambiarPlan(PlanCambiado e) {
+        if (avisando) {
+            return;
+        }
+        Runnable r = () -> {
+            if (actual != null && actual.pacienteId() == e.pacienteId() && boxItems != null) {
+                cargarItems();
+            }
+        };
+        if (Platform.isFxApplicationThread()) {
+            r.run();
+        } else {
+            Platform.runLater(r);
+        }
     }
 
     /** Desde la cabecera de la ficha o la pestaña Odontograma. */
@@ -253,5 +320,15 @@ public class AtencionesController {
 
     private static String texto(String v) {
         return v == null ? "" : v;
+    }
+
+    /** Avisa a las demás pestañas; el oyente propio ignora el aviso (ya está al día). */
+    private void avisarCambioDePlan(long pacienteId) {
+        avisando = true;
+        try {
+            eventos.publishEvent(new PlanCambiado(pacienteId));
+        } finally {
+            avisando = false;
+        }
     }
 }

@@ -1,0 +1,19 @@
+Yo, {FIRMANTE}, identificado(a) con {DOCUMENTO_FIRMANTE}, en calidad de {CALIDAD_FIRMANTE}, declaro que el (la) cirujano(a) dentista {ODONTOLOGO} (COP {COP}), de {CLINICA}, me ha explicado en términos sencillos el diagnóstico odontológico de {PACIENTE} (historia clínica {HISTORIA}) y el plan de tratamiento N° {PLAN} propuesto, que comprende:
+
+{PROCEDIMIENTOS}
+
+1. Beneficios: el tratamiento busca eliminar la infección y el dolor, recuperar la función masticatoria y la estética, y evitar que las lesiones avancen.
+
+2. Riesgos y molestias posibles: sensibilidad o dolor pasajero, inflamación, sangrado leve, reacción a la anestesia local, fractura de piezas debilitadas, necesidad de repetir o cambiar un procedimiento y, en tratamientos de conductos o cirugías, infección posterior. Se me informó que los resultados dependen también de mi higiene oral y de que asista a los controles.
+
+3. Alternativas: se me informaron las alternativas razonables a cada procedimiento, incluida la de no tratarse, y sus consecuencias (progresión de caries, dolor, infección o pérdida de piezas).
+
+4. Costo: el presupuesto del plan asciende a S/ {TOTAL} ({TOTAL_LETRAS}), según el detalle y el cronograma de pagos que se me entregó. Si durante el tratamiento cambia el diagnóstico, el odontólogo me explicará el cambio antes de realizarlo.
+
+5. He informado mis antecedentes médicos, alergias y medicamentos que tomo; sé que ocultarlos puede causar complicaciones.
+
+6. Puedo hacer preguntas en cualquier momento y retirar este consentimiento antes de cada procedimiento, sin perjuicio de pagar lo ya realizado.
+
+Habiendo comprendido lo anterior, AUTORIZO de manera libre y voluntaria la realización del plan de tratamiento descrito.
+
+Fecha: {FECHA}

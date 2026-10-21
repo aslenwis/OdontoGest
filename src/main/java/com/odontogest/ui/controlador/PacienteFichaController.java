@@ -81,7 +81,7 @@ public class PacienteFichaController {
         visible(lblInactivo, !p.activo());
     }
 
-    /** Muestra la pestaña con ese id ("datos", "anamnesis", "odontograma", "atenciones"). */
+    /** Muestra la pestaña con ese id ("datos", "anamnesis", "odontograma", "plan", "atenciones"). */
     public void seleccionarPestana(String id) {
         if (pestanas == null || id == null) {
             return;
