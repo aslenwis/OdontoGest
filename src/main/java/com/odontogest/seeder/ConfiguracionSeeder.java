@@ -42,6 +42,8 @@ public class ConfiguracionSeeder implements ApplicationRunner {
 
     private static final List<ClaveDefecto> CLAVES = List.of(
             new ClaveDefecto("esquema.version", ENTERO, "sistema", "1", false, "Versión del esquema de base de datos"),
+            new ClaveDefecto("seeder.ultimo_hc_demo", TEXTO, "sistema", "", false,
+                    "Última historia clínica creada por el seeder demo (los pacientes hasta ella se marcan como demo)"),
 
             new ClaveDefecto("clinica.nombre", TEXTO, "clinica", "Consultorio Odontológico Demo", true, "Nombre de la clínica"),
             new ClaveDefecto("clinica.ruc", TEXTO, "clinica", "20000000001", true, "RUC (ficticio en la demo)"),

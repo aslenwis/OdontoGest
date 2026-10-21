@@ -25,7 +25,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * temporal, así nunca se toca la BD real de {@code ~/OdontoGest}. Todas las subclases comparten
  * el mismo contexto (y la misma BD SQLite temporal, con los datos demo del seeder).
  */
-@SpringBootTest
+@SpringBootTest(properties = "app.seeder.datos-demo=false")
 public abstract class PruebaIntegracion {
 
     protected static final Path HOME_PRUEBAS;

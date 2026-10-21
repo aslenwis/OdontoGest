@@ -23,7 +23,8 @@ public record PacienteDetalle(
         LocalDate fechaNacimiento, Sexo sexo, String telefono, String email, String direccion, String ocupacion,
         String contactoEmergenciaNombre, String contactoEmergenciaTelefono,
         String apoderadoNombre, String apoderadoDocumento, String apoderadoParentesco,
-        boolean aceptaRecordatorios, boolean activo, int edad, String alergias, LocalDateTime consentimientoDatosEn) {
+        boolean aceptaRecordatorios, boolean activo, int edad, String alergias, LocalDateTime consentimientoDatosEn,
+        boolean demo) {
 
     public static final int MAYORIA_DE_EDAD = 18;
 

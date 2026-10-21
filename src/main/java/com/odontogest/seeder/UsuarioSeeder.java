@@ -13,7 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 /**
  * Usuarios de demostración: {@code admin / Admin123*}, {@code odontologo / Odonto123*} (vinculado al
@@ -25,6 +27,7 @@ public class UsuarioSeeder {
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
+    private final Clock reloj;
 
     public void sembrar(Odontologo odontologoGeneral) {
         crear("admin", "Admin123*", "Administrador del sistema", Rol.ADMIN, null);
@@ -40,7 +43,7 @@ public class UsuarioSeeder {
         u.setRol(rol);
         u.setOdontologo(odontologo);
         u.setActivo(true);
-        u.setCreadoEn(LocalDateTime.now());
+        u.setCreadoEn(LocalDateTime.now(reloj).truncatedTo(ChronoUnit.SECONDS));
         usuarioRepository.save(u);
     }
 }

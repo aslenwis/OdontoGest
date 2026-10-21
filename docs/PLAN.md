@@ -959,6 +959,15 @@ Reglas del seeder demo:
 - Todos los DNI empiezan con `9` y se marcan en la UI con la etiqueta “Paciente demo” (columna derivada: `numero_historia` ≤ `HC-000060` creado por el seeder; guardar en `configuracion` la clave `seeder.ultimo_hc_demo`).
 - El seeder de la versión INDECOPI se deja activo para que el evaluador vea el sistema con datos.
 
+**Decisiones de la implementación (Fase 9):**
+- **Reloj de la aplicación** (`config/RelojAplicacion`, un `java.time.Clock`): los servicios toman la hora con `LocalDateTime.now(reloj)`. En uso normal es la hora real; el seeder lo fija en momentos del pasado. Así la historia demo (unos seis meses) se registra **con los servicios de la interfaz**, cumpliendo sus validaciones (citas no en el pasado, "atender ahora" solo el día de la cita) y con hashes de odontograma válidos, sin tocar fechas por SQL.
+- `ClinicaDemoSeeder` simula el consultorio como una cola de eventos en orden cronológico (registro en recepción → cita → primera consulta → plan → pagos de cuotas → evolución → controles), cambiando de sesión según quién lo haría (admin para lo clínico, recepción para caja y agenda). Un paso que un servicio rechaza se omite y se registra en el log. Resultado con la semilla 2026: 60 pacientes, 40 primeras consultas, 15 evoluciones, ~90 pagos (con pacientes morosos), 120 citas en ±30 días; unos 8 s.
+- `DatabaseSeeder` ya no es una sola transacción: usuarios y odontólogos en una; la historia demo sin transacción envolvente (cada servicio confirma la suya). Un error en la demo no impide abrir la aplicación. `app.seeder.datos-demo` (por defecto `true`) la desactiva; las pruebas la desactivan salvo `DatosDemoTest`, que siembra en una base propia.
+- "Paciente demo": `PacienteService` compara la historia con `seeder.ultimo_hc_demo` (clave de sistema nueva, no editable) y lo marca en la lista y en la cabecera de la ficha.
+- Pantalla de carga (`ui/PantallaCarga`, `Preloader` de JavaFX registrado en `Launcher` con `javafx.preloader`): se ve mientras `init()` levanta Spring; no cambia la integración Spring + JavaFX.
+- Empaquetado: el perfil usa `${java.home}/bin/jpackage` (no exige `jpackage` en el PATH) y genera además `target/dist/OdontoGest-<versión>-windows-x64.zip` (carpeta `OdontoGest/` + `LEEME.txt`) con la herramienta `jar` del JDK. Icono en `packaging/odontogest.ico` y `src/main/resources/img/icono.png`. El lanzador de jpackage abre la aplicación en un proceso hijo.
+- Verificado: el ZIP descomprimido en una carpeta limpia, con `JAVA_HOME` vacío y sin Java en el PATH, abre `OdontoGest.exe`, siembra la demo y muestra "OdontoGest - Iniciar sesión" (~20 s la primera vez).
+
 #### Catálogo de hallazgos (NTS N° 188-MINSA/DGIESP-2022, numeral 6.1 — validado)
 Orden = orden de la paleta. La pieza ausente (6.1.20) se registra como tres tipos (DEX/DNE/DAO) con el mismo
 dibujo y capa, para que solo la ausente por caries (DEX) cuente en CPO-D/ceo-d. Los hallazgos de rango cubren

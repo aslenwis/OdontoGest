@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -39,6 +40,7 @@ public class AuditoriaService {
 
     public static final int MAXIMO_RESULTADOS = 500;
 
+    private final Clock reloj;
     private final AuditoriaRepository auditoriaRepository;
     private final UsuarioRepository usuarioRepository;
     private final SesionUsuario sesionUsuario;
@@ -51,7 +53,7 @@ public class AuditoriaService {
     public void registrar(String accion, String entidad, Long entidadId, Object detalle) {
         Long usuarioId = sesionUsuario.usuario().map(UsuarioSesion::id).orElse(null);
         auditoriaRepository.save(Auditoria.de(usuarioId, accion, entidad, entidadId,
-                detalle == null ? null : gson.toJson(detalle), LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)));
+                detalle == null ? null : gson.toJson(detalle), LocalDateTime.now(reloj).truncatedTo(ChronoUnit.SECONDS)));
     }
 
     /** Consulta para el administrador (pestaña Auditoría de Reportes). */

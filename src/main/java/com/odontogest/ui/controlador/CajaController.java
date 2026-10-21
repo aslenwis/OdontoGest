@@ -133,7 +133,7 @@ public class CajaController implements Refrescable {
         tareaUi.ejecutar(() -> {
             var d = pacienteService.obtener(pacienteId);
             return new PacienteResumen(d.id(), d.numeroHistoria(), d.documento(), d.nombreCompleto(), d.edad(),
-                    d.telefono(), d.activo());
+                    d.telefono(), d.activo(), d.demo());
         }, p -> {
             autocompletar.fijar(p);
             elegirPaciente(p);

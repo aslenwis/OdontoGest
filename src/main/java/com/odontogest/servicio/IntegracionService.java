@@ -20,6 +20,7 @@ import com.odontogest.servicio.dto.PersonaDniDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -35,6 +36,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class IntegracionService {
 
+    private final Clock reloj;
     private final ConfiguracionService configuracion;
     private final ConsultaDniGateway dniGateway;
     private final CorreoGateway correoGateway;
@@ -87,7 +89,7 @@ public class IntegracionService {
         String clinica = configuracion.texto("clinica.nombre");
         correoGateway.enviar(parametrosSmtp(), d, "Correo de prueba – " + clinica,
                 "Este es un correo de prueba enviado desde OdontoGest el "
-                        + DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").format(LocalDateTime.now())
+                        + DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").format(LocalDateTime.now(reloj))
                         + ".\n\nSi lo recibe, la configuración del servidor de correo es correcta y los recordatorios "
                         + "de citas podrán enviarse.\n\n" + clinica);
     }

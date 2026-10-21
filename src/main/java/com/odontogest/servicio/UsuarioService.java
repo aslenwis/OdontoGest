@@ -22,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,7 @@ public class UsuarioService {
     private static final Pattern USERNAME = Pattern.compile("[A-Za-z0-9._-]{3,30}");
     private static final int LARGO_MINIMO_PASSWORD = 8;
 
+    private final Clock reloj;
     private final UsuarioRepository usuarioRepository;
     private final AuditoriaService auditoria;
     private final OdontologoRepository odontologoRepository;
@@ -50,7 +52,7 @@ public class UsuarioService {
     private final SesionUsuario sesionUsuario;
 
     public List<UsuarioDto> listar() {
-        LocalDateTime ahora = LocalDateTime.now();
+        LocalDateTime ahora = LocalDateTime.now(reloj);
         return usuarioRepository.findAllByOrderByUsernameAsc().stream().map(u -> dto(u, ahora)).toList();
     }
 
@@ -83,7 +85,7 @@ public class UsuarioService {
             u = new Usuario();
             u.setUsername(username);
             u.setPasswordHash(passwordEncoder.encode(form.password()));
-            u.setCreadoEn(LocalDateTime.now());
+            u.setCreadoEn(LocalDateTime.now(reloj));
         } else {
             u = buscar(form.id());
             boolean pierdeAdmin = u.getRol() == Rol.ADMIN && u.isActivo() && (form.rol() != Rol.ADMIN || !form.activo());

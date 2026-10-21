@@ -38,6 +38,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -82,6 +83,7 @@ public class RespaldoService {
     private static final byte[] CABECERA_SQLITE = "SQLite format 3\0".getBytes(StandardCharsets.US_ASCII);
     private static final List<String> TABLAS_REQUERIDAS = List.of("configuracion", "usuario", "paciente", "odontograma");
 
+    private final Clock reloj;
     private final JdbcTemplate jdbcTemplate;
     private final ConfiguracionService configuracionService;
     private final AuditoriaService auditoria;
@@ -346,19 +348,19 @@ public class RespaldoService {
         m.put("aplicacion", "OdontoGest");
         BuildProperties build = buildProperties.getIfAvailable();
         m.put("version", build == null ? "desarrollo" : build.getVersion());
-        m.put("fecha", LocalDateTimeConverter.aTexto(LocalDateTime.now()));
+        m.put("fecha", LocalDateTimeConverter.aTexto(LocalDateTime.now(reloj)));
         m.put("esquema", VERSION_ESQUEMA);
         return gson.toJson(m);
     }
 
-    private static Path nuevoArchivo(String prefijo) {
+    private Path nuevoArchivo(String prefijo) {
         Path carpeta = DirectorioDatos.home().resolve(DirectorioDatos.RESPALDOS);
         try {
             Files.createDirectories(carpeta);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-        String base = prefijo + SELLO.format(LocalDateTime.now());
+        String base = prefijo + SELLO.format(LocalDateTime.now(reloj));
         Path archivo = carpeta.resolve(base + ".zip");
         for (int i = 2; Files.exists(archivo); i++) {
             archivo = carpeta.resolve(base + "-" + i + ".zip");

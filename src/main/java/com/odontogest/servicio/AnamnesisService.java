@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Type;
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -45,6 +46,7 @@ public class AnamnesisService {
     private static final Type TIPO_MAPA = new TypeToken<Map<String, Boolean>>() { }.getType();
     private static final Gson GSON = new Gson();
 
+    private final Clock reloj;
     private final AnamnesisRepository anamnesisRepository;
     private final PacienteRepository pacienteRepository;
     private final SesionUsuario sesionUsuario;
@@ -94,7 +96,7 @@ public class AnamnesisService {
         a.setPresionArterial(presion);
         a.setObservaciones(Validador.limpioMultilinea(dto.observaciones()));
         a.setActualizadoPor(usuarioId);
-        a.setActualizadoEn(LocalDateTime.now());
+        a.setActualizadoEn(LocalDateTime.now(reloj));
         anamnesisRepository.save(a);
         return obtener(paciente.getId());
     }

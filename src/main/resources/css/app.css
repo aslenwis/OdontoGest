@@ -143,6 +143,14 @@
     -fx-padding: 3 8 3 8;
 }
 
+.etiqueta-demo {
+    -fx-background-color: -color-accent-subtle;
+    -fx-text-fill: -color-accent-fg;
+    -fx-background-radius: 4;
+    -fx-padding: 2 8 2 8;
+    -fx-font-size: 0.9em;
+}
+
 .etiqueta-aviso .ikonli-font-icon {
     -fx-icon-color: -color-warning-fg;
 }

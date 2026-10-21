@@ -35,6 +35,7 @@
                         <graphic><FontIcon iconLiteral="fth-file-text"/></graphic>
                     </Label>
                     <Label fx:id="lblInactivo" text="Paciente inactivo" styleClass="etiqueta-aviso"/>
+                    <Label fx:id="lblDemo" text="Paciente demo" styleClass="etiqueta-demo"/>
                 </FlowPane>
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>

@@ -32,6 +32,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -52,6 +53,11 @@ public class PacienteService {
     public static final int TAMANIO_PAGINA = 15;
     private static final int EDAD_MAXIMA = 120;
 
+    /** Última historia creada por el seeder demo (PLAN §3.5); la escribe {@code DatabaseSeeder}. */
+    public static final String CLAVE_ULTIMO_HC_DEMO = "seeder.ultimo_hc_demo";
+
+    private final Clock reloj;
+    private final ConfiguracionService configuracionService;
     private final PacienteRepository pacienteRepository;
     private final AuditoriaService auditoria;
     private final AnamnesisRepository anamnesisRepository;
@@ -67,8 +73,9 @@ public class PacienteService {
         PageRequest solicitud = PageRequest.of(Math.max(0, pagina), TAMANIO_PAGINA,
                 Sort.by("apellidoPaterno", "apellidoMaterno", "nombres", "id"));
         Page<Paciente> resultado = pacienteRepository.findAll(especificacion(filtro, incluirInactivos), solicitud);
-        LocalDate hoy = LocalDate.now();
-        List<PacienteResumen> filas = resultado.getContent().stream().map(p -> resumen(p, hoy)).toList();
+        LocalDate hoy = LocalDate.now(reloj);
+        String ultimoDemo = ultimoDemo();
+        List<PacienteResumen> filas = resultado.getContent().stream().map(p -> resumen(p, hoy, ultimoDemo)).toList();
         return new Pagina<>(filas, resultado.getNumber(), TAMANIO_PAGINA, resultado.getTotalElements());
     }
 
@@ -89,7 +96,7 @@ public class PacienteService {
         validar(f);
 
         Paciente p = f.id() == null ? new Paciente() : buscarPaciente(f.id());
-        LocalDateTime ahora = LocalDateTime.now();
+        LocalDateTime ahora = LocalDateTime.now(reloj);
         if (p.getId() == null) {
             p.setNumeroHistoria(correlativoService.siguienteHistoriaClinica());
             p.setCreadoEn(ahora);
@@ -108,7 +115,7 @@ public class PacienteService {
         p.setOcupacion(f.ocupacion());
         p.setContactoEmergenciaNombre(f.contactoEmergenciaNombre());
         p.setContactoEmergenciaTelefono(f.contactoEmergenciaTelefono());
-        boolean menor = Validaciones.esMenorDeEdad(f.fechaNacimiento(), LocalDate.now());
+        boolean menor = Validaciones.esMenorDeEdad(f.fechaNacimiento(), LocalDate.now(reloj));
         p.setApoderadoNombre(menor ? f.apoderadoNombre() : null);
         p.setApoderadoDocumento(menor ? f.apoderadoDocumento() : null);
         p.setApoderadoParentesco(menor ? f.apoderadoParentesco() : null);
@@ -128,7 +135,7 @@ public class PacienteService {
         Paciente p = buscarPaciente(id);
         p.setActivo(activo);
         auditoria.registrar(activo ? "PACIENTE_REACTIVAR" : "PACIENTE_DESACTIVAR", "paciente", id, null);
-        p.setActualizadoEn(LocalDateTime.now());
+        p.setActualizadoEn(LocalDateTime.now(reloj));
     }
 
     private Paciente buscarPaciente(long id) {
@@ -177,7 +184,7 @@ public class PacienteService {
     }
 
     private void validar(PacienteForm f) {
-        LocalDate hoy = LocalDate.now();
+        LocalDate hoy = LocalDate.now(reloj);
         Validador v = new Validador()
                 .requerido(f.nombres(), "los nombres")
                 .requerido(f.apellidoPaterno(), "el apellido paterno")
@@ -229,9 +236,23 @@ public class PacienteService {
         }
     }
 
-    private static PacienteResumen resumen(Paciente p, LocalDate hoy) {
+    private static PacienteResumen resumen(Paciente p, LocalDate hoy, String ultimoDemo) {
         return new PacienteResumen(p.getId(), p.getNumeroHistoria(), documento(p), p.getNombreCompleto(),
-                Validaciones.edad(p.getFechaNacimiento(), hoy), p.getTelefono(), p.isActivo());
+                Validaciones.edad(p.getFechaNacimiento(), hoy), p.getTelefono(), p.isActivo(),
+                esDemo(p.getNumeroHistoria(), ultimoDemo));
+    }
+
+    /**
+     * Paciente creado por el seeder de demostración: su historia no pasa de {@code seeder.ultimo_hc_demo}
+     * (las historias tienen el mismo largo, {@code HC-000001}, así que se comparan como texto).
+     */
+    static boolean esDemo(String numeroHistoria, String ultimoDemo) {
+        return ultimoDemo != null && !ultimoDemo.isBlank() && numeroHistoria != null
+                && numeroHistoria.length() == ultimoDemo.length() && numeroHistoria.compareTo(ultimoDemo) <= 0;
+    }
+
+    private String ultimoDemo() {
+        return configuracionService.texto(CLAVE_ULTIMO_HC_DEMO);
     }
 
     private static String documento(Paciente p) {
@@ -239,13 +260,13 @@ public class PacienteService {
                 ? "Sin documento" : p.getTipoDocumento().name() + " " + p.getNumeroDocumento();
     }
 
-    private static PacienteDetalle detalle(Paciente p, String alergias, LocalDateTime consentimiento) {
+    private PacienteDetalle detalle(Paciente p, String alergias, LocalDateTime consentimiento) {
         return new PacienteDetalle(p.getId(), p.getNumeroHistoria(), p.getTipoDocumento(), p.getNumeroDocumento(),
                 p.getNombres(), p.getApellidoPaterno(), p.getApellidoMaterno(), p.getFechaNacimiento(), p.getSexo(),
                 p.getTelefono(), p.getEmail(), p.getDireccion(), p.getOcupacion(),
                 p.getContactoEmergenciaNombre(), p.getContactoEmergenciaTelefono(),
                 p.getApoderadoNombre(), p.getApoderadoDocumento(), p.getApoderadoParentesco(),
-                p.isAceptaRecordatorios(), p.isActivo(), Validaciones.edad(p.getFechaNacimiento(), LocalDate.now()),
-                alergias, consentimiento);
+                p.isAceptaRecordatorios(), p.isActivo(), Validaciones.edad(p.getFechaNacimiento(), LocalDate.now(reloj)),
+                alergias, consentimiento, esDemo(p.getNumeroHistoria(), ultimoDemo()));
     }
 }

@@ -65,7 +65,8 @@ public class PacientesController implements Refrescable {
                 Formularios.columna("Paciente", PacienteResumen::nombreCompleto, 320),
                 Formularios.columna("Edad", p -> p.edad() + " años", 80),
                 Formularios.columna("Teléfono", PacienteResumen::telefono, 130),
-                Formularios.columna("Estado", p -> p.activo() ? "Activo" : "Inactivo", 90));
+                Formularios.columna("Estado", p -> (p.activo() ? "Activo" : "Inactivo") + (p.demo() ? " · Paciente demo" : ""),
+                        150));
         tabla.setRowFactory(t -> {
             TableRow<PacienteResumen> fila = new TableRow<>();
             fila.setOnMouseClicked(e -> {

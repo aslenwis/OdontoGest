@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
@@ -79,6 +80,7 @@ public class ReporteService {
             Rol.ODONTOLOGO, EnumSet.of(TipoReporte.PRODUCCION, TipoReporte.EPIDEMIOLOGICO),
             Rol.RECEPCION, EnumSet.of(TipoReporte.INGRESOS, TipoReporte.MOROSIDAD));
 
+    private final Clock reloj;
     private final ReporteDao reporteDao;
     private final OdontogramaService odontogramaService;
     private final ConfiguracionService configuracionService;
@@ -177,7 +179,7 @@ public class ReporteService {
     // ------------------------------------------------------------------ morosidad (RF-REP-04)
 
     public ReporteMorosidadDto morosidad() {
-        return morosidad(LocalDate.now());
+        return morosidad(LocalDate.now(reloj));
     }
 
     ReporteMorosidadDto morosidad(LocalDate hoy) {

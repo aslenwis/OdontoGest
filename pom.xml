@@ -249,7 +249,8 @@
                                 <phase>package</phase>
                                 <goals><goal>exec</goal></goals>
                                 <configuration>
-                                    <executable>jpackage</executable>
+                                    <!-- El jpackage del JDK que ejecuta Maven: no exige tenerlo en el PATH. -->
+                                    <executable>${java.home}/bin/jpackage</executable>
                                     <arguments>
                                         <argument>--type</argument><argument>${jpackage.type}</argument>
                                         <argument>--name</argument><argument>OdontoGest</argument>
@@ -265,6 +266,21 @@
                                         <argument>--strip-debug --no-man-pages --no-header-files</argument>
                                         <argument>--java-options</argument><argument>-Xmx768m</argument>
                                         <argument>--java-options</argument><argument>-Dfile.encoding=UTF-8</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <!-- ZIP final para entregar: OdontoGest/ + LEEME.txt (jar -M = ZIP sin manifiesto). -->
+                            <execution>
+                                <id>zip-distribucion</id>
+                                <phase>package</phase>
+                                <goals><goal>exec</goal></goals>
+                                <configuration>
+                                    <executable>${java.home}/bin/jar</executable>
+                                    <arguments>
+                                        <argument>-cMf</argument>
+                                        <argument>${project.build.directory}/dist/OdontoGest-${project.version}-windows-x64.zip</argument>
+                                        <argument>-C</argument><argument>${project.build.directory}/dist</argument><argument>OdontoGest</argument>
+                                        <argument>-C</argument><argument>${project.basedir}/packaging</argument><argument>LEEME.txt</argument>
                                     </arguments>
                                 </configuration>
                             </execution>

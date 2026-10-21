@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,6 +38,7 @@ import java.util.Map;
 @Transactional(readOnly = true)
 public class ConsentimientoService {
 
+    private final Clock reloj;
     private final ConsentimientoRepository consentimientoRepository;
     private final AuditoriaService auditoria;
     private final PacienteRepository pacienteRepository;
@@ -54,7 +56,7 @@ public class ConsentimientoService {
     /** Documento para imprimir y firmar. */
     public byte[] pdfDatosPersonales(long pacienteId) {
         PacienteDetalle paciente = pacienteService.obtener(pacienteId);
-        return consentimientoPdf.datosPersonales(configuracionService.datosClinica(), paciente, LocalDate.now());
+        return consentimientoPdf.datosPersonales(configuracionService.datosClinica(), paciente, LocalDate.now(reloj));
     }
 
     /**
@@ -74,7 +76,7 @@ public class ConsentimientoService {
         Consentimiento c = new Consentimiento();
         c.setPaciente(paciente);
         c.setTipo(TipoConsentimiento.DATOS_PERSONALES);
-        c.setAceptadoEn(LocalDateTime.now());
+        c.setAceptadoEn(LocalDateTime.now(reloj));
         c.setFirmadoPor(firmante);
         c.setRegistradoPor(usuarioId);
         Consentimiento guardado = consentimientoRepository.save(c);

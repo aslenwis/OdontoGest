@@ -31,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -53,6 +54,7 @@ public class AtencionService {
 
     private static final DateTimeFormatter FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
+    private final Clock reloj;
     private final AtencionRepository atencionRepository;
     private final AuditoriaService auditoria;
     private final PacienteRepository pacienteRepository;
@@ -99,7 +101,7 @@ public class AtencionService {
         if (!cita.getEstado().activa()) {
             throw new NegocioException("La cita está " + cita.getEstado().etiqueta().toLowerCase() + ": no se puede atender.");
         }
-        if (!cita.getInicio().toLocalDate().equals(LocalDate.now())) {
+        if (!cita.getInicio().toLocalDate().equals(LocalDate.now(reloj))) {
             throw new NegocioException("Solo se atienden las citas del día; esta es del " + FECHA.format(cita.getInicio()) + ".");
         }
         if (!atencionRepository.findByCitaIdIn(List.of(citaId)).isEmpty()) {
@@ -137,7 +139,7 @@ public class AtencionService {
         Atencion a = new Atencion();
         a.setPaciente(paciente);
         a.setOdontologo(odontologo);
-        a.setFecha(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+        a.setFecha(LocalDateTime.now(reloj).truncatedTo(ChronoUnit.SECONDS));
         a.setMotivoConsulta(motivo);
         a.setExamenClinico(Validador.limpioMultilinea(form.examenClinico()));
         a.setDiagnostico(Validador.limpioMultilinea(form.diagnostico()));
@@ -186,7 +188,7 @@ public class AtencionService {
         }
         a.setEstado(EstadoAtencion.CERRADA);
         auditoria.registrar("ATENCION_CERRAR", "atencion", a.getId(), null);
-        a.setCerradaEn(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+        a.setCerradaEn(LocalDateTime.now(reloj).truncatedTo(ChronoUnit.SECONDS));
         if (a.getCitaId() != null) {
             citaService.marcarAtendida(a.getCitaId());
         }

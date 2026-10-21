@@ -51,6 +51,7 @@ public class PacienteFichaController {
     @FXML private Label lblAlergias;
     @FXML private Label lblConsentimiento;
     @FXML private Label lblInactivo;
+    @FXML private Label lblDemo;
     @FXML private TabPane pestanas;
     @FXML private Button btnNuevaAtencion;
     @FXML private Button btnNuevaCita;
@@ -82,6 +83,7 @@ public class PacienteFichaController {
             visible(lblAlergias, false);
             visible(lblConsentimiento, false);
             visible(lblInactivo, false);
+            visible(lblDemo, false);
             lblSaldo.setText("");
             return;
         }
@@ -94,6 +96,7 @@ public class PacienteFichaController {
                 + (p.edad() == 1 ? " año" : " años"));
         lblAlergias.setText("Alergias: " + (p.tieneAlergias() ? p.alergias().replaceAll("\\s+", " ") : ""));
         visible(lblAlergias, p.tieneAlergias());
+        visible(lblDemo, p.demo());
         lblConsentimiento.setText("Falta consentimiento de datos personales");
         visible(lblConsentimiento, p.consentimientoDatosEn() == null);
         visible(lblInactivo, !p.activo());

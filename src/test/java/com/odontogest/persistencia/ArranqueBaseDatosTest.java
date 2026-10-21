@@ -64,7 +64,7 @@ class ArranqueBaseDatosTest extends PruebaIntegracion {
 
     @Test
     void cargaConfiguracionCorrelativosYAdmin() {
-        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM configuracion", Integer.class)).isEqualTo(29);
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM configuracion", Integer.class)).isEqualTo(30);   // 29 + seeder.ultimo_hc_demo (Fase 9)
         assertThat(jdbc.queryForObject("SELECT valor FROM configuracion WHERE clave = 'api.dni.prefijo_token'", String.class))
                 .isEqualTo("Bearer ");
         assertThat(jdbc.queryForObject("SELECT editable FROM configuracion WHERE clave = 'esquema.version'", Integer.class))

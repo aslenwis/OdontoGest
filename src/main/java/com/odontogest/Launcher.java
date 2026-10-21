@@ -7,6 +7,7 @@ package com.odontogest;
 
 import com.odontogest.config.DirectorioDatos;
 import com.odontogest.config.RestauracionPendiente;
+import com.odontogest.ui.PantallaCarga;
 import javafx.application.Application;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +39,8 @@ public final class Launcher {
             // La base anterior sigue en su lugar; la marca queda para reintentar en el próximo arranque.
             LoggerFactory.getLogger(Launcher.class).error("No se pudo aplicar la restauración pendiente", e);
         }
+        // Pantalla de carga mientras Spring arranca (y, la primera vez, se siembran los datos demo).
+        System.setProperty("javafx.preloader", PantallaCarga.class.getName());
         Application.launch(JavaFxApplication.class, args);
     }
 }

@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -41,6 +42,7 @@ public class AutenticacionService {
     private static final String CREDENCIALES_INVALIDAS = "Usuario o contraseña incorrectos.";
     private static final DateTimeFormatter HORA = DateTimeFormatter.ofPattern("HH:mm");
 
+    private final Clock reloj;
     private final UsuarioRepository usuarioRepository;
     private final AuditoriaService auditoria;
     private final PasswordEncoder passwordEncoder;
@@ -61,7 +63,7 @@ public class AutenticacionService {
         Usuario usuario = usuarioRepository.findByUsernameIgnoreCase(username.trim())
                 .orElseThrow(() -> new NegocioException(CREDENCIALES_INVALIDAS));
 
-        LocalDateTime ahora = LocalDateTime.now();
+        LocalDateTime ahora = LocalDateTime.now(reloj);
         if (!usuario.isActivo()) {
             throw new NegocioException("El usuario está desactivado. Consulte con el administrador.");
         }

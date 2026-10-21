@@ -52,6 +52,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -82,6 +83,7 @@ public class OdontogramaService {
 
     public static final int LARGO_MINIMO_MOTIVO = 10;
 
+    private final Clock reloj;
     private final OdontogramaRepository odontogramaRepository;
     private final AuditoriaService auditoria;
     private final HallazgoRepository hallazgoRepository;
@@ -217,7 +219,7 @@ public class OdontogramaService {
         o.setTipo(odontogramaRepository.existsByPacienteIdAndTipo(pacienteId, TipoOdontograma.INICIAL)
                 ? TipoOdontograma.EVOLUCION : TipoOdontograma.INICIAL);
         o.setDenticion(denticion != null ? denticion
-                : Denticion.sugerida(Validaciones.edad(atencion.getPaciente().getFechaNacimiento(), LocalDate.now())));
+                : Denticion.sugerida(Validaciones.edad(atencion.getPaciente().getFechaNacimiento(), LocalDate.now(reloj))));
         o.setEstado(EstadoOdontogramaRegistro.BORRADOR);
         o.setCreadoEn(ahora());
         return odontogramaRepository.save(o).getId();
@@ -487,7 +489,7 @@ public class OdontogramaService {
     }
 
     /** Fechas guardadas al segundo: lo mismo que entra en el hash es lo que se lee después. */
-    private static LocalDateTime ahora() {
-        return LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+    private LocalDateTime ahora() {
+        return LocalDateTime.now(reloj).truncatedTo(ChronoUnit.SECONDS);
     }
 }

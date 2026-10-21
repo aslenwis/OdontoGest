@@ -62,6 +62,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -98,6 +99,7 @@ public class PlanTratamientoService {
     private static final BigDecimal MONTO_MAXIMO = new BigDecimal("999999.99");
     private static final int MAXIMO_CUOTAS = 60;
 
+    private final Clock reloj;
     private final PlanTratamientoRepository planRepository;
     private final AuditoriaService auditoria;
     private final PlanItemRepository itemRepository;
@@ -170,7 +172,7 @@ public class PlanTratamientoService {
         if (doc.plan().items().isEmpty()) {
             throw new NegocioException("El plan no tiene procedimientos.");
         }
-        return consentimientoPdf.tratamiento(doc, LocalDate.now());
+        return consentimientoPdf.tratamiento(doc, LocalDate.now(reloj));
     }
 
     // ------------------------------------------------------------------ plan
@@ -312,7 +314,7 @@ public class PlanTratamientoService {
         consentimientoRepository.save(c);
         if (cuotaRepository.findByPlanIdOrderByNumeroAsc(p.getId()).isEmpty()) {
             long total = DineroConverter.aCentimos(p.getTotal());
-            guardarCuotas(p, generador.generar(total, total, 0, null, null, LocalDate.now()));
+            guardarCuotas(p, generador.generar(total, total, 0, null, null, LocalDate.now(reloj)));
         }
         p.setEstado(EstadoPlan.ACEPTADO);
         p.setAceptadoEn(ahora);
@@ -432,7 +434,7 @@ public class PlanTratamientoService {
         List<CuotaProgramada> programadas;
         try {
             programadas = generador.generar(DineroConverter.aCentimos(p.getTotal()), DineroConverter.aCentimos(inicial),
-                    form.numeroCuotas(), form.primerVencimiento(), form.frecuencia(), LocalDate.now());
+                    form.numeroCuotas(), form.primerVencimiento(), form.frecuencia(), LocalDate.now(reloj));
         } catch (ReglaDominioException e) {
             throw new NegocioException(e.getMessage());
         } catch (NullPointerException e) {
@@ -654,7 +656,7 @@ public class PlanTratamientoService {
         List<PlanItemDto> items = new ArrayList<>(itemRepository.listarPorPlan(p.getId()).stream()
                 .map(PlanTratamientoService::dto).toList());
         items.sort(PlanTratamientoService.ORDEN_ITEMS);
-        LocalDate hoy = LocalDate.now();
+        LocalDate hoy = LocalDate.now(reloj);
         List<CuotaDto> cuotas = cuotaRepository.findByPlanIdOrderByNumeroAsc(p.getId()).stream()
                 .map(c -> new CuotaDto(c.getId(), c.getNumero(), c.getVencimiento(), c.getMonto(), c.getPagado(),
                         EstadoCuota.de(DineroConverter.aCentimos(c.getMonto()), DineroConverter.aCentimos(c.getPagado()),
@@ -694,7 +696,7 @@ public class PlanTratamientoService {
                 r.getProcedimiento().getId(), r.getFase(), r.getPrioridad());
     }
 
-    private static LocalDateTime ahora() {
-        return LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+    private LocalDateTime ahora() {
+        return LocalDateTime.now(reloj).truncatedTo(ChronoUnit.SECONDS);
     }
 }

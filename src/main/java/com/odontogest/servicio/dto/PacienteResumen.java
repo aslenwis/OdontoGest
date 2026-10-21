@@ -11,5 +11,5 @@ package com.odontogest.servicio.dto;
  * @param documento tipo y número, p. ej. "DNI 71234567"
  */
 public record PacienteResumen(long id, String numeroHistoria, String documento, String nombreCompleto,
-                              int edad, String telefono, boolean activo) {
+                              int edad, String telefono, boolean activo, boolean demo) {
 }

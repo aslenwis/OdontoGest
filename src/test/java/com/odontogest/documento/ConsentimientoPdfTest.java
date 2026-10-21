@@ -77,7 +77,7 @@ class ConsentimientoPdfTest {
                 "(01) 000-0000", "contacto@consultorio-demo.pe");
         PacienteDetalle paciente = new PacienteDetalle(1, "HC-000001", TipoDocumento.DNI, "72004779", "Ana", "Prueba",
                 "Demo", LocalDate.of(1986, 1, 1), Sexo.F, null, null, null, null, null, null, null, null, null, false, true,
-                40, null, null);
+                40, null, null, false);
         List<PlanItemDto> items = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             items.add(new PlanItemDto(i, 7, 1, "RES-C", "Resina compuesta (2 o más superficies)", FormaCobro.PIEZA, null,

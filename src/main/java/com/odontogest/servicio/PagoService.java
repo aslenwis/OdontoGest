@@ -43,6 +43,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -78,6 +79,7 @@ public class PagoService {
     static final Set<EstadoPlan> COBRABLES = EnumSet.of(EstadoPlan.ACEPTADO, EstadoPlan.EN_CURSO, EstadoPlan.FINALIZADO);
     private static final BigDecimal MONTO_MAXIMO = new BigDecimal("999999.99");
 
+    private final Clock reloj;
     private final PagoRepository pagoRepository;
     private final AuditoriaService auditoria;
     private final PagoAplicacionRepository aplicacionRepository;
@@ -97,7 +99,7 @@ public class PagoService {
 
     /** Cuotas con saldo de los planes cobrables del paciente, en orden FIFO. */
     public List<CuotaPacienteDto> cuotasPendientes(long pacienteId) {
-        LocalDate hoy = LocalDate.now();
+        LocalDate hoy = LocalDate.now(reloj);
         return cuotaRepository.listarPorPaciente(pacienteId, COBRABLES).stream()
                 .filter(c -> c.getPagado().compareTo(c.getMonto()) < 0)
                 .map(c -> dto(c, hoy))
@@ -124,7 +126,7 @@ public class PagoService {
 
     /** Estado de cuenta del paciente (RF-CAJ-04). */
     public EstadoCuentaDto estadoCuenta(long pacienteId) {
-        LocalDate hoy = LocalDate.now();
+        LocalDate hoy = LocalDate.now(reloj);
         List<CuotaPacienteDto> cuotas = cuotaRepository.listarPorPaciente(pacienteId, COBRABLES).stream()
                 .map(c -> dto(c, hoy)).toList();
         BigDecimal total = suma(cuotas.stream().map(CuotaPacienteDto::monto).toList());
@@ -195,7 +197,7 @@ public class PagoService {
         pago.setNumeroRecibo(correlativoService.siguienteRecibo());
         pago.setPaciente(paciente);
         pago.setPlanId(planes.size() == 1 ? planes.iterator().next() : null);
-        pago.setFecha(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+        pago.setFecha(LocalDateTime.now(reloj).truncatedTo(ChronoUnit.SECONDS));
         pago.setMonto(form.monto());
         pago.setMedio(form.medio());
         pago.setReferencia(referencia);
@@ -249,7 +251,7 @@ public class PagoService {
         }
         pago.setAnulado(true);
         pago.setMotivoAnulacion(m);
-        pago.setAnuladoEn(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+        pago.setAnuladoEn(LocalDateTime.now(reloj).truncatedTo(ChronoUnit.SECONDS));
         cuotaRepository.flush();
         log.info("Pago {} anulado: {}", pago.getNumeroRecibo(), m);
         auditoria.registrar("PAGO_ANULAR", "pago", pago.getId(), Map.of("recibo", pago.getNumeroRecibo(), "motivo", m));

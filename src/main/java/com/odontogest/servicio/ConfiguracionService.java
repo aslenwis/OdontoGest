@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -66,6 +67,7 @@ public class ConfiguracionService {
     private static final Set<Integer> INTERVALOS_AGENDA = Set.of(5, 10, 15, 20, 30);
     private static final long TAMANIO_MAXIMO_LOGO = 2L * 1024 * 1024;
 
+    private final Clock reloj;
     private final ConfiguracionRepository configuracionRepository;
     private final AuditoriaService auditoria;
     private final CifradorSecretos cifrador;
@@ -135,7 +137,7 @@ public class ConfiguracionService {
         }
         Map<String, String> normalizados = new HashMap<>();
         valores.forEach((clave, valor) -> normalizados.put(clave, valor == null ? "" : valor.trim()));
-        LocalDateTime ahora = LocalDateTime.now();
+        LocalDateTime ahora = LocalDateTime.now(reloj);
         normalizados.forEach((clave, valor) -> {
             Configuracion c = configuracionRepository.findById(clave)
                     .orElseThrow(() -> new NegocioException("No existe la configuración '" + clave + "'."));
@@ -149,6 +151,19 @@ public class ConfiguracionService {
         cache.clear();
         log.info("Configuración guardada: {}", normalizados.keySet());   // nunca el valor (puede ser un secreto)
         auditoria.registrar("CONFIGURACION_GUARDAR", "configuracion", null, Map.of("claves", normalizados.keySet()));
+    }
+
+    /**
+     * Escribe una clave de sistema (no editable desde la interfaz), p. ej. la que deja el seeder demo. No pide
+     * permiso: solo la usan procesos internos.
+     */
+    @Transactional
+    public void guardarSistema(String clave, String valor) {
+        Configuracion c = configuracionRepository.findById(clave)
+                .orElseThrow(() -> new NegocioException("No existe la configuración '" + clave + "'."));
+        c.setValor(valor == null ? "" : valor);
+        c.setActualizadoEn(LocalDateTime.now(reloj));
+        cache.remove(clave);
     }
 
     /**

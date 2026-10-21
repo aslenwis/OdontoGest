@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
@@ -41,13 +42,14 @@ public class DashboardService {
     static final int MOROSOS_TABLERO = 10;
     private static final DateTimeFormatter MES = DateTimeFormatter.ofPattern("MMM yyyy", Locale.of("es", "PE"));
 
+    private final Clock reloj;
     private final DashboardDao dashboardDao;
     private final ReporteDao reporteDao;
     private final CitaService citaService;
     private final SesionUsuario sesionUsuario;
 
     public DashboardDto cargar() {
-        return cargar(LocalDate.now());
+        return cargar(LocalDate.now(reloj));
     }
 
     DashboardDto cargar(LocalDate hoy) {

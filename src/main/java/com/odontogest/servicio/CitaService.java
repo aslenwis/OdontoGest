@@ -37,6 +37,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -70,6 +71,7 @@ public class CitaService {
     private static final DateTimeFormatter HORA = DateTimeFormatter.ofPattern("HH:mm");
     private static final DateTimeFormatter FECHA_HORA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
+    private final Clock reloj;
     private final CitaRepository citaRepository;
     private final AuditoriaService auditoria;
     private final PacienteRepository pacienteRepository;
@@ -110,7 +112,7 @@ public class CitaService {
 
     /** Próximas citas activas del paciente. */
     public List<CitaDto> proximasDelPaciente(long pacienteId) {
-        LocalDateTime ahora = LocalDateTime.now();
+        LocalDateTime ahora = LocalDateTime.now(reloj);
         return dtos(citaRepository.listarPaciente(pacienteId, ahora, ahora.plusYears(2),
                 EnumSet.of(EstadoCita.PROGRAMADA, EstadoCita.CONFIRMADA)));
     }
@@ -136,7 +138,7 @@ public class CitaService {
      */
     public Optional<LocalDateTime> siguienteHueco(long odontologoId, int duracionMin, LocalDateTime desde, Long pacienteId) {
         validarDuracion(duracionMin);
-        LocalDateTime inicio = desde.isBefore(LocalDateTime.now()) ? LocalDateTime.now() : desde;
+        LocalDateTime inicio = desde.isBefore(LocalDateTime.now(reloj)) ? LocalDateTime.now(reloj) : desde;
         int dias = configuracionService.entero("agenda.dias_busqueda_hueco");
         LocalDateTime hasta = inicio.toLocalDate().plusDays(dias + 1L).atStartOfDay();
         List<Intervalo> ocupados = new ArrayList<>();
@@ -238,7 +240,7 @@ public class CitaService {
             throw new NegocioException("Una cita " + cita.getEstado().etiqueta().toLowerCase() + " no puede pasar a "
                     + destino.etiqueta().toLowerCase() + ".");
         }
-        if (destino == EstadoCita.NO_ASISTIO && cita.getInicio().isAfter(LocalDateTime.now())) {
+        if (destino == EstadoCita.NO_ASISTIO && cita.getInicio().isAfter(LocalDateTime.now(reloj))) {
             throw new NegocioException("La cita aún no empieza: no se puede marcar como inasistencia.");
         }
         if (!atencionRepository.findByCitaIdIn(List.of(citaId)).isEmpty()) {
@@ -281,7 +283,7 @@ public class CitaService {
             throw new NegocioException("La hora debe coincidir con la grilla de " + intervalo + " minutos (p. ej. 09:00, 09:"
                     + String.format("%02d", intervalo) + ").");
         }
-        if (inicio.isBefore(LocalDateTime.now())) {
+        if (inicio.isBefore(LocalDateTime.now(reloj))) {
             throw new NegocioException("No se puede programar una cita en el pasado.");
         }
         Intervalo cita = new Intervalo(inicio, fin);
@@ -379,7 +381,7 @@ public class CitaService {
         return sb.toString();
     }
 
-    private static LocalDateTime ahora() {
-        return LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+    private LocalDateTime ahora() {
+        return LocalDateTime.now(reloj).truncatedTo(ChronoUnit.SECONDS);
     }
 }
