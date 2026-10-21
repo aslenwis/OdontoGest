@@ -6,10 +6,14 @@
 package com.odontogest.ui.controlador;
 
 import com.odontogest.evento.NavegarA;
+import com.odontogest.evento.SolicitudNuevaAtencion;
+import com.odontogest.seguridad.Permiso;
+import com.odontogest.seguridad.SesionUsuario;
 import com.odontogest.servicio.dto.PacienteDetalle;
 import com.odontogest.ui.soporte.PacienteActivo;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TabPane;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +21,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 /**
- * Ficha del paciente: cabecera con identificación y alertas (alergias en rojo, consentimiento de datos
- * pendiente) y pestañas. Las pestañas siguen a {@link PacienteActivo}.
+ * Ficha del paciente: cabecera con identificación, alertas (alergias en rojo, consentimiento de datos
+ * pendiente) y "Nueva atención"; pestañas Datos, Anamnesis, Odontograma y Atenciones, que siguen a
+ * {@link PacienteActivo}.
  */
 @Component
 @RequiredArgsConstructor
@@ -26,6 +31,7 @@ public class PacienteFichaController {
 
     private final PacienteActivo pacienteActivo;
     private final ApplicationEventPublisher eventos;
+    private final SesionUsuario sesionUsuario;
 
     @FXML private Label lblIniciales;
     @FXML private Label lblNombre;
@@ -34,11 +40,15 @@ public class PacienteFichaController {
     @FXML private Label lblConsentimiento;
     @FXML private Label lblInactivo;
     @FXML private TabPane pestanas;
+    @FXML private Button btnNuevaAtencion;
 
     private ChangeListener<PacienteDetalle> oyente;
 
     @FXML
     public void initialize() {
+        boolean atiende = sesionUsuario.tiene(Permiso.ATENCION_GESTIONAR);
+        btnNuevaAtencion.setVisible(atiende);
+        btnNuevaAtencion.setManaged(atiende);
         if (oyente != null) {
             pacienteActivo.pacienteProperty().removeListener(oyente);
         }
@@ -69,6 +79,20 @@ public class PacienteFichaController {
         lblConsentimiento.setText("Falta consentimiento de datos personales");
         visible(lblConsentimiento, p.consentimientoDatosEn() == null);
         visible(lblInactivo, !p.activo());
+    }
+
+    /** Muestra la pestaña con ese id ("datos", "anamnesis", "odontograma", "atenciones"). */
+    public void seleccionarPestana(String id) {
+        if (pestanas == null || id == null) {
+            return;
+        }
+        pestanas.getTabs().stream().filter(t -> id.equals(t.getId())).findFirst()
+                .ifPresent(t -> pestanas.getSelectionModel().select(t));
+    }
+
+    @FXML
+    private void onNuevaAtencion() {
+        eventos.publishEvent(new SolicitudNuevaAtencion());
     }
 
     @FXML

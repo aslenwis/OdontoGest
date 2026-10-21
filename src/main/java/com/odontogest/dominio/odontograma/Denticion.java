@@ -11,6 +11,14 @@ package com.odontogest.dominio.odontograma;
 public enum Denticion {
     PERMANENTE, DECIDUA, MIXTA;
 
+    /** Dentición habitual para la edad: decidua antes de los 6 años, mixta de 6 a 12, permanente desde los 13. */
+    public static Denticion sugerida(int edad) {
+        if (edad < 6) {
+            return DECIDUA;
+        }
+        return edad <= 12 ? MIXTA : PERMANENTE;
+    }
+
     /** Indica si la pieza puede registrarse en un odontograma de esta dentición. */
     public boolean admite(PiezaDental pieza) {
         return switch (this) {

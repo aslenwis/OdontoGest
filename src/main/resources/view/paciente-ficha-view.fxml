@@ -38,15 +38,24 @@
                 </FlowPane>
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="btnNuevaAtencion" text="Nueva atención" styleClass="accent" onAction="#onNuevaAtencion">
+                <graphic><FontIcon iconLiteral="fth-clipboard"/></graphic>
+            </Button>
         </HBox>
     </top>
     <center>
         <TabPane fx:id="pestanas" tabClosingPolicy="UNAVAILABLE">
-            <Tab text="Datos">
+            <Tab text="Datos" id="datos">
                 <fx:include source="paciente-datos-tab.fxml"/>
             </Tab>
-            <Tab text="Anamnesis">
+            <Tab text="Anamnesis" id="anamnesis">
                 <fx:include source="paciente-anamnesis-tab.fxml"/>
+            </Tab>
+            <Tab text="Odontograma" id="odontograma">
+                <fx:include source="paciente-odontograma-tab.fxml"/>
+            </Tab>
+            <Tab text="Atenciones" id="atenciones">
+                <fx:include source="paciente-atenciones-tab.fxml"/>
             </Tab>
         </TabPane>
     </center>

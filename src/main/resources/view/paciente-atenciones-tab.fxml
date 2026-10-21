@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<!-- Pestaña Atenciones (RF-ATE): línea de tiempo a la izquierda y detalle de la atención a la derecha. -->
+<SplitPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.odontogest.ui.controlador.AtencionesController" dividerPositions="0.32">
+    <VBox spacing="8" minWidth="260">
+        <padding><Insets top="12" right="10" bottom="12" left="12"/></padding>
+        <Button fx:id="btnNueva" text="Nueva atención" styleClass="accent" maxWidth="Infinity" onAction="#onNueva">
+            <graphic><FontIcon iconLiteral="fth-plus"/></graphic>
+        </Button>
+        <ListView fx:id="lstAtenciones" VBox.vgrow="ALWAYS"/>
+    </VBox>
+    <ScrollPane fitToWidth="true" styleClass="edge-to-edge">
+        <VBox fx:id="panelDetalle" spacing="10">
+            <padding><Insets top="14" right="18" bottom="14" left="18"/></padding>
+            <Label fx:id="lblTitulo" styleClass="title-4"/>
+            <Label fx:id="lblDetalle" styleClass="text-muted"/>
+            <Label text="Motivo de consulta *" styleClass="text-bold"/>
+            <TextArea fx:id="txtMotivo" prefRowCount="2" wrapText="true"/>
+            <Label text="Examen clínico" styleClass="text-bold"/>
+            <TextArea fx:id="txtExamen" prefRowCount="3" wrapText="true"/>
+            <Label text="Diagnóstico" styleClass="text-bold"/>
+            <TextArea fx:id="txtDiagnostico" prefRowCount="3" wrapText="true"/>
+            <Label text="Observaciones" styleClass="text-bold"/>
+            <TextArea fx:id="txtObservaciones" prefRowCount="2" wrapText="true"/>
+            <HBox spacing="8" alignment="CENTER_LEFT">
+                <Button fx:id="btnOdontograma" text="Ir al odontograma" onAction="#onIrOdontograma">
+                    <graphic><FontIcon iconLiteral="fth-grid"/></graphic>
+                </Button>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="btnCerrar" text="Cerrar atención" onAction="#onCerrar">
+                    <graphic><FontIcon iconLiteral="fth-lock"/></graphic>
+                </Button>
+                <Button fx:id="btnGuardar" text="Guardar" styleClass="accent" onAction="#onGuardar">
+                    <graphic><FontIcon iconLiteral="fth-save"/></graphic>
+                </Button>
+            </HBox>
+        </VBox>
+    </ScrollPane>
+</SplitPane>

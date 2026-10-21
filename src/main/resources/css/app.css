@@ -146,3 +146,32 @@
 .etiqueta-aviso .ikonli-font-icon {
     -fx-icon-color: -color-warning-fg;
 }
+
+/* ---------------------------------------------------------------- Odontograma */
+.odontograma-panel {
+    -fx-background-color: -color-bg-subtle;
+}
+
+.odontograma-pie {
+    -fx-background-color: -color-bg-subtle;
+    -fx-border-color: -color-border-default transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+.odontograma-hover {
+    -fx-background-color: -color-bg-default;
+    -fx-background-radius: 4;
+    -fx-padding: 2 8 2 8;
+    -fx-text-fill: -color-fg-muted;
+}
+
+.odontograma-panel .titled-pane > .content {
+    -fx-padding: 0;
+}
+
+/* AtlantaFX fija -fx-cell-size en 2.8em y ListCellSkin lo usa como alto fijo; con el valor por defecto (24)
+   el alto vuelve a depender del contenido y el texto de varias líneas del inspector se ve completo. */
+.lista-ajustable .list-cell {
+    -fx-cell-size: 24;
+    -fx-padding: 6 8 6 8;
+}

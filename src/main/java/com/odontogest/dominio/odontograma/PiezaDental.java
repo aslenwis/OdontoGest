@@ -126,6 +126,11 @@ public record PiezaDental(int fdi) implements Comparable<PiezaDental> {
         return arcada() == otra.arcada();
     }
 
+    /** Ambas piezas están en la misma fila de dibujo (p. ej. 18 y 28; no 16 y 55). */
+    public boolean mismaFila(PiezaDental otra) {
+        return filaDe(this).contains(otra);
+    }
+
     /**
      * Piezas entre {@code a} y {@code b} (ambas incluidas) en su fila de dibujo, p. ej. 18–28 = toda la arcada
      * superior permanente. Si están en filas distintas devuelve solo los extremos.

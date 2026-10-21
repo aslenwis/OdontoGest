@@ -15,12 +15,19 @@ import com.odontogest.servicio.dto.HallazgoTipoDto;
 import com.odontogest.servicio.dto.HallazgoTipoForm;
 import com.odontogest.ui.soporte.Formularios;
 import com.odontogest.ui.soporte.Notificador;
+import com.odontogest.ui.componente.PaletaOdontograma;
+import com.odontogest.ui.componente.RenderizadorOdontograma;
 import com.odontogest.ui.soporte.TareaUi;
+import com.odontogest.ui.soporte.Tema;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -35,6 +42,8 @@ import java.util.List;
  */
 @Component
 public class HallazgosTabController extends ListadoEditable<HallazgoTipoDto> {
+
+    private static final RenderizadorOdontograma RENDERIZADOR = new RenderizadorOdontograma();
 
     private final CatalogoHallazgoService catalogoService;
 
@@ -66,7 +75,27 @@ public class HallazgosTabController extends ListadoEditable<HallazgoTipoDto> {
 
     @Override
     protected void configurarColumnas() {
+        TableColumn<HallazgoTipoDto, HallazgoTipoDto> muestra = new TableColumn<>("Dibujo");
+        muestra.setCellValueFactory(f -> new SimpleObjectProperty<>(f.getValue()));
+        muestra.setCellFactory(c -> new TableCell<>() {
+            private final Canvas lienzo = new Canvas(30, 30);
+
+            @Override
+            protected void updateItem(HallazgoTipoDto t, boolean vacio) {
+                super.updateItem(t, vacio);
+                if (vacio || t == null) {
+                    setGraphic(null);
+                    return;
+                }
+                RENDERIZADOR.muestra(lienzo.getGraphicsContext2D(), OdontogramaController.definicion(t), 30,
+                        Tema.actual() == Tema.OSCURO ? PaletaOdontograma.oscura() : PaletaOdontograma.clara());
+                setGraphic(lienzo);
+            }
+        });
+        muestra.setPrefWidth(60);
+        muestra.setSortable(false);
         Formularios.columnas(tabla,
+                muestra,
                 Formularios.columna("Orden", HallazgoTipoDto::orden, 60),
                 Formularios.columna("Nombre", HallazgoTipoDto::nombre, 210),
                 Formularios.columna("Sigla", HallazgosTabController::sigla, 110),

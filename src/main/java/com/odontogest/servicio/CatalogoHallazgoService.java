@@ -216,7 +216,8 @@ public class CatalogoHallazgoService {
                 hallazgoTipoRepository.contarHallazgos(t.getId()) > 0);
     }
 
-    private static TipoHallazgoDef definicion(HallazgoTipo t) {
+    /** Definición de dominio del tipo (también la usan OdontogramaService e IntegridadService). */
+    static TipoHallazgoDef definicion(HallazgoTipo t) {
         return new TipoHallazgoDef(t.getId(), t.getCodigo(), t.getNombre(), t.getSigla(), opciones(t.getSiglasOpciones()),
                 t.getRepresentacion(), t.getSimbolo(), t.getReglaColor(), t.getGrupoExclusion(), t.isOcultaSuperficies(),
                 t.getConteoCpod(), t.getConteoCeod());

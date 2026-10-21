@@ -43,7 +43,7 @@ class LayoutOdontogramaTest {
 
         LayoutOdontograma alto = LayoutOdontograma.calcular(3000, 400, Denticion.MIXTA);
         assertThat(alto.lado()).as("limitado por el alto de fila")
-                .isCloseTo((400 - 2 * LayoutOdontograma.MARGEN) / 4 * 0.45, within(1e-6));
+                .isCloseTo((400 - 2 * LayoutOdontograma.MARGEN) / 4 * LayoutOdontograma.FACTOR_ALTO_FILA, within(1e-6));
         assertThat(alto.separacion()).isCloseTo(0.12 * alto.lado(), within(1e-9));
     }
 
@@ -87,18 +87,20 @@ class LayoutOdontogramaTest {
     }
 
     @Test
-    void arcadaInferiorEnEspejo() {
+    void ordenDeLaNtsYArcadaInferiorEnEspejo() {
         LayoutOdontograma l = LayoutOdontograma.calcular(ANCHO, ALTO, Denticion.PERMANENTE);
         CeldaPieza sup = l.celda(16);
-        assertThat(sup.recuadro().getMaxY()).isLessThanOrEqualTo(sup.raiz().getMinY() + 1e-9);
-        assertThat(sup.raiz().getMaxY()).isLessThanOrEqualTo(sup.corona().getMinY() + 1e-9);
-        assertThat(sup.etiqueta().getY()).isGreaterThan(sup.corona().getMaxY());
+        assertThat(sup.etiqueta().getY()).as("número entre recuadro y raíz")
+                .isGreaterThan(sup.recuadro().getMaxY()).isLessThan(sup.raiz().getMinY());
+        assertThat(sup.raiz().getMaxY()).isCloseTo(sup.corona().getMinY(), within(1e-9));
 
         CeldaPieza inf = l.celda(46);
-        assertThat(inf.etiqueta().getY()).isLessThan(inf.corona().getMinY());
-        assertThat(inf.corona().getMaxY()).isLessThanOrEqualTo(inf.raiz().getMinY() + 1e-9);
-        assertThat(inf.raiz().getMaxY()).isLessThanOrEqualTo(inf.recuadro().getMinY() + 1e-9);
+        assertThat(inf.corona().getMaxY()).isCloseTo(inf.raiz().getMinY(), within(1e-9));
+        assertThat(inf.etiqueta().getY()).isGreaterThan(inf.raiz().getMaxY()).isLessThan(inf.recuadro().getMinY());
         assertThat(inf.corona().getWidth()).isEqualTo(inf.corona().getHeight()).isEqualTo(l.lado());
+
+        assertThat(inf.corona().getMinY() - sup.corona().getMaxY())
+                .as("margen oclusal libre entre las coronas de ambas arcadas").isGreaterThan(0.7 * l.lado());
     }
 
     @Test

@@ -1448,8 +1448,9 @@ Las anulaciones posteriores **no** alteran el hash (son registros nuevos; se lis
 #### 5.1.5 Geometría, dibujo y detección de superficie (UI)
 **Layout (`LayoutOdontograma`)**: dado el ancho y alto disponibles, calcula una celda por pieza.
 - Filas (de arriba a abajo): permanentes superiores (18…11 | 21…28), deciduas superiores (55…51 | 61…65), deciduas inferiores (85…81 | 71…75), permanentes inferiores (48…41 | 31…38). En dentición `PERMANENTE` o `DECIDUA` se omiten las filas que no aplican.
-- Lado de la celda `s = min((ancho − 2·margen − 15·g − gLinea) / 16, altoFila·0.45)` con `g = 0.12·s` y un espacio extra `gLinea` en la línea media.
-- Cada celda superior tiene, de arriba a abajo: **recuadro de sigla** (alto `0.35·s`), **zona radicular** (alto `0.6·s`), **corona** (cuadrado `s×s`) y el número FDI. En la arcada inferior el orden se invierte (espejo), de modo que la vestibular de ambas arcadas queda hacia el borde exterior del dibujo.
+- Lado de la celda `s = min((ancho − 2·margen − 15·g − gLinea) / 16, altoFila·0.38)` con `g = 0.12·s` y un espacio extra `gLinea = 0.5·s` en la línea media. La celda mide `2.6·s`, así que con `0.38` las filas nunca se superponen.
+- Cada celda superior tiene, de arriba a abajo (orden del Anexo de la NTS N° 188): **recuadro de sigla** (alto `0.35·s`), **número FDI** (`0.25·s`), **zona radicular** (`0.6·s`), **corona** (cuadrado `s×s`) y un **margen oclusal** (`0.4·s`) donde se dibujan las flechas de extrusión, intrusión y giroversión. En la arcada inferior el orden se invierte (espejo), de modo que la vestibular de ambas arcadas queda hacia el borde exterior del dibujo.
+- Si el ancho limita `s`, el paso entre filas es `min(altoFila, s/0.38)` y el bloque de filas se centra en vertical (sin hueco grande entre arcadas).
 ```java
 public record CeldaPieza(PiezaDental pieza, Rectangle2D corona, Rectangle2D raiz, Rectangle2D recuadro, Point2D etiqueta) {}
 public final class LayoutOdontograma {

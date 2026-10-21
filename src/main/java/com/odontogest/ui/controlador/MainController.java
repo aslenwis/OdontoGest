@@ -75,6 +75,7 @@ public class MainController {
     private final Notificador notificador;
     private final TareaUi tareaUi;
     private final PacienteActivo pacienteActivo;
+    private final PacienteFichaController fichaController;
 
     @FXML private StackPane raiz;
     @FXML private ModalPane modal;
@@ -161,6 +162,9 @@ public class MainController {
                 pacienteActivo.abrir(n.longValue());
             }
             mostrar(VISTA_FICHA, "Ficha del paciente");
+            if (evento.parametros().get("pestana") instanceof String pestana) {
+                fichaController.seleccionarPestana(pestana);
+            }
         } else if (VISTA_PACIENTES.equals(evento.vista())) {
             mostrar(VISTA_PACIENTES, "Pacientes");
         }

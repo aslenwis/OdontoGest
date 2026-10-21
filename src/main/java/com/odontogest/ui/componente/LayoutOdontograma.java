@@ -24,10 +24,12 @@ import java.util.Optional;
  * Filas (de arriba a abajo): permanentes superiores, deciduas superiores, deciduas inferiores y permanentes
  * inferiores; se omiten las que no corresponden a la dentición. Lado de la corona:
  * <pre>
- * s = min((ancho − 2·margen − 15·g − gLinea) / 16, altoFila · 0,45)   con g = 0,12·s y gLinea = 0,5·s
+ * s = min((ancho − 2·margen − 15·g − gLinea) / 16, altoFila · 0,38)   con g = 0,12·s y gLinea = 0,5·s
  * </pre>
- * Celda superior, de arriba a abajo: recuadro de sigla (0,35·s), raíz (0,6·s), corona (s) y número. En la
- * arcada inferior el orden se invierte (espejo), así la cara vestibular queda hacia el borde exterior.
+ * Como en el Anexo de la NTS 188, la celda superior tiene de arriba a abajo: recuadro de sigla (0,35·s), número
+ * FDI (0,25·s), raíz (0,6·s), corona (s) y un margen oclusal (0,4·s) para las flechas de extrusión, intrusión y
+ * giroversión. En la arcada inferior el orden se invierte (espejo): la cara vestibular queda hacia el borde
+ * exterior y el lado oclusal de ambas arcadas mira al plano oclusal.
  * Las filas deciduas (5 piezas por lado) se centran sobre la misma línea media.
  * <p>
  * Usa solo clases de geometría de JavaFX (sin nodos), por eso se prueba sin levantar la interfaz.
@@ -35,13 +37,15 @@ import java.util.Optional;
 public final class LayoutOdontograma {
 
     public static final double MARGEN = 16;
-    static final double FACTOR_ALTO_FILA = 0.45;
+    /** La celda mide 2,6·s; con 0,38 cabe en el alto de fila (0,988) y las filas nunca se superponen. */
+    static final double FACTOR_ALTO_FILA = 0.38;
     static final double SEPARACION = 0.12;
     static final double LINEA_MEDIA = 0.5;
     static final double ALTO_RECUADRO = 0.35;
     static final double ALTO_RAIZ = 0.6;
-    /** Con 0,25 la celda mide 2,2·s ≤ altoFila (porque s ≤ 0,45·altoFila): las filas nunca se superponen. */
     static final double ALTO_ETIQUETA = 0.25;
+    /** Espacio libre del lado oclusal para dibujar flechas fuera de la pieza. */
+    static final double MARGEN_OCLUSAL = 0.4;
     private static final double LADO_MINIMO = 1;
 
     private final double lado;
@@ -60,13 +64,16 @@ public final class LayoutOdontograma {
         double g = SEPARACION * s;
         double hueco = g + LINEA_MEDIA * s;
         double centroX = ancho / 2;
-        double altoContenido = (ALTO_RECUADRO + ALTO_RAIZ + 1 + ALTO_ETIQUETA) * s;
+        double altoContenido = (ALTO_RECUADRO + ALTO_ETIQUETA + ALTO_RAIZ + 1 + MARGEN_OCLUSAL) * s;
+        // Si el ancho limita el lado, las filas se juntan y el bloque se centra en vertical (sin huecos entre arcadas).
+        double pasoFila = Math.min(altoFila, s / FACTOR_ALTO_FILA);
+        double arriba = (alto - filas.size() * pasoFila) / 2;
 
         Map<Integer, CeldaPieza> celdas = new LinkedHashMap<>();
         for (int r = 0; r < filas.size(); r++) {
             List<PiezaDental> fila = filas.get(r);
             int porLado = fila.size() / 2;
-            double y0 = MARGEN + r * altoFila + (altoFila - altoContenido) / 2;
+            double y0 = arriba + r * pasoFila + (pasoFila - altoContenido) / 2;
             boolean superior = fila.get(0).arcada() == Arcada.SUPERIOR;
             for (int i = 0; i < fila.size(); i++) {
                 double x = i < porLado
@@ -81,17 +88,17 @@ public final class LayoutOdontograma {
 
     private static CeldaPieza celdaSuperior(PiezaDental pieza, double x, double y0, double s) {
         Rectangle2D recuadro = new Rectangle2D(x, y0, s, ALTO_RECUADRO * s);
-        Rectangle2D raiz = new Rectangle2D(x, y0 + ALTO_RECUADRO * s, s, ALTO_RAIZ * s);
-        Rectangle2D corona = new Rectangle2D(x, y0 + (ALTO_RECUADRO + ALTO_RAIZ) * s, s, s);
-        Point2D etiqueta = new Point2D(x + s / 2, corona.getMaxY() + ALTO_ETIQUETA * s / 2);
+        Point2D etiqueta = new Point2D(x + s / 2, recuadro.getMaxY() + ALTO_ETIQUETA * s / 2);
+        Rectangle2D raiz = new Rectangle2D(x, recuadro.getMaxY() + ALTO_ETIQUETA * s, s, ALTO_RAIZ * s);
+        Rectangle2D corona = new Rectangle2D(x, raiz.getMaxY(), s, s);
         return new CeldaPieza(pieza, corona, raiz, recuadro, etiqueta);
     }
 
     private static CeldaPieza celdaInferior(PiezaDental pieza, double x, double y0, double s) {
-        Point2D etiqueta = new Point2D(x + s / 2, y0 + ALTO_ETIQUETA * s / 2);
-        Rectangle2D corona = new Rectangle2D(x, y0 + ALTO_ETIQUETA * s, s, s);
+        Rectangle2D corona = new Rectangle2D(x, y0 + MARGEN_OCLUSAL * s, s, s);
         Rectangle2D raiz = new Rectangle2D(x, corona.getMaxY(), s, ALTO_RAIZ * s);
-        Rectangle2D recuadro = new Rectangle2D(x, raiz.getMaxY(), s, ALTO_RECUADRO * s);
+        Point2D etiqueta = new Point2D(x + s / 2, raiz.getMaxY() + ALTO_ETIQUETA * s / 2);
+        Rectangle2D recuadro = new Rectangle2D(x, raiz.getMaxY() + ALTO_ETIQUETA * s, s, ALTO_RECUADRO * s);
         return new CeldaPieza(pieza, corona, raiz, recuadro, etiqueta);
     }
 
