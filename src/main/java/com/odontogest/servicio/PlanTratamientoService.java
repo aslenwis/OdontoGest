@@ -99,6 +99,7 @@ public class PlanTratamientoService {
     private static final int MAXIMO_CUOTAS = 60;
 
     private final PlanTratamientoRepository planRepository;
+    private final AuditoriaService auditoria;
     private final PlanItemRepository itemRepository;
     private final CuotaRepository cuotaRepository;
     private final ProcedimientoRepository procedimientoRepository;
@@ -206,6 +207,7 @@ public class PlanTratamientoService {
             agregarSugerencias(guardado);
         }
         log.info("Plan {} creado para {}", guardado.getId(), paciente.getNumeroHistoria());
+        auditoria.registrar("PLAN_CREAR", "plan_tratamiento", guardado.getId(), null);
         return guardado.getId();
     }
 
@@ -281,6 +283,7 @@ public class PlanTratamientoService {
         }
         p.setEstado(destino);
         log.info("Plan {} → {}", p.getId(), destino);
+        auditoria.registrar("PLAN_ESTADO", "plan_tratamiento", p.getId(), Map.of("estado", destino.name()));
         return dto(p);
     }
 
@@ -314,6 +317,7 @@ public class PlanTratamientoService {
         p.setEstado(EstadoPlan.ACEPTADO);
         p.setAceptadoEn(ahora);
         log.info("Plan {} aceptado; consentimiento firmado por {}", p.getId(), firmante);
+        auditoria.registrar("PLAN_ACEPTAR", "plan_tratamiento", p.getId(), Map.of("firmadoPor", firmante));
         return dto(p);
     }
 

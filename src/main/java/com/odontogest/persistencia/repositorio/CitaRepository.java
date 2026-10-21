@@ -43,6 +43,13 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
             ORDER BY c.inicio""")
     List<Cita> listarOdontologo(long odontologoId, LocalDateTime desde, LocalDateTime hasta, Collection<EstadoCita> estados);
 
+    /** Citas de todos los odontólogos que empiezan en {@code [desde, hasta)}. */
+    @Query("""
+            SELECT c FROM Cita c JOIN FETCH c.paciente JOIN FETCH c.odontologo
+            WHERE c.estado IN :estados AND c.inicio >= :desde AND c.inicio < :hasta
+            ORDER BY c.inicio, c.odontologo.id""")
+    List<Cita> listarEntre(LocalDateTime desde, LocalDateTime hasta, Collection<EstadoCita> estados);
+
     /** Citas de un paciente que se cruzan con {@code [desde, hasta)}. */
     @Query("""
             SELECT c FROM Cita c JOIN FETCH c.paciente JOIN FETCH c.odontologo

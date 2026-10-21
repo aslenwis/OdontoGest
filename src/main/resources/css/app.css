@@ -258,3 +258,88 @@
     -fx-border-color: transparent transparent transparent -color-border-default;
     -fx-border-width: 0 0 0 1;
 }
+
+/* ---------------------------------------------------------------- Tablero de inicio y reportes */
+.kpi {
+    -fx-background-color: -color-bg-default;
+    -fx-background-radius: 10;
+    -fx-border-color: -color-border-default;
+    -fx-border-radius: 10;
+    -fx-padding: 14 18 14 18;
+    -fx-spacing: 4;
+    -fx-min-width: 210;
+    -fx-pref-width: 230;
+}
+
+.kpi-clic:hover {
+    -fx-border-color: -color-accent-emphasis;
+    -fx-cursor: hand;
+}
+
+.kpi-titulo {
+    -fx-text-fill: -color-fg-muted;
+}
+
+.kpi-valor {
+    -fx-font-size: 1.9em;
+    -fx-font-weight: bold;
+}
+
+.kpi-detalle {
+    -fx-text-fill: -color-fg-muted;
+    -fx-font-size: 0.9em;
+}
+
+.kpi-icono {
+    -fx-icon-size: 22;
+    -fx-icon-color: -color-accent-fg;
+}
+
+.kpi-peligro .kpi-icono {
+    -fx-icon-color: -color-danger-fg;
+}
+
+.kpi-peligro .kpi-valor {
+    -fx-text-fill: -color-danger-fg;
+}
+
+.panel-tablero {
+    -fx-background-color: -color-bg-default;
+    -fx-background-radius: 10;
+    -fx-border-color: -color-border-default;
+    -fx-border-radius: 10;
+    -fx-padding: 12 14 12 14;
+    -fx-spacing: 8;
+}
+
+.grafico-montos .default-color0.chart-bar {
+    -fx-bar-fill: -color-accent-emphasis;
+}
+
+.grafico-montos .chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+.grafico-indices .default-color0.chart-bar {
+    -fx-bar-fill: -color-accent-emphasis;
+}
+
+.grafico-indices .default-color1.chart-bar {
+    -fx-bar-fill: -color-success-emphasis;
+}
+
+.leyenda-color {
+    -fx-min-width: 12;
+    -fx-min-height: 12;
+    -fx-max-width: 12;
+    -fx-max-height: 12;
+    -fx-background-radius: 2;
+}
+
+.leyenda-cpod {
+    -fx-background-color: -color-accent-emphasis;
+}
+
+.leyenda-ceod {
+    -fx-background-color: -color-success-emphasis;
+}

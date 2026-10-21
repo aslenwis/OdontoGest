@@ -10,12 +10,16 @@ import com.odontogest.evento.ConectividadCambiada;
 import com.odontogest.modelo.TipoConfiguracion;
 import com.odontogest.servicio.ConfiguracionService;
 import com.odontogest.servicio.IntegracionService;
+import com.odontogest.servicio.RespaldoService;
 import com.odontogest.servicio.dto.ConfiguracionDto;
+import com.odontogest.servicio.dto.RespaldoDto;
+import com.odontogest.ui.soporte.Exportador;
 import com.odontogest.ui.soporte.Formularios;
 import com.odontogest.ui.soporte.HiloUi;
 import com.odontogest.ui.soporte.Notificador;
 import com.odontogest.ui.soporte.Refrescable;
 import com.odontogest.ui.soporte.TareaUi;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -23,12 +27,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TitledPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -40,6 +46,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -62,6 +69,8 @@ public class ConfiguracionController implements Refrescable {
 
     private final ConfiguracionService configuracionService;
     private final IntegracionService integracionService;
+    private final RespaldoService respaldoService;
+    private final Exportador exportador;
     private final TareaUi tareaUi;
     private final Notificador notificador;
 
@@ -272,7 +281,7 @@ public class ConfiguracionController implements Refrescable {
             case "recordatorio" -> nota("Se envían cada 15 minutos a los pacientes con correo que aceptan recordatorios, "
                     + "si hay internet y el correo SMTP está configurado.");
             case "agenda" -> nota("Cambiar el intervalo no mueve las citas ya programadas; las nuevas se ajustan a la grilla.");
-            case "respaldo" -> nota("La creación y restauración de respaldos se agrega en la Fase 8.");
+            case "respaldo" -> respaldos();
             default -> null;
         };
     }
@@ -282,6 +291,102 @@ public class ConfiguracionController implements Refrescable {
         l.setWrapText(true);
         l.getStyleClass().addAll(Styles.TEXT_MUTED, Styles.TEXT_SMALL);
         return l;
+    }
+
+    // ------------------------------------------------------------------ respaldos (PLAN §5.4)
+
+    private Node respaldos() {
+        VBox caja = new VBox(8);
+        Label aviso = new Label();
+        aviso.setWrapText(true);
+        aviso.getStyleClass().add("etiqueta-aviso");
+        Button cancelar = Formularios.boton("Cancelar restauración", Feather.X);
+        Button cerrar = Formularios.boton("Cerrar OdontoGest ahora", Feather.POWER, Styles.ACCENT);
+        cerrar.setOnAction(e -> Platform.exit());
+        HBox pendiente = new HBox(8, aviso, cancelar, cerrar);
+        pendiente.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(aviso, Priority.ALWAYS);
+
+        TableView<RespaldoDto> tabla = new TableView<>();
+        Formularios.columnas(tabla,
+                Formularios.columna("Fecha", r -> Formularios.fechaHora(r.fecha()), 130),
+                Formularios.columna("Tipo", r -> r.automatico() ? "Automático (al cerrar)" : "Manual", 150),
+                Formularios.columna("Tamaño", RespaldoDto::tamanio, 80),
+                Formularios.columna("Archivo", RespaldoDto::nombre, 260));
+        tabla.setPrefHeight(190);
+        tabla.setPlaceholder(new Label("Aún no hay respaldos."));
+
+        Button crear = Formularios.boton("Crear respaldo ahora", Feather.SAVE, Styles.ACCENT);
+        Button restaurarSeleccionado = Formularios.boton("Restaurar el seleccionado…", Feather.ROTATE_CCW);
+        Button restaurarArchivo = Formularios.boton("Restaurar desde archivo…", Feather.UPLOAD);
+        Button carpeta = Formularios.boton("Abrir carpeta", Feather.FOLDER);
+        restaurarSeleccionado.disableProperty().bind(tabla.getSelectionModel().selectedItemProperty().isNull());
+
+        Runnable cargar = () -> tareaUi.ejecutar(() -> new EstadoRespaldos(respaldoService.listar(),
+                respaldoService.hayRestauracionPendiente()), estado -> {
+            tabla.getItems().setAll(estado.respaldos());
+            aviso.setText("Hay una restauración programada: se aplicará la próxima vez que abra OdontoGest. Los datos "
+                    + "actuales se guardarán en la carpeta de respaldos (antes-de-restaurar-…).");
+            pendiente.setVisible(estado.restauracionPendiente());
+            pendiente.setManaged(estado.restauracionPendiente());
+        });
+        crear.setOnAction(e -> tareaUi.ejecutar(crear, respaldoService::crearAhora, r -> {
+            notificador.exito("Respaldo creado: " + r.nombre() + " (" + r.tamanio() + ").");
+            cargar.run();
+        }));
+        restaurarSeleccionado.setOnAction(e -> {
+            RespaldoDto r = tabla.getSelectionModel().getSelectedItem();
+            restaurar(restaurarSeleccionado, Path.of(r.ruta()), "del " + Formularios.fechaHora(r.fecha()), cargar);
+        });
+        restaurarArchivo.setOnAction(e -> {
+            FileChooser selector = new FileChooser();
+            selector.setTitle("Elegir respaldo de OdontoGest");
+            selector.getExtensionFilters().add(new FileChooser.ExtensionFilter("Respaldo de OdontoGest (*.zip)", "*.zip"));
+            File inicial = new File(respaldoService.carpetaRespaldos());
+            if (inicial.isDirectory()) {
+                selector.setInitialDirectory(inicial);
+            }
+            File archivo = selector.showOpenDialog(restaurarArchivo.getScene().getWindow());
+            if (archivo != null) {
+                restaurar(restaurarArchivo, archivo.toPath(), "«" + archivo.getName() + "»", cargar);
+            }
+        });
+        carpeta.setOnAction(e -> exportador.abrir(new File(respaldoService.carpetaRespaldos())));
+        cancelar.setOnAction(e -> tareaUi.ejecutar(cancelar, () -> {
+            respaldoService.cancelarRestauracion();
+            return null;
+        }, r -> {
+            notificador.exito("Restauración cancelada: se seguirá usando la base de datos actual.");
+            cargar.run();
+        }));
+
+        FlowPane botones = new FlowPane(8, 8, crear, restaurarSeleccionado, restaurarArchivo, carpeta);
+        caja.getChildren().addAll(pendiente, botones, tabla, nota("El respaldo es un archivo .zip con la base de datos, "
+                + "los adjuntos y la clave de cifrado: guarde copias fuera de esta computadora (USB o nube). Los respaldos "
+                + "automáticos se crean al cerrar la aplicación; los manuales no se borran solos."));
+        cargar.run();
+        return caja;
+    }
+
+    private record EstadoRespaldos(List<RespaldoDto> respaldos, boolean restauracionPendiente) {
+    }
+
+    private void restaurar(Button origen, Path zip, String descripcion, Runnable recargar) {
+        if (!notificador.confirmar("Restaurar respaldo", "Se reemplazarán TODOS los datos actuales por los del respaldo "
+                + descripcion + ".\n\nLos datos actuales no se pierden: se guardan en la carpeta de respaldos. La "
+                + "restauración se aplica al volver a abrir OdontoGest.\n\n¿Continuar?")) {
+            return;
+        }
+        tareaUi.ejecutar(origen, () -> {
+            respaldoService.programarRestauracion(zip);
+            return null;
+        }, r -> {
+            recargar.run();
+            if (notificador.confirmar("Reiniciar", "Respaldo verificado. Para aplicarlo, OdontoGest debe cerrarse y volver "
+                    + "a abrirse.\n\n¿Cerrar la aplicación ahora?")) {
+                Platform.exit();
+            }
+        });
     }
 
     private Node pruebaCorreo() {

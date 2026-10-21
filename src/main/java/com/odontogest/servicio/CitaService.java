@@ -71,6 +71,7 @@ public class CitaService {
     private static final DateTimeFormatter FECHA_HORA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     private final CitaRepository citaRepository;
+    private final AuditoriaService auditoria;
     private final PacienteRepository pacienteRepository;
     private final OdontologoRepository odontologoRepository;
     private final HorarioAtencionRepository horarioRepository;
@@ -91,6 +92,16 @@ public class CitaService {
         List<Cita> citas = citaRepository.listarOdontologo(odontologoId, desde.atStartOfDay(),
                 desde.plusDays(dias).atStartOfDay(), EnumSet.complementOf(EnumSet.of(EstadoCita.CANCELADA)));
         return new AgendaDto(desde, dias, odontologoService.obtener(odontologoId), dtos(citas), intervaloMin());
+    }
+
+    /** Citas no canceladas de un día, de un odontólogo o de todos ({@code odontologoId == null}). */
+    public List<CitaDto> delDia(LocalDate dia, Long odontologoId) {
+        Set<EstadoCita> estados = EnumSet.complementOf(EnumSet.of(EstadoCita.CANCELADA));
+        LocalDateTime desde = dia.atStartOfDay();
+        LocalDateTime hasta = dia.plusDays(1).atStartOfDay();
+        return dtos(odontologoId == null ? citaRepository.listarEntre(desde, hasta, estados)
+                : citaRepository.listarOdontologo(odontologoId, desde, hasta, estados).stream()
+                        .filter(c -> !c.getInicio().isBefore(desde)).toList());
     }
 
     public CitaDto obtener(long citaId) {
@@ -194,6 +205,8 @@ public class CitaService {
         Cita guardada = citaRepository.save(cita);
         log.info("Cita {} {} para {} el {}", guardada.getId(), form.id() == null ? "programada" : "actualizada",
                 paciente.getNumeroHistoria(), FECHA_HORA.format(inicio));
+        auditoria.registrar(form.id() == null ? "CITA_PROGRAMAR" : "CITA_EDITAR", "cita", guardada.getId(),
+                Map.of("inicio", inicio.toString()));
         publicar(guardada);
         return obtener(guardada.getId());
     }
@@ -208,6 +221,7 @@ public class CitaService {
         cita.setFin(validarIntervalo(cita.getId(), cita.getPaciente().getId(), cita.getOdontologo(), inicio, duracion, true));
         cita.setInicio(inicio);
         log.info("Cita {} movida al {}", citaId, FECHA_HORA.format(inicio));
+        auditoria.registrar("CITA_MOVER", "cita", citaId, Map.of("inicio", inicio.toString()));
         publicar(cita);
         return obtener(citaId);
     }
@@ -232,6 +246,7 @@ public class CitaService {
         }
         cita.setEstado(destino);
         log.info("Cita {} → {}", citaId, destino);
+        auditoria.registrar("CITA_ESTADO", "cita", citaId, Map.of("estado", destino.name()));
         publicar(cita);
         return obtener(citaId);
     }

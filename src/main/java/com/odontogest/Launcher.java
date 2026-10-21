@@ -6,15 +6,19 @@
 package com.odontogest;
 
 import com.odontogest.config.DirectorioDatos;
+import com.odontogest.config.RestauracionPendiente;
 import javafx.application.Application;
+import org.slf4j.LoggerFactory;
 
+import java.nio.file.Path;
 import java.util.Locale;
 
 /**
  * Punto de entrada del ejecutable.
  * <p>
  * No extiende {@link Application} a propósito: así el fat JAR arranca sin exigir
- * JavaFX en el module-path. Prepara la carpeta de datos antes de levantar Spring.
+ * JavaFX en el module-path. Prepara la carpeta de datos y aplica una restauración pendiente antes de levantar
+ * Spring.
  */
 public final class Launcher {
 
@@ -24,8 +28,16 @@ public final class Launcher {
     public static void main(String[] args) {
         // Interfaz en español: nombres de meses y días en DatePicker, fechas largas en PDF.
         Locale.setDefault(Locale.forLanguageTag("es-PE"));
-        DirectorioDatos.inicializar();
-        // Fase 8: RestauracionPendiente.aplicarSiExiste(home) antes de abrir la BD.
+        Path home = DirectorioDatos.inicializar();
+        // Un respaldo programado para restaurar reemplaza la base antes de que Spring la abra (PLAN §5.4).
+        try {
+            if (RestauracionPendiente.aplicarSiExiste(home)) {
+                System.setProperty(RestauracionPendiente.PROPIEDAD_APLICADA, "true");
+            }
+        } catch (RuntimeException e) {
+            // La base anterior sigue en su lugar; la marca queda para reintentar en el próximo arranque.
+            LoggerFactory.getLogger(Launcher.class).error("No se pudo aplicar la restauración pendiente", e);
+        }
         Application.launch(JavaFxApplication.class, args);
     }
 }

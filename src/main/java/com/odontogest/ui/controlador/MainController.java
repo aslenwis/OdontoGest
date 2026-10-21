@@ -61,16 +61,19 @@ public class MainController {
     public static final String VISTA_FICHA = "paciente-ficha-view";
     public static final String VISTA_CAJA = "caja-view";
     public static final String VISTA_AGENDA = "agenda-view";
+    public static final String VISTA_DASHBOARD = "dashboard-view";
+    public static final String VISTA_REPORTES = "reportes-view";
 
     /** Entrada del menú lateral; {@code permiso == null} = visible para todos. */
     private record ItemMenu(String vista, String titulo, Ikon icono, Permiso permiso) {
     }
 
     private static final List<ItemMenu> MENU = List.of(
-            new ItemMenu(null, "Inicio", Feather.HOME, null),
+            new ItemMenu(VISTA_DASHBOARD, "Inicio", Feather.HOME, null),
             new ItemMenu(VISTA_AGENDA, "Agenda", Feather.CALENDAR, Permiso.AGENDA_GESTIONAR),
             new ItemMenu(VISTA_PACIENTES, "Pacientes", Feather.USERS, Permiso.PACIENTE_VER),
             new ItemMenu(VISTA_CAJA, "Caja", Feather.DOLLAR_SIGN, Permiso.PAGO_REGISTRAR),
+            new ItemMenu(VISTA_REPORTES, "Reportes", Feather.BAR_CHART_2, Permiso.REPORTES_VER),
             new ItemMenu("catalogos-view", "Catálogos", Feather.BOOK_OPEN, Permiso.CATALOGOS_EDITAR),
             new ItemMenu("usuarios-view", "Usuarios", Feather.USER_CHECK, Permiso.USUARIOS),
             new ItemMenu("configuracion-view", "Configuración", Feather.SETTINGS, Permiso.CONFIGURACION));
@@ -86,6 +89,7 @@ public class MainController {
     private final PacienteFichaController fichaController;
     private final CajaController cajaController;
     private final AgendaController agendaController;
+    private final ReportesController reportesController;
     private final IntegracionService integracionService;
 
     @FXML private StackPane raiz;
@@ -93,11 +97,9 @@ public class MainController {
     @FXML private VBox zonaToasts;
     @FXML private VBox menu;
     @FXML private StackPane contenido;
-    @FXML private VBox bienvenida;
     @FXML private Label lblTitulo;
     @FXML private Label lblUsuario;
     @FXML private Label lblRol;
-    @FXML private Label lblBienvenida;
     @FXML private Button btnTema;
     @FXML private Label lblSinInternet;
 
@@ -110,10 +112,11 @@ public class MainController {
         UsuarioSesion usuario = sesionUsuario.exigirUsuario();
         lblUsuario.setText(usuario.nombreCompleto());
         lblRol.setText(Rol.valueOf(usuario.rol()).etiqueta);
-        lblBienvenida.setText("Bienvenido(a), " + usuario.nombreCompleto());
         actualizarBotonTema();
         construirMenu();
         mostrarConectividad(integracionService.enLinea());
+        // Después de initialize: esta vista aún se está guardando en la caché de CargadorVistas.
+        Platform.runLater(() -> mostrar(VISTA_DASHBOARD, "Inicio"));
     }
 
     /** RNF-03: aviso no bloqueante cuando no hay internet (DNI y correo no disponibles). */
@@ -145,16 +148,12 @@ public class MainController {
             b.setMaxWidth(Double.MAX_VALUE);
             b.setOnAction(e -> {
                 b.setSelected(true);       // un clic sobre el elemento activo no lo deselecciona
-                if (item.vista() == null) {
-                    mostrarInicio();
-                } else {
-                    mostrar(item.vista(), item.titulo());
-                }
+                mostrar(item.vista(), item.titulo());
             });
-            botonesMenu.put(item.vista() == null ? "" : item.vista(), b);
+            botonesMenu.put(item.vista(), b);
             menu.getChildren().add(b);
         }
-        botonesMenu.get("").setSelected(true);
+        botonesMenu.get(VISTA_DASHBOARD).setSelected(true);
     }
 
     /** Muestra una vista en el área de contenido; si es {@link Refrescable}, recarga sus datos. */
@@ -170,11 +169,6 @@ public class MainController {
         if (cargada.controlador() instanceof Refrescable refrescable) {
             refrescable.refrescar();
         }
-    }
-
-    private void mostrarInicio() {
-        contenido.getChildren().setAll(bienvenida);
-        lblTitulo.setText("Inicio");
     }
 
     /** Navegación pedida por otros controladores; puede llegar desde cualquier hilo. */
@@ -200,6 +194,13 @@ public class MainController {
             if (evento.parametros().get("pacienteId") instanceof Number n) {
                 agendaController.nuevaCitaPara(n.longValue());
             }
+        } else if (VISTA_REPORTES.equals(evento.vista()) && sesionUsuario.tiene(Permiso.REPORTES_VER)) {
+            mostrar(VISTA_REPORTES, "Reportes");
+            if (evento.parametros().get("pestana") instanceof String pestana) {
+                reportesController.seleccionarPestana(pestana);
+            }
+        } else if (VISTA_DASHBOARD.equals(evento.vista())) {
+            mostrar(VISTA_DASHBOARD, "Inicio");
         } else if (VISTA_CAJA.equals(evento.vista()) && sesionUsuario.tiene(Permiso.PAGO_REGISTRAR)) {
             mostrar(VISTA_CAJA, "Caja");
             if (evento.parametros().get("pacienteId") instanceof Number n) {
@@ -217,6 +218,11 @@ public class MainController {
             configuracionService.guardar(Map.of("ui.tema", nuevo.name()));
             return null;
         }, r -> { });
+    }
+
+    @FXML
+    private void onAcercaDe() {
+        cargadorVistas.mostrarModal("acerca-de-view", "Acerca de OdontoGest");
     }
 
     @FXML

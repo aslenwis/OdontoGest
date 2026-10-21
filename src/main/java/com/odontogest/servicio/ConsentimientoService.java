@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Consentimientos del paciente (RF-PAC-05): consentimiento para el tratamiento de datos personales (Ley N° 29733)
@@ -37,6 +38,7 @@ import java.util.List;
 public class ConsentimientoService {
 
     private final ConsentimientoRepository consentimientoRepository;
+    private final AuditoriaService auditoria;
     private final PacienteRepository pacienteRepository;
     private final PacienteService pacienteService;
     private final ConfiguracionService configuracionService;
@@ -77,6 +79,7 @@ public class ConsentimientoService {
         c.setRegistradoPor(usuarioId);
         Consentimiento guardado = consentimientoRepository.save(c);
         log.info("Consentimiento de datos registrado para {}", paciente.getNumeroHistoria());
+        auditoria.registrar("CONSENTIMIENTO_DATOS", "paciente", paciente.getId(), Map.of("firmadoPor", firmante));
         return new ConsentimientoDto(guardado.getId(), guardado.getTipo(), guardado.getAceptadoEn(), guardado.getFirmadoPor());
     }
 }

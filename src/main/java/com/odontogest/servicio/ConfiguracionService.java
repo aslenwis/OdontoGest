@@ -67,6 +67,7 @@ public class ConfiguracionService {
     private static final long TAMANIO_MAXIMO_LOGO = 2L * 1024 * 1024;
 
     private final ConfiguracionRepository configuracionRepository;
+    private final AuditoriaService auditoria;
     private final CifradorSecretos cifrador;
     private final SesionUsuario sesionUsuario;
     private final Map<String, String> cache = new ConcurrentHashMap<>();
@@ -147,6 +148,7 @@ public class ConfiguracionService {
         });
         cache.clear();
         log.info("Configuración guardada: {}", normalizados.keySet());   // nunca el valor (puede ser un secreto)
+        auditoria.registrar("CONFIGURACION_GUARDAR", "configuracion", null, Map.of("claves", normalizados.keySet()));
     }
 
     /**

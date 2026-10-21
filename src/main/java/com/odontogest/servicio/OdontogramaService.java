@@ -83,6 +83,7 @@ public class OdontogramaService {
     public static final int LARGO_MINIMO_MOTIVO = 10;
 
     private final OdontogramaRepository odontogramaRepository;
+    private final AuditoriaService auditoria;
     private final HallazgoRepository hallazgoRepository;
     private final HallazgoAnulacionRepository anulacionRepository;
     private final HallazgoTipoRepository hallazgoTipoRepository;
@@ -174,6 +175,11 @@ public class OdontogramaService {
         return Optional.of(new EstadoFirmado(ultimo.get().getId(), proyector.proyectar(firmados, null)));
     }
 
+    /** Índices de lo firmado (sin el borrador) para el reporte epidemiológico; vacío si no hay nada firmado. */
+    Optional<IndicesVista> indicesFirmados(long pacienteId) {
+        return estadoFirmado(pacienteId).map(e -> indices(e.estado()));
+    }
+
     /** Ficha odontológica en PDF (RF-ODO-10); la imagen del odontograma la dibuja la UI. */
     public byte[] pdfFicha(long pacienteId, LocalDateTime hasta, byte[] imagenPng) {
         OdontogramaVista vista = obtenerVista(pacienteId, hasta);
@@ -244,6 +250,7 @@ public class OdontogramaService {
         long pacienteId = o.getPaciente().getId();
         Validado v = validar(cmd, tipo, o.getDenticion(), estadoActual(pacienteId));
 
+        auditoria.registrar("HALLAZGO_CREAR", "odontograma", o.getId(), Map.of("tipo", tipo.getCodigo(), "pieza", cmd.piezaFdi()));
         hallazgoRepository.save(Hallazgo.registrar(o, tipo, cmd.piezaFdi(), v.piezaFin(), v.superficies(), v.estado(),
                 v.sigla(), v.nota(), usuarioId, ahora()));
         return obtenerVista(pacienteId, null);
@@ -261,6 +268,7 @@ public class OdontogramaService {
         borradorEditable(o.getId());
         hallazgoRepository.delete(h);
         log.info("Hallazgo {} eliminado del borrador {}", hallazgoId, o.getId());
+        auditoria.registrar("HALLAZGO_ELIMINAR", "hallazgo", hallazgoId, Map.of("odontograma", o.getId()));
         return obtenerVista(o.getPaciente().getId(), null);
     }
 
@@ -281,6 +289,7 @@ public class OdontogramaService {
         }
         anulacionRepository.save(HallazgoAnulacion.de(h, m, usuarioId, ahora()));
         log.info("Hallazgo {} anulado: {}", hallazgoId, m);
+        auditoria.registrar("HALLAZGO_ANULAR", "hallazgo", hallazgoId, Map.of("motivo", m));
         return obtenerVista(h.getOdontograma().getPaciente().getId(), null);
     }
 
@@ -310,6 +319,7 @@ public class OdontogramaService {
         o.setEstado(EstadoOdontogramaRegistro.CERRADO);
         odontogramaRepository.save(o);
         log.info("Odontograma {} cerrado con hash {}", o.getId(), o.getHashCierre());
+        auditoria.registrar("ODONTOGRAMA_CERRAR", "odontograma", o.getId(), Map.of("hash", o.getHashCierre()));
         eventos.publishEvent(new OdontogramaCerrado(pacienteId, o.getId(), o.getHashCierre()));
         return obtenerVista(pacienteId, null);
     }

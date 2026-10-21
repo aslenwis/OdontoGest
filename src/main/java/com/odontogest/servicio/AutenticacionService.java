@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
 /**
  * Inicio y cierre de sesión (RF-SEG-01, RF-SEG-04).
@@ -41,6 +42,7 @@ public class AutenticacionService {
     private static final DateTimeFormatter HORA = DateTimeFormatter.ofPattern("HH:mm");
 
     private final UsuarioRepository usuarioRepository;
+    private final AuditoriaService auditoria;
     private final PasswordEncoder passwordEncoder;
     private final SesionUsuario sesionUsuario;
     private final ApplicationEventPublisher eventos;
@@ -82,6 +84,7 @@ public class AutenticacionService {
         sesionUsuario.iniciar(sesion);
         eventos.publishEvent(new SesionIniciada(sesion));
         log.info("Inicio de sesión: {} ({})", sesion.username(), sesion.rol());
+        auditoria.registrar("LOGIN", "usuario", sesion.id(), null);
         return sesion;
     }
 
@@ -96,10 +99,12 @@ public class AutenticacionService {
             usuario.setIntentosFallidos(0);
             usuario.setBloqueadoHasta(ahora.plus(DURACION_BLOQUEO));
             log.warn("Usuario {} bloqueado por {} intentos fallidos", usuario.getUsername(), MAX_INTENTOS);
+            auditoria.registrar("USUARIO_BLOQUEADO", "usuario", usuario.getId(), Map.of("username", usuario.getUsername()));
             throw new NegocioException("Demasiados intentos fallidos. El usuario queda bloqueado por "
                     + DURACION_BLOQUEO.toMinutes() + " minutos.");
         }
         usuario.setIntentosFallidos(intentos);
+        auditoria.registrar("LOGIN_FALLIDO", "usuario", usuario.getId(), Map.of("username", usuario.getUsername(), "intento", intentos));
         throw new NegocioException(CREDENCIALES_INVALIDAS);
     }
 }

@@ -39,10 +39,20 @@ public class Exportador {
      * @param origen control que se deshabilita mientras se genera
      */
     public void guardarPdf(Node origen, String nombreSugerido, Callable<byte[]> generar) {
+        guardar(origen, nombreSugerido, "Guardar PDF", "Documento PDF (*.pdf)", ".pdf", generar);
+    }
+
+    /** Como {@link #guardarPdf}, para un libro de Excel (.xlsx). */
+    public void guardarExcel(Node origen, String nombreSugerido, Callable<byte[]> generar) {
+        guardar(origen, nombreSugerido, "Guardar Excel", "Libro de Excel (*.xlsx)", ".xlsx", generar);
+    }
+
+    private void guardar(Node origen, String nombreSugerido, String titulo, String filtro, String extension,
+                         Callable<byte[]> generar) {
         FileChooser selector = new FileChooser();
-        selector.setTitle("Guardar PDF");
+        selector.setTitle(titulo);
         selector.setInitialFileName(nombreSugerido);
-        selector.getExtensionFilters().add(new FileChooser.ExtensionFilter("Documento PDF (*.pdf)", "*.pdf"));
+        selector.getExtensionFilters().add(new FileChooser.ExtensionFilter(filtro, "*" + extension));
         if (ultimaCarpeta != null && ultimaCarpeta.isDirectory()) {
             selector.setInitialDirectory(ultimaCarpeta);
         }
@@ -50,8 +60,8 @@ public class Exportador {
         if (destino == null) {
             return;
         }
-        File archivo = destino.getName().toLowerCase().endsWith(".pdf") ? destino
-                : new File(destino.getParentFile(), destino.getName() + ".pdf");
+        File archivo = destino.getName().toLowerCase().endsWith(extension) ? destino
+                : new File(destino.getParentFile(), destino.getName() + extension);
         ultimaCarpeta = archivo.getParentFile();
         tareaUi.ejecutar(origen, () -> {
             Files.write(archivo.toPath(), generar.call());

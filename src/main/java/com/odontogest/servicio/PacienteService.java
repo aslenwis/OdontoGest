@@ -37,6 +37,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Pacientes e historia clínica (RF-PAC-01 a RF-PAC-03): búsqueda paginada, ficha y registro con número
@@ -52,6 +53,7 @@ public class PacienteService {
     private static final int EDAD_MAXIMA = 120;
 
     private final PacienteRepository pacienteRepository;
+    private final AuditoriaService auditoria;
     private final AnamnesisRepository anamnesisRepository;
     private final ConsentimientoRepository consentimientoRepository;
     private final CorrelativoService correlativoService;
@@ -115,6 +117,8 @@ public class PacienteService {
 
         Paciente guardado = pacienteRepository.save(p);
         log.info("Paciente {} {}", f.id() == null ? "registrado" : "actualizado", guardado.getNumeroHistoria());
+        auditoria.registrar(f.id() == null ? "PACIENTE_CREAR" : "PACIENTE_EDITAR", "paciente", guardado.getId(),
+                Map.of("historia", guardado.getNumeroHistoria()));
         return guardado.getId();
     }
 
@@ -123,6 +127,7 @@ public class PacienteService {
         sesionUsuario.exigir(Permiso.PACIENTE_EDITAR);
         Paciente p = buscarPaciente(id);
         p.setActivo(activo);
+        auditoria.registrar(activo ? "PACIENTE_REACTIVAR" : "PACIENTE_DESACTIVAR", "paciente", id, null);
         p.setActualizadoEn(LocalDateTime.now());
     }
 

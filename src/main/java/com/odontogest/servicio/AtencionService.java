@@ -36,6 +36,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -53,6 +54,7 @@ public class AtencionService {
     private static final DateTimeFormatter FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final AtencionRepository atencionRepository;
+    private final AuditoriaService auditoria;
     private final PacienteRepository pacienteRepository;
     private final OdontologoRepository odontologoRepository;
     private final OdontogramaRepository odontogramaRepository;
@@ -145,6 +147,8 @@ public class AtencionService {
         Atencion guardada = atencionRepository.save(a);
         odontogramaService.abrirBorrador(guardada.getId(), form.denticion());
         log.info("Atención {} abierta para {}", guardada.getId(), paciente.getNumeroHistoria());
+        auditoria.registrar("ATENCION_ABRIR", "atencion", guardada.getId(),
+                Map.of("paciente", paciente.getNumeroHistoria(), "cita", String.valueOf(citaId)));
         return guardada.getId();
     }
 
@@ -181,6 +185,7 @@ public class AtencionService {
             }
         }
         a.setEstado(EstadoAtencion.CERRADA);
+        auditoria.registrar("ATENCION_CERRAR", "atencion", a.getId(), null);
         a.setCerradaEn(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         if (a.getCitaId() != null) {
             citaService.marcarAtendida(a.getCitaId());

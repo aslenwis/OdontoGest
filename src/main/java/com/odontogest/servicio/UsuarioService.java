@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -43,6 +44,7 @@ public class UsuarioService {
     private static final int LARGO_MINIMO_PASSWORD = 8;
 
     private final UsuarioRepository usuarioRepository;
+    private final AuditoriaService auditoria;
     private final OdontologoRepository odontologoRepository;
     private final PasswordEncoder passwordEncoder;
     private final SesionUsuario sesionUsuario;
@@ -98,6 +100,8 @@ public class UsuarioService {
         u.setActivo(form.activo());
         Usuario guardado = usuarioRepository.save(u);
         log.info("Usuario {} {} por {}", guardado.getUsername(), nuevo ? "creado" : "actualizado", actual.username());
+        auditoria.registrar(nuevo ? "USUARIO_CREAR" : "USUARIO_EDITAR", "usuario", guardado.getId(),
+                Map.of("username", guardado.getUsername(), "rol", guardado.getRol().name()));
         return guardado.getId();
     }
 
@@ -112,6 +116,7 @@ public class UsuarioService {
         u.setPasswordHash(passwordEncoder.encode(nueva));
         u.setIntentosFallidos(0);
         u.setBloqueadoHasta(null);
+        auditoria.registrar("USUARIO_RESTABLECER_PASSWORD", "usuario", usuarioId, null);
     }
 
     /** El usuario de la sesión cambia su propia contraseña. */
@@ -128,6 +133,7 @@ public class UsuarioService {
         validarPassword(nueva, v);
         v.lanzarSiHayErrores();
         u.setPasswordHash(passwordEncoder.encode(nueva));
+        auditoria.registrar("USUARIO_CAMBIAR_PASSWORD", "usuario", u.getId(), null);
     }
 
     private static void validarPassword(String password, Validador v) {

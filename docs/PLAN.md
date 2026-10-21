@@ -1737,6 +1737,17 @@ public class TareaUi {
 ### 5.5 Auditoría
 `AuditoriaService.registrar(String accion, String entidad, Long id, Object detalle)` con `@Transactional(propagation = MANDATORY)`: se llama dentro de la transacción del servicio que hace el cambio, así la auditoría no queda huérfana si la operación falla.
 
+**Decisiones de la implementación (Fase 8):**
+- Auditoría: 24 acciones en 10 servicios (inicio de sesión y fallidos, pacientes, hallazgos, cierre de odontograma, atenciones, planes, pagos, citas, usuarios, configuración, consentimiento y respaldos). El detalle es JSON (Gson) y nunca lleva contraseñas ni valores de configuración: de `CONFIGURACION_GUARDAR` solo se guardan las claves. El usuario sale de `SesionUsuario`; la fecha se trunca a segundos. La consulta (pestaña Auditoría de Reportes) es solo del administrador y devuelve como máximo 500 filas.
+- `RespaldoService` no lleva `@Transactional` de clase (excepción a la convención): SQLite no permite `VACUUM` dentro de una transacción; su auditoría usa `TransactionTemplate`. El ZIP se escribe como `.parcial` y se renombra al terminar. Nombres: `odontogest-respaldo-<fecha>.zip` (manual) y `odontogest-auto-<fecha>.zip` (al cerrar). `respaldo.mantener` poda **solo los automáticos**; los manuales no se borran solos. No hay respaldo automático si hay una restauración pendiente.
+- Validación al programar una restauración: ZIP legible, `manifest.json` de OdontoGest con `esquema` entre 1 y `VERSION_ESQUEMA`, rutas sin salir de `restauracion/` (zip-slip), cabecera SQLite, `PRAGMA integrity_check = ok` y tablas principales presentes. Si algo falla, se limpia `restauracion/` y no queda marca.
+- `RestauracionPendiente` también aparta el `-wal`/`-shm` de la base anterior (un WAL viejo corrompería la restaurada), `adjuntos/` y `clave.key`; si falla al colocar la base nueva, devuelve la anterior. `Launcher` deja la propiedad `odontogest.restauracion.aplicada` y `JavaFxApplication` avisa al usuario y lo registra en el log (que aún no existe cuando corre `Launcher`). Verificado con el JAR real: base con WAL sin cerrar → restauración → arranque correcto con los datos del respaldo.
+- Tablero (`DashboardService` + `DashboardDao`): para el odontólogo, el monto del mes y el gráfico son **su producción** (procedimientos realizados en sus atenciones) y las citas de hoy son solo las suyas; no ve la lista de deudores. Para los demás, ingresos de caja. Se recarga con `CitaCambiada` y `PagoRegistrado`.
+- Reportes por rol (`ReporteService.disponibles()`): administrador, todos más Auditoría; odontólogo, Producción (forzada a la suya) y Epidemiológico; recepción, Ingresos y Morosidad. Rango máximo de 3 años. El gráfico de ingresos va por día hasta 31 días y por mes en rangos mayores.
+- Epidemiológico: pacientes activos cuyo **último odontograma firmado** se cerró en el rango; índices de lo firmado (sin borradores) y edad a la fecha de ese cierre. Grupos de `GrupoEtario` (dominio): ceo-d se informa hasta los 11 años, CPO-D desde los 6; el promedio y el nivel OMS los calcula `PromedioIndices`.
+- Excel (`ReporteExcel`, POI XSSF): fechas y montos son celdas numéricas con formato, totales con fórmulas `SUM` ya calculadas, cabecera fija con autofiltro, impresión horizontal a una página de ancho. Comprobado abriendo los cinco libros con Microsoft Excel.
+- "Acerca de" (`SistemaService`) no exige sesión (se abre también desde el login); "Verificar integridad" ejecuta `PRAGMA integrity_check` y `PRAGMA foreign_key_check`.
+
 ### 5.6 Matriz de permisos (`Permiso`)
 | Permiso | ADMIN | ODONTOLOGO | RECEPCION |
 |---|---|---|---|
@@ -1747,7 +1758,7 @@ public class TareaUi {
 | PLAN_EDITAR | ✔ | ✔ | — |
 | PAGO_REGISTRAR / PAGO_ANULAR | ✔ / ✔ | — / — | ✔ / — |
 | AGENDA_GESTIONAR | ✔ | ✔ | ✔ |
-| REPORTES_VER | ✔ | ✔ (solo su producción) | ✔ (caja) |
+| REPORTES_VER | ✔ (todos y auditoría) | ✔ (su producción y epidemiológico) | ✔ (ingresos y morosidad) |
 | CATALOGOS_EDITAR / USUARIOS / CONFIGURACION / RESPALDO | ✔ | — | — |
 
 `SesionUsuario.exigir(Permiso p)` lanza `PermisoDenegadoException`; cada método de servicio que escribe lo invoca. La UI además oculta o deshabilita los controles (`SesionUsuario.tiene(p)`).

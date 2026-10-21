@@ -66,6 +66,11 @@ public class LoginController {
                 });
     }
 
+    @FXML
+    private void onAcercaDe() {
+        cargadorVistas.mostrarModal("acerca-de-view", "Acerca de OdontoGest");
+    }
+
     private void mostrarError(String mensaje) {
         lblError.setText(mensaje);
         lblError.setVisible(true);

@@ -9,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
@@ -90,6 +91,23 @@ public class CargadorVistas {
         stage.setMinHeight(640);
         stage.setMaximized(true);
         stage.show();
+    }
+
+    /** Abre una vista como ventana modal sobre la ventana actual (p. ej. "Acerca de"), ajustada a su contenido. */
+    public Stage mostrarModal(String nombre, String titulo) {
+        Stage dialogo = new Stage();
+        if (stage != null) {
+            dialogo.initOwner(stage);
+            dialogo.getIcons().setAll(stage.getIcons());
+        }
+        dialogo.initModality(Modality.WINDOW_MODAL);
+        dialogo.setTitle(titulo);
+        Scene escena = new Scene(cargarNueva(nombre).raiz());
+        escena.getStylesheets().add(Objects.requireNonNull(getClass().getResource(CSS)).toExternalForm());
+        dialogo.setScene(escena);
+        dialogo.setResizable(false);
+        dialogo.show();
+        return dialogo;
     }
 
     public Stage ventana() {

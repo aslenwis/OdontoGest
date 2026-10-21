@@ -79,6 +79,7 @@ public class PagoService {
     private static final BigDecimal MONTO_MAXIMO = new BigDecimal("999999.99");
 
     private final PagoRepository pagoRepository;
+    private final AuditoriaService auditoria;
     private final PagoAplicacionRepository aplicacionRepository;
     private final CuotaRepository cuotaRepository;
     private final PacienteRepository pacienteRepository;
@@ -217,6 +218,8 @@ public class PagoService {
         }
         aplicacionRepository.flush();
         log.info("Pago {} de S/ {} registrado para {}", guardado.getNumeroRecibo(), form.monto(), paciente.getNumeroHistoria());
+        auditoria.registrar("PAGO_REGISTRAR", "pago", guardado.getId(), Map.of("recibo", guardado.getNumeroRecibo(),
+                "monto", form.monto().toPlainString(), "medio", form.medio().name()));
         eventos.publishEvent(new PagoRegistrado(paciente.getId(), guardado.getId(), guardado.getNumeroRecibo(), false));
         return obtener(guardado.getId());
     }
@@ -249,6 +252,7 @@ public class PagoService {
         pago.setAnuladoEn(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         cuotaRepository.flush();
         log.info("Pago {} anulado: {}", pago.getNumeroRecibo(), m);
+        auditoria.registrar("PAGO_ANULAR", "pago", pago.getId(), Map.of("recibo", pago.getNumeroRecibo(), "motivo", m));
         eventos.publishEvent(new PagoRegistrado(pago.getPaciente().getId(), pago.getId(), pago.getNumeroRecibo(), true));
         return obtener(pago.getId());
     }

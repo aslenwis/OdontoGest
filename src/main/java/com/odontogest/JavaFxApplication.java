@@ -5,9 +5,11 @@
  */
 package com.odontogest;
 
+import com.odontogest.config.RestauracionPendiente;
 import com.odontogest.integracion.ConectividadService;
 import com.odontogest.integracion.RecordatorioScheduler;
 import com.odontogest.servicio.ConfiguracionService;
+import com.odontogest.servicio.RespaldoService;
 import com.odontogest.ui.soporte.CargadorVistas;
 import com.odontogest.ui.soporte.Exportador;
 import com.odontogest.ui.soporte.Tema;
@@ -59,6 +61,14 @@ public class JavaFxApplication extends Application {
             return;
         }
         temaInicial.aplicar();
+        if (Boolean.getBoolean(RestauracionPendiente.PROPIEDAD_APLICADA)) {
+            log.warn("Se aplicó un respaldo programado al iniciar; la base anterior quedó en respaldos/antes-de-restaurar-*");
+            Alert aviso = new Alert(Alert.AlertType.INFORMATION, "Se restauró el respaldo programado. Los datos que había "
+                    + "antes quedaron guardados en la carpeta de respaldos (antes-de-restaurar-…).", ButtonType.OK);
+            aviso.setTitle("OdontoGest");
+            aviso.setHeaderText("Respaldo restaurado");
+            aviso.showAndWait();
+        }
         context.getBean(Exportador.class).setHostServices(getHostServices());
         context.getBean(CargadorVistas.class).mostrarLogin(stage);
         // Fase 7: aviso de conectividad y recordatorios en hilos de fondo (no bloquean la interfaz).
@@ -68,10 +78,11 @@ public class JavaFxApplication extends Application {
 
     @Override
     public void stop() {
-        // Fase 8: RespaldoService.respaldoAutomaticoAlCerrar() si está habilitado.
         if (context != null) {
             context.getBean(RecordatorioScheduler.class).detener();
             context.getBean(ConectividadService.class).detener();
+            // Con los hilos de fondo detenidos: respaldo automático si está habilitado (PLAN §5.4).
+            context.getBean(RespaldoService.class).respaldoAutomaticoAlCerrar();
             context.close();
         }
         Platform.exit();
