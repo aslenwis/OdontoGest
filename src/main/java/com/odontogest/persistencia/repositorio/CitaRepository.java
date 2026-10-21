@@ -55,4 +55,16 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
             SELECT c FROM Cita c JOIN FETCH c.odontologo
             WHERE c.paciente.id = :pacienteId ORDER BY c.inicio DESC""")
     List<Cita> listarPorPaciente(long pacienteId);
+
+    /**
+     * Citas pendientes que empiezan en {@code [desde, hasta)} sin recordatorio enviado, de pacientes con correo que
+     * aceptan recordatorios (PLAN §5.2.6).
+     */
+    @Query("""
+            SELECT c FROM Cita c JOIN FETCH c.paciente p JOIN FETCH c.odontologo
+            WHERE c.estado IN :estados AND c.inicio >= :desde AND c.inicio < :hasta
+              AND c.recordatorioEnviadoEn IS NULL
+              AND p.email IS NOT NULL AND p.email <> '' AND p.aceptaRecordatorios = true
+            ORDER BY c.inicio""")
+    List<Cita> pendientesDeRecordatorio(LocalDateTime desde, LocalDateTime hasta, Collection<EstadoCita> estados);
 }

@@ -27,7 +27,12 @@
         <Label text="Tipo de documento *" GridPane.rowIndex="1"/>
         <ComboBox fx:id="cmbTipoDocumento" maxWidth="Infinity" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
         <Label text="N° de documento *" GridPane.rowIndex="2"/>
-        <TextField fx:id="txtNumeroDocumento" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+        <HBox spacing="8" GridPane.rowIndex="2" GridPane.columnIndex="1">
+            <TextField fx:id="txtNumeroDocumento" HBox.hgrow="ALWAYS" minWidth="110"/>
+            <Button fx:id="btnConsultarDni" text="Consultar" minWidth="-Infinity" onAction="#onConsultarDni">
+                <graphic><FontIcon iconLiteral="fth-download-cloud"/></graphic>
+            </Button>
+        </HBox>
 
         <Label text="Datos personales" styleClass="formulario-seccion" GridPane.rowIndex="3" GridPane.columnSpan="2"/>
         <Label text="Nombres *" GridPane.rowIndex="4"/>

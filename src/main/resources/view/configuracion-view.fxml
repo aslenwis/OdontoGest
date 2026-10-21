@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<!-- Configuración (PLAN §6.1): un panel por grupo de claves, generado desde la tabla configuracion; los secretos
+     son campos de contraseña. Botones en una barra fija abajo. -->
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.odontogest.ui.controlador.ConfiguracionController">
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="edge-to-edge">
+            <VBox fx:id="grupos" spacing="12" maxWidth="900">
+                <padding><Insets top="16" right="20" bottom="16" left="20"/></padding>
+            </VBox>
+        </ScrollPane>
+    </center>
+    <bottom>
+        <HBox spacing="8" alignment="CENTER_LEFT" styleClass="barra-acciones">
+            <padding><Insets top="8" right="20" bottom="8" left="20"/></padding>
+            <Label fx:id="lblConexion" styleClass="text-small"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="lblCambios" styleClass="text-muted, text-small"/>
+            <Button fx:id="btnDescartar" text="Descartar cambios" onAction="#onDescartar">
+                <graphic><FontIcon iconLiteral="fth-rotate-ccw"/></graphic>
+            </Button>
+            <Button fx:id="btnGuardar" text="Guardar cambios" styleClass="accent" onAction="#onGuardar">
+                <graphic><FontIcon iconLiteral="fth-save"/></graphic>
+            </Button>
+        </HBox>
+    </bottom>
+</BorderPane>

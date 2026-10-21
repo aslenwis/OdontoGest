@@ -23,6 +23,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import org.kordamp.ikonli.Ikon;
@@ -103,7 +104,10 @@ public final class Formularios {
     public static VBox panelLateral(String titulo, Node contenido, Node... botones) {
         Label t = new Label(titulo);
         t.getStyleClass().add(Styles.TITLE_3);
-        ScrollPane desplazable = new ScrollPane(contenido);
+        // Margen derecho para que la barra de desplazamiento no tape el borde de los campos.
+        StackPane envoltura = new StackPane(contenido);
+        envoltura.setPadding(new Insets(0, 14, 0, 0));
+        ScrollPane desplazable = new ScrollPane(envoltura);
         desplazable.setFitToWidth(true);
         desplazable.getStyleClass().add("edge-to-edge");
         VBox.setVgrow(desplazable, Priority.ALWAYS);

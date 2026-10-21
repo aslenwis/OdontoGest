@@ -11,6 +11,7 @@ import com.lowagie.text.DocumentException;
 import com.lowagie.text.Element;
 import com.lowagie.text.Font;
 import com.lowagie.text.FontFactory;
+import com.lowagie.text.Image;
 import com.lowagie.text.PageSize;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Phrase;
@@ -23,6 +24,9 @@ import org.springframework.stereotype.Component;
 
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -94,6 +98,12 @@ public class PlantillaPdf {
     }
 
     private static void cabecera(Document documento, DatosClinica clinica) throws DocumentException {
+        Image logo = logo(clinica.logoRuta());
+        if (logo != null) {
+            logo.scaleToFit(140, 48);
+            logo.setAbsolutePosition(documento.right() - logo.getScaledWidth(), documento.top() - logo.getScaledHeight() + 6);
+            documento.add(logo);
+        }
         documento.add(new Paragraph(clinica.nombre(), CLINICA));
         List<String> datos = new ArrayList<>();
         if (!clinica.ruc().isBlank()) {
@@ -106,6 +116,22 @@ public class PlantillaPdf {
         }
         documento.add(new Paragraph(String.join("  ·  ", datos), PEQUENA));
         documento.add(new Chunk(new LineSeparator(0.8f, 100, Color.GRAY, Element.ALIGN_CENTER, -4)));
+    }
+
+    /** Logo de la clínica (PNG o JPG); {@code null} si no hay o no se puede leer: el documento sale sin logo. */
+    private static Image logo(String ruta) {
+        if (ruta == null || ruta.isBlank()) {
+            return null;
+        }
+        Path archivo = Path.of(ruta);
+        if (!Files.isRegularFile(archivo)) {
+            return null;
+        }
+        try {
+            return Image.getInstance(Files.readAllBytes(archivo));
+        } catch (IOException | RuntimeException e) {
+            return null;
+        }
     }
 
     /** Pie: fecha de generación y número de página. */

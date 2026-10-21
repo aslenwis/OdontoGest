@@ -5,6 +5,8 @@
  */
 package com.odontogest;
 
+import com.odontogest.integracion.ConectividadService;
+import com.odontogest.integracion.RecordatorioScheduler;
 import com.odontogest.servicio.ConfiguracionService;
 import com.odontogest.ui.soporte.CargadorVistas;
 import com.odontogest.ui.soporte.Exportador;
@@ -59,12 +61,17 @@ public class JavaFxApplication extends Application {
         temaInicial.aplicar();
         context.getBean(Exportador.class).setHostServices(getHostServices());
         context.getBean(CargadorVistas.class).mostrarLogin(stage);
+        // Fase 7: aviso de conectividad y recordatorios en hilos de fondo (no bloquean la interfaz).
+        context.getBean(ConectividadService.class).iniciarMonitoreo();
+        context.getBean(RecordatorioScheduler.class).iniciar();
     }
 
     @Override
     public void stop() {
         // Fase 8: RespaldoService.respaldoAutomaticoAlCerrar() si está habilitado.
         if (context != null) {
+            context.getBean(RecordatorioScheduler.class).detener();
+            context.getBean(ConectividadService.class).detener();
             context.close();
         }
         Platform.exit();

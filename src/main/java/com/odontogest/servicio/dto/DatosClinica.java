@@ -7,6 +7,12 @@ package com.odontogest.servicio.dto;
 
 /**
  * Datos de la clínica para las cabeceras de los documentos PDF (configuración {@code clinica.*}).
+ *
+ * @param logoRuta archivo de imagen del logo ({@code ""} = sin logo)
  */
-public record DatosClinica(String nombre, String ruc, String direccion, String telefono, String email) {
+public record DatosClinica(String nombre, String ruc, String direccion, String telefono, String email, String logoRuta) {
+
+    public DatosClinica(String nombre, String ruc, String direccion, String telefono, String email) {
+        this(nombre, ruc, direccion, telefono, email, "");
+    }
 }

@@ -7,16 +7,19 @@ package com.odontogest.ui.controlador;
 
 import atlantafx.base.controls.ModalPane;
 import atlantafx.base.theme.Styles;
+import com.odontogest.evento.ConectividadCambiada;
 import com.odontogest.evento.NavegarA;
 import com.odontogest.modelo.Rol;
 import com.odontogest.seguridad.Permiso;
 import com.odontogest.seguridad.SesionUsuario;
 import com.odontogest.servicio.AutenticacionService;
 import com.odontogest.servicio.ConfiguracionService;
+import com.odontogest.servicio.IntegracionService;
 import com.odontogest.servicio.UsuarioService;
 import com.odontogest.servicio.dto.UsuarioSesion;
 import com.odontogest.ui.soporte.CargadorVistas;
 import com.odontogest.ui.soporte.Formularios;
+import com.odontogest.ui.soporte.HiloUi;
 import com.odontogest.ui.soporte.Notificador;
 import com.odontogest.ui.soporte.PacienteActivo;
 import com.odontogest.ui.soporte.Refrescable;
@@ -69,7 +72,8 @@ public class MainController {
             new ItemMenu(VISTA_PACIENTES, "Pacientes", Feather.USERS, Permiso.PACIENTE_VER),
             new ItemMenu(VISTA_CAJA, "Caja", Feather.DOLLAR_SIGN, Permiso.PAGO_REGISTRAR),
             new ItemMenu("catalogos-view", "Catálogos", Feather.BOOK_OPEN, Permiso.CATALOGOS_EDITAR),
-            new ItemMenu("usuarios-view", "Usuarios", Feather.USER_CHECK, Permiso.USUARIOS));
+            new ItemMenu("usuarios-view", "Usuarios", Feather.USER_CHECK, Permiso.USUARIOS),
+            new ItemMenu("configuracion-view", "Configuración", Feather.SETTINGS, Permiso.CONFIGURACION));
 
     private final SesionUsuario sesionUsuario;
     private final AutenticacionService autenticacionService;
@@ -82,6 +86,7 @@ public class MainController {
     private final PacienteFichaController fichaController;
     private final CajaController cajaController;
     private final AgendaController agendaController;
+    private final IntegracionService integracionService;
 
     @FXML private StackPane raiz;
     @FXML private ModalPane modal;
@@ -94,6 +99,7 @@ public class MainController {
     @FXML private Label lblRol;
     @FXML private Label lblBienvenida;
     @FXML private Button btnTema;
+    @FXML private Label lblSinInternet;
 
     private final ToggleGroup grupoMenu = new ToggleGroup();
     private final Map<String, ToggleButton> botonesMenu = new HashMap<>();
@@ -107,6 +113,22 @@ public class MainController {
         lblBienvenida.setText("Bienvenido(a), " + usuario.nombreCompleto());
         actualizarBotonTema();
         construirMenu();
+        mostrarConectividad(integracionService.enLinea());
+    }
+
+    /** RNF-03: aviso no bloqueante cuando no hay internet (DNI y correo no disponibles). */
+    @EventListener
+    public void alCambiarConectividad(ConectividadCambiada e) {
+        HiloUi.ejecutar(() -> {
+            if (lblSinInternet != null) {
+                mostrarConectividad(e.enLinea());
+            }
+        });
+    }
+
+    private void mostrarConectividad(boolean enLinea) {
+        lblSinInternet.setVisible(!enLinea);
+        lblSinInternet.setManaged(!enLinea);
     }
 
     private void construirMenu() {

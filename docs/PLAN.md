@@ -1704,6 +1704,13 @@ public interface ConsultaDniGateway { Optional<DatosPersona> consultar(String dn
 ```
 `HttpConsultaDniGateway`: `java.net.http.HttpClient` con timeout de `api.timeout_seg`; URL = plantilla con `{numero}` reemplazado; cabecera = `cabecera_auth: prefijo_token + token`; respuesta parseada con Gson a `JsonObject` y leída con `api.dni.mapeo_json`. HTTP 404 → `Optional.empty()`; otros errores → `IntegracionException` con mensaje amigable. Botón “Probar conexión” en Configuración consulta un DNI de prueba que el usuario escribe.
 
+**Decisiones de la implementación (Fase 7):**
+- Los gateways reciben sus parámetros explícitos (`consultar(dni, ParametrosDni)`, `enviar(ParametrosSmtp, destino, asunto, cuerpo)`): `integracion` no depende de `servicio` y se prueba con un servidor HTTP local. `IntegracionService` arma los parámetros desde `ConfiguracionService` (único lugar donde se descifran los secretos).
+- `ConfiguracionService.guardar` valida por tipo (entero con rangos, booleano, JSON, URL con `{numero}`, correos) y es todo o nada; exige `CONFIGURACION` salvo para `ui.tema`. Un secreto vacío se borra; para conservarlo no se envía. `listar()` nunca devuelve el valor de un secreto.
+- `ConectividadService` hace HEAD con 2 s de espera a dos destinos públicos y guarda el resultado 30 s; el monitoreo (cada minuto) y `RecordatorioScheduler` los inicia `JavaFxApplication.start()`, no las pruebas. La barra superior muestra "Sin internet" con `ConectividadCambiada`.
+- `RecordatorioService` lee en una transacción corta, envía **fuera** de toda transacción (el pool tiene una sola conexión) y registra cada resultado en otra; una cita con envío fallido se reintenta en el siguiente ciclo.
+- El logo elegido se copia a `${odontogest.home}/logo.png|jpg` y `PlantillaPdf` lo dibuja en la cabecera si existe. El grupo "Interfaz" no aparece en Configuración: el tema se cambia con el botón de la barra lateral.
+
 ### 5.3 Concurrencia en JavaFX (`TareaUi`)
 ```java
 @Component @RequiredArgsConstructor

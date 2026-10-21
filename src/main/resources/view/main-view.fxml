@@ -39,6 +39,10 @@
                 <padding><Insets top="10" right="16" bottom="10" left="20"/></padding>
                 <Label fx:id="lblTitulo" text="Inicio" styleClass="title-4"/>
                 <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblSinInternet" text="Sin internet: DNI y correo no disponibles" styleClass="etiqueta-aviso"
+                       visible="false" managed="false">
+                    <graphic><FontIcon iconLiteral="fth-wifi-off"/></graphic>
+                </Label>
                 <FontIcon iconLiteral="fth-user" iconSize="18"/>
                 <VBox alignment="CENTER_LEFT">
                     <Label fx:id="lblUsuario" styleClass="text-bold"/>

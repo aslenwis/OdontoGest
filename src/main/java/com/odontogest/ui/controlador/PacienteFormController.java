@@ -11,10 +11,13 @@ import com.odontogest.modelo.Sexo;
 import com.odontogest.modelo.TipoDocumento;
 import com.odontogest.seguridad.Permiso;
 import com.odontogest.seguridad.SesionUsuario;
+import com.odontogest.servicio.IntegracionService;
 import com.odontogest.servicio.PacienteService;
 import com.odontogest.servicio.dto.PacienteDetalle;
 import com.odontogest.servicio.dto.PacienteForm;
+import com.odontogest.servicio.dto.PersonaDniDto;
 import com.odontogest.ui.soporte.Formularios;
+import com.odontogest.ui.soporte.Notificador;
 import com.odontogest.ui.soporte.TareaUi;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -24,6 +27,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -44,11 +48,14 @@ import java.util.function.LongConsumer;
 public class PacienteFormController {
 
     private final PacienteService pacienteService;
+    private final IntegracionService integracionService;
     private final TareaUi tareaUi;
+    private final Notificador notificador;
     private final SesionUsuario sesionUsuario;
 
     @FXML private ComboBox<TipoDocumento> cmbTipoDocumento;
     @FXML private TextField txtNumeroDocumento;
+    @FXML private Button btnConsultarDni;
     @FXML private TextField txtNombres;
     @FXML private TextField txtApellidoPaterno;
     @FXML private TextField txtApellidoMaterno;
@@ -71,6 +78,7 @@ public class PacienteFormController {
     @FXML private Button btnCancelar;
 
     private Long pacienteId;
+    private boolean dniHabilitado;
     private LongConsumer alGuardar = id -> { };
     private Runnable alCancelar;
 
@@ -85,7 +93,17 @@ public class PacienteFormController {
             if (sinDocumento) {
                 txtNumeroDocumento.clear();
             }
+            actualizarBotonDni();
         });
+        txtNumeroDocumento.textProperty().addListener((obs, a, b) -> actualizarBotonDni());
+        btnConsultarDni.setDisable(true);
+        tareaUi.ejecutar(integracionService::dniHabilitado, habilitado -> {
+            dniHabilitado = habilitado;
+            btnConsultarDni.setTooltip(new Tooltip(habilitado
+                    ? "Completa nombres y apellidos desde la API de DNI (requiere internet)."
+                    : "Consulta de DNI deshabilitada: actívela en Configuración → API DNI."));
+            actualizarBotonDni();
+        }, error -> btnConsultarDni.setDisable(true));
         cmbSexo.getItems().setAll(Sexo.values());
         cmbSexo.setConverter(Formularios.conversor(s -> s.etiqueta));
         cmbParentesco.getItems().setAll("Madre", "Padre", "Tutor(a) legal", "Abuelo(a)", "Hermano(a)", "Otro");
@@ -97,11 +115,6 @@ public class PacienteFormController {
     }
 
     /**
-     * @param existente  paciente a editar, o {@code null} para uno nuevo
-     * @param alGuardar  recibe el id guardado
-     * @param alCancelar {@code null} oculta el botón Cancelar (formulario incrustado en la ficha)
-     */
-    /**
      * Saca los botones Guardar/Cancelar del formulario para ponerlos en una barra fija fuera del desplazamiento
      * (así se ven aunque la pantalla sea baja).
      */
@@ -110,12 +123,40 @@ public class PacienteFormController {
         return pie;
     }
 
+    /**
+     * @param existente  paciente a editar, o {@code null} para uno nuevo
+     * @param alGuardar  recibe el id guardado
+     * @param alCancelar {@code null} oculta el botón Cancelar (formulario incrustado en la ficha)
+     */
     public void configurar(PacienteDetalle existente, LongConsumer alGuardar, Runnable alCancelar) {
         this.alGuardar = alGuardar;
         this.alCancelar = alCancelar;
         btnCancelar.setVisible(alCancelar != null);
         btnCancelar.setManaged(alCancelar != null);
         cargar(existente);
+    }
+
+    private void actualizarBotonDni() {
+        String n = txtNumeroDocumento.getText() == null ? "" : txtNumeroDocumento.getText().trim();
+        btnConsultarDni.setDisable(!dniHabilitado || cmbTipoDocumento.getValue() != TipoDocumento.DNI
+                || !n.matches("\\d{8}") || !sesionUsuario.tiene(Permiso.PACIENTE_EDITAR));
+    }
+
+    /** RF-PAC-06: completa los nombres desde la API de DNI; si falla, se siguen escribiendo a mano. */
+    @FXML
+    private void onConsultarDni() {
+        String dni = txtNumeroDocumento.getText().trim();
+        tareaUi.ejecutar(btnConsultarDni, () -> integracionService.consultarDni(dni), resultado -> {
+            if (resultado.isEmpty()) {
+                notificador.info("La API no encontró el DNI " + dni + ": ingrese los datos a mano.");
+                return;
+            }
+            PersonaDniDto p = resultado.get();
+            txtNombres.setText(texto(p.nombres()));
+            txtApellidoPaterno.setText(texto(p.apellidoPaterno()));
+            txtApellidoMaterno.setText(texto(p.apellidoMaterno()));
+            notificador.exito("Datos completados desde la consulta de DNI.");
+        });
     }
 
     /** Llena el formulario con el paciente (o lo limpia si es {@code null}). */
