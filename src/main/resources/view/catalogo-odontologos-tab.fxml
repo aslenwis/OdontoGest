@@ -10,22 +10,21 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<!-- Odontólogos y horarios de atención (RF-CAT-04) -->
 <VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.odontogest.ui.controlador.OdontologosTabController" spacing="12">
+      fx:controller="com.odontogest.ui.controlador.OdontologosTabControllerASEJ" spacing="12">
     <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
     <HBox spacing="8" alignment="CENTER_LEFT">
         <Label text="El horario define los bloques disponibles en la agenda." styleClass="text-muted" wrapText="true"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <CheckBox fx:id="chkInactivos" text="Incluir inactivos"/>
-        <Button fx:id="btnEditar" text="Editar" onAction="#onEditar">
+        <CheckBox fx:id="chkInactivosASEJ" text="Incluir inactivos"/>
+        <Button fx:id="btnEditarASEJ" text="Editar" onAction="#onEditarASEJ">
             <graphic><FontIcon iconLiteral="fth-edit-2"/></graphic>
         </Button>
-        <Button text="Nuevo odontólogo" styleClass="accent" onAction="#onNuevo">
+        <Button text="Nuevo odontólogo" styleClass="accent" onAction="#onNuevoASEJ">
             <graphic><FontIcon iconLiteral="fth-plus"/></graphic>
         </Button>
     </HBox>
-    <TableView fx:id="tabla" VBox.vgrow="ALWAYS">
+    <TableView fx:id="tablaASEJ" VBox.vgrow="ALWAYS">
         <placeholder><Label text="Sin registros."/></placeholder>
     </TableView>
 </VBox>

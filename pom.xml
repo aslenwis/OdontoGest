@@ -28,16 +28,13 @@
         <poi.version>5.2.5</poi.version>
         <archunit.version>1.3.0</archunit.version>
         <jacoco.version>0.8.12</jacoco.version>
-        <!-- RNF-10: cobertura mínima de instrucciones en el paquete dominio -->
         <cobertura.minima.dominio>0.70</cobertura.minima.dominio>
-        <main.class>com.odontogest.Launcher</main.class>
-        <!-- jpackage -->
-        <jpackage.type>app-image</jpackage.type>  <!-- app-image | msi | exe (msi/exe requieren WiX en Windows) -->
+        <main.class>com.odontogest.LauncherASEJ</main.class>
+        <jpackage.type>app-image</jpackage.type>
         <jpackage.vendor>OdontoGest - Proyecto Ingeniería de Software</jpackage.vendor>
     </properties>
 
     <dependencies>
-        <!-- Persistencia -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -52,7 +49,6 @@
             <artifactId>hibernate-community-dialects</artifactId>
         </dependency>
 
-        <!-- Validación, correo, hash de contraseñas -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
@@ -66,7 +62,6 @@
             <artifactId>spring-security-crypto</artifactId>
         </dependency>
 
-        <!-- JSON para integraciones (versión gestionada por Spring Boot) -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
@@ -78,7 +73,6 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Interfaz gráfica -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
@@ -90,7 +84,6 @@
             <version>${javafx.version}</version>
         </dependency>
         <dependency>
-            <!-- SwingFXUtils: convierte el snapshot del odontograma (WritableImage) a PNG para el PDF -->
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-swing</artifactId>
             <version>${javafx.version}</version>
@@ -111,7 +104,6 @@
             <version>${ikonli.version}</version>
         </dependency>
 
-        <!-- Documentos -->
         <dependency>
             <groupId>com.github.librepdf</groupId>
             <artifactId>openpdf</artifactId>
@@ -123,7 +115,6 @@
             <version>${poi.version}</version>
         </dependency>
 
-        <!-- Pruebas -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -141,6 +132,15 @@
         <finalName>odontogest</finalName>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include>**/*TestASEJ.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
@@ -153,7 +153,6 @@
                     </excludes>
                 </configuration>
                 <executions>
-                    <!-- Genera META-INF/build-info.properties → BuildProperties (versión en "Acerca de") -->
                     <execution>
                         <id>build-info</id>
                         <goals><goal>build-info</goal></goals>
@@ -162,7 +161,6 @@
             </plugin>
 
             <plugin>
-                <!-- mvn javafx:run durante el desarrollo -->
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
@@ -172,7 +170,6 @@
             </plugin>
 
             <plugin>
-                <!-- Cobertura: mvn test genera target/site/jacoco/index.html y falla si dominio < 70 % -->
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.version}</version>
@@ -214,7 +211,6 @@
     </build>
 
     <profiles>
-        <!-- mvn clean package -Pempaquetar   (EJECUTAR EN WINDOWS para generar el .exe con natives de Windows) -->
         <profile>
             <id>empaquetar</id>
             <build>
@@ -249,7 +245,6 @@
                                 <phase>package</phase>
                                 <goals><goal>exec</goal></goals>
                                 <configuration>
-                                    <!-- El jpackage del JDK que ejecuta Maven: no exige tenerlo en el PATH. -->
                                     <executable>${java.home}/bin/jpackage</executable>
                                     <arguments>
                                         <argument>--type</argument><argument>${jpackage.type}</argument>
@@ -269,7 +264,6 @@
                                     </arguments>
                                 </configuration>
                             </execution>
-                            <!-- ZIP final para entregar: OdontoGest/ + LEEME.txt (jar -M = ZIP sin manifiesto). -->
                             <execution>
                                 <id>zip-distribucion</id>
                                 <phase>package</phase>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import atlantafx.base.controls.CustomTextField?>
-<?import com.odontogest.ui.componente.OdontogramaCanvas?>
+<?import com.odontogest.ui.componente.OdontogramaCanvasASEJ?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
@@ -22,33 +22,30 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<!-- Pestaña Odontograma (PLAN §6.2): línea de tiempo arriba, paleta a la izquierda, lienzo al centro,
-     inspector a la derecha y especificaciones/índices abajo. -->
-<!-- En ventanas bajas la pestaña se desplaza en lugar de recortar el panel inferior. -->
 <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="edge-to-edge" xmlns="http://javafx.com/javafx/21"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.odontogest.ui.controlador.OdontogramaController">
-<BorderPane fx:id="raiz">
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.odontogest.ui.controlador.OdontogramaControllerASEJ">
+<BorderPane fx:id="raizASEJ">
     <top>
         <ToolBar>
-            <ComboBox fx:id="cmbMomento" prefWidth="200" promptText="Sin odontograma"/>
-            <Slider fx:id="sldLinea" prefWidth="100" min="0" max="0" majorTickUnit="1" minorTickCount="0"
+            <ComboBox fx:id="cmbMomentoASEJ" prefWidth="200" promptText="Sin odontograma"/>
+            <Slider fx:id="sldLineaASEJ" prefWidth="100" min="0" max="0" majorTickUnit="1" minorTickCount="0"
                     snapToTicks="true" showTickMarks="true"/>
             <Separator/>
             <Label text="Dentición"/>
-            <RadioButton fx:id="rbPermanente" text="Permanente"/>
-            <RadioButton fx:id="rbDecidua" text="Decidua"/>
-            <RadioButton fx:id="rbMixta" text="Mixta"/>
+            <RadioButton fx:id="rbPermanenteASEJ" text="Permanente"/>
+            <RadioButton fx:id="rbDeciduaASEJ" text="Decidua"/>
+            <RadioButton fx:id="rbMixtaASEJ" text="Mixta"/>
             <Separator/>
-            <ToggleButton fx:id="tglComparar" text="Comparar con inicial">
+            <ToggleButton fx:id="tglCompararASEJ" text="Comparar con inicial">
                 <graphic><FontIcon iconLiteral="fth-git-pull-request"/></graphic>
             </ToggleButton>
-            <Button fx:id="btnCerrar" text="Cerrar y firmar" onAction="#onCerrar">
+            <Button fx:id="btnCerrarASEJ" text="Cerrar y firmar" onAction="#onCerrarASEJ">
                 <graphic><FontIcon iconLiteral="fth-lock"/></graphic>
             </Button>
-            <Button fx:id="btnNuevaEvolucion" text="Nueva evolución" onAction="#onNuevaEvolucion">
+            <Button fx:id="btnNuevaEvolucionASEJ" text="Nueva evolución" onAction="#onNuevaEvolucionASEJ">
                 <graphic><FontIcon iconLiteral="fth-plus-circle"/></graphic>
             </Button>
-            <Button fx:id="btnPdf" text="PDF" onAction="#onPdf">
+            <Button fx:id="btnPdfASEJ" text="PDF" onAction="#onPdfASEJ">
                 <graphic><FontIcon iconLiteral="fth-printer"/></graphic>
             </Button>
         </ToolBar>
@@ -57,24 +54,24 @@
     <left>
         <VBox spacing="8" prefWidth="250" styleClass="odontograma-panel">
             <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
-            <Button fx:id="btnSeleccion" text="Modo selección (Esc)" maxWidth="Infinity" onAction="#onModoSeleccion">
+            <Button fx:id="btnSeleccionASEJ" text="Modo selección (Esc)" maxWidth="Infinity" onAction="#onModoSeleccionASEJ">
                 <graphic><FontIcon iconLiteral="fth-mouse-pointer"/></graphic>
             </Button>
-            <CustomTextField fx:id="txtBuscarHallazgo" promptText="Buscar hallazgo o sigla…">
+            <CustomTextField fx:id="txtBuscarHallazgoASEJ" promptText="Buscar hallazgo o sigla…">
                 <left><FontIcon iconLiteral="fth-search"/></left>
             </CustomTextField>
-            <ListView fx:id="lstPaleta" VBox.vgrow="ALWAYS" minHeight="96" styleClass="paleta-hallazgos"/>
+            <ListView fx:id="lstPaletaASEJ" VBox.vgrow="ALWAYS" minHeight="96" styleClass="paleta-hallazgos"/>
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Label text="Estado" styleClass="text-bold"/>
-                <RadioButton fx:id="rbBueno" text="Bueno">
+                <RadioButton fx:id="rbBuenoASEJ" text="Bueno">
                     <tooltip><Tooltip text="Atajo: B"/></tooltip>
                 </RadioButton>
-                <RadioButton fx:id="rbMalo" text="Malo">
+                <RadioButton fx:id="rbMaloASEJ" text="Malo">
                     <tooltip><Tooltip text="Atajo: M"/></tooltip>
                 </RadioButton>
             </HBox>
-            <Label fx:id="lblPendiente" wrapText="true" styleClass="text-muted, text-small"/>
-            <Button fx:id="btnRegistrar" text="Registrar (Enter)" maxWidth="Infinity" styleClass="accent" onAction="#onRegistrar">
+            <Label fx:id="lblPendienteASEJ" wrapText="true" styleClass="text-muted, text-small"/>
+            <Button fx:id="btnRegistrarASEJ" text="Registrar (Enter)" maxWidth="Infinity" styleClass="accent" onAction="#onRegistrarASEJ">
                 <graphic><FontIcon iconLiteral="fth-check"/></graphic>
             </Button>
         </VBox>
@@ -82,17 +79,17 @@
 
     <center>
         <StackPane>
-            <OdontogramaCanvas fx:id="lienzo"/>
-            <VBox fx:id="panelVacio" alignment="CENTER" spacing="10" maxWidth="420" maxHeight="-Infinity"
+            <OdontogramaCanvasASEJ fx:id="lienzoASEJ"/>
+            <VBox fx:id="panelVacioASEJ" alignment="CENTER" spacing="10" maxWidth="420" maxHeight="-Infinity"
                   styleClass="tarjeta" StackPane.alignment="CENTER">
                 <padding><Insets top="18" right="18" bottom="18" left="18"/></padding>
                 <Label text="El paciente aún no tiene odontograma" styleClass="text-bold"/>
                 <Label text="Abra una atención para registrar el odontograma inicial." wrapText="true" styleClass="text-muted"/>
-                <Button fx:id="btnNuevaAtencion" text="Nueva atención" styleClass="accent" onAction="#onNuevaAtencion">
+                <Button fx:id="btnNuevaAtencionASEJ" text="Nueva atención" styleClass="accent" onAction="#onNuevaAtencionASEJ">
                     <graphic><FontIcon iconLiteral="fth-clipboard"/></graphic>
                 </Button>
             </VBox>
-            <Label fx:id="lblHover" styleClass="odontograma-hover" StackPane.alignment="BOTTOM_LEFT">
+            <Label fx:id="lblHoverASEJ" styleClass="odontograma-hover" StackPane.alignment="BOTTOM_LEFT">
                 <StackPane.margin><Insets left="10" bottom="8"/></StackPane.margin>
             </Label>
         </StackPane>
@@ -101,15 +98,15 @@
     <right>
         <VBox spacing="8" prefWidth="300" styleClass="odontograma-panel">
             <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
-            <Label fx:id="lblPieza" text="Inspector" styleClass="title-4"/>
-            <Label fx:id="lblPiezaDetalle" text="Haga clic en una pieza para ver sus hallazgos." wrapText="true"
+            <Label fx:id="lblPiezaASEJ" text="Inspector" styleClass="title-4"/>
+            <Label fx:id="lblPiezaDetalleASEJ" text="Haga clic en una pieza para ver sus hallazgos." wrapText="true"
                    styleClass="text-muted, text-small"/>
-            <ListView fx:id="lstHallazgos" VBox.vgrow="ALWAYS" styleClass="lista-ajustable"/>
+            <ListView fx:id="lstHallazgosASEJ" VBox.vgrow="ALWAYS" styleClass="lista-ajustable"/>
             <HBox spacing="8">
-                <Button fx:id="btnEliminar" text="Eliminar" styleClass="danger" onAction="#onEliminar">
+                <Button fx:id="btnEliminarASEJ" text="Eliminar" styleClass="danger" onAction="#onEliminarASEJ">
                     <graphic><FontIcon iconLiteral="fth-trash-2"/></graphic>
                 </Button>
-                <Button fx:id="btnAnular" text="Anular…" onAction="#onAnular">
+                <Button fx:id="btnAnularASEJ" text="Anular…" onAction="#onAnularASEJ">
                     <graphic><FontIcon iconLiteral="fth-slash"/></graphic>
                 </Button>
             </HBox>
@@ -121,19 +118,19 @@
             <padding><Insets top="10" right="12" bottom="10" left="12"/></padding>
             <VBox spacing="4" HBox.hgrow="ALWAYS">
                 <Label text="Especificaciones" styleClass="text-bold"/>
-                <TextArea fx:id="txtEspecificaciones" prefRowCount="2" wrapText="true"/>
+                <TextArea fx:id="txtEspecificacionesASEJ" prefRowCount="2" wrapText="true"/>
             </VBox>
             <VBox spacing="4" HBox.hgrow="ALWAYS">
                 <Label text="Observaciones" styleClass="text-bold"/>
-                <TextArea fx:id="txtObservaciones" prefRowCount="2" wrapText="true"/>
+                <TextArea fx:id="txtObservacionesASEJ" prefRowCount="2" wrapText="true"/>
             </VBox>
             <VBox spacing="6" prefWidth="360" minWidth="320">
-                <Label fx:id="lblEstado" styleClass="text-bold"/>
-                <Label fx:id="lblCpod" styleClass="text-bold"/>
-                <Label fx:id="lblCeod" styleClass="text-bold"/>
+                <Label fx:id="lblEstadoASEJ" styleClass="text-bold"/>
+                <Label fx:id="lblCpodASEJ" styleClass="text-bold"/>
+                <Label fx:id="lblCeodASEJ" styleClass="text-bold"/>
                 <HBox spacing="8" alignment="CENTER_LEFT">
-                    <Label fx:id="lblIntegridad" wrapText="true" styleClass="text-small" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-                    <Button fx:id="btnGuardarTextos" text="Guardar textos" minWidth="-Infinity" onAction="#onGuardarTextos">
+                    <Label fx:id="lblIntegridadASEJ" wrapText="true" styleClass="text-small" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                    <Button fx:id="btnGuardarTextosASEJ" text="Guardar textos" minWidth="-Infinity" onAction="#onGuardarTextosASEJ">
                         <graphic><FontIcon iconLiteral="fth-save"/></graphic>
                     </Button>
                 </HBox>

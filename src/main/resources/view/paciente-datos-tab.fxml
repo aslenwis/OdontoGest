@@ -10,41 +10,39 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<!-- Datos del paciente: formulario desplazable y botones en una barra fija abajo (visibles en pantallas bajas). -->
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.odontogest.ui.controlador.DatosPacienteController">
+            fx:controller="com.odontogest.ui.controlador.DatosPacienteControllerASEJ">
 <center>
 <ScrollPane fitToWidth="true" styleClass="edge-to-edge">
     <HBox spacing="24">
         <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
 
-        <!-- El formulario (paciente-form-view.fxml) se inserta aquí desde el controlador -->
-        <StackPane fx:id="contenedorFormulario" prefWidth="560" maxWidth="640" HBox.hgrow="ALWAYS"/>
+        <StackPane fx:id="contenedorFormularioASEJ" prefWidth="560" maxWidth="640" HBox.hgrow="ALWAYS"/>
 
         <VBox spacing="12" prefWidth="300" styleClass="tarjeta">
             <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
             <Label text="Consentimiento de datos personales" styleClass="text-bold"/>
             <Label text="Ley N° 29733: el paciente (o su apoderado) firma el documento impreso." wrapText="true"
                    styleClass="text-muted, text-small"/>
-            <Label fx:id="lblEstadoConsentimiento" wrapText="true"/>
-            <Button fx:id="btnPdfConsentimiento" text="Imprimir consentimiento (PDF)" maxWidth="Infinity"
-                    onAction="#onPdfConsentimiento">
+            <Label fx:id="lblEstadoConsentimientoASEJ" wrapText="true"/>
+            <Button fx:id="btnPdfConsentimientoASEJ" text="Imprimir consentimiento (PDF)" maxWidth="Infinity"
+                    onAction="#onPdfConsentimientoASEJ">
                 <graphic><FontIcon iconLiteral="fth-printer"/></graphic>
             </Button>
-            <Button fx:id="btnRegistrarFirma" text="Registrar firma" maxWidth="Infinity" onAction="#onRegistrarFirma">
+            <Button fx:id="btnRegistrarFirmaASEJ" text="Registrar firma" maxWidth="Infinity" onAction="#onRegistrarFirmaASEJ">
                 <graphic><FontIcon iconLiteral="fth-edit-3"/></graphic>
             </Button>
 
             <Label text="Estado del paciente" styleClass="text-bold">
                 <VBox.margin><Insets top="16"/></VBox.margin>
             </Label>
-            <Button fx:id="btnEstado" maxWidth="Infinity" onAction="#onCambiarEstado"/>
+            <Button fx:id="btnEstadoASEJ" maxWidth="Infinity" onAction="#onCambiarEstadoASEJ"/>
         </VBox>
     </HBox>
 </ScrollPane>
 </center>
 <bottom>
-    <HBox fx:id="barraAcciones" styleClass="barra-acciones">
+    <HBox fx:id="barraAccionesASEJ" styleClass="barra-acciones">
         <padding><Insets top="8" right="20" bottom="8" left="20"/></padding>
     </HBox>
 </bottom>

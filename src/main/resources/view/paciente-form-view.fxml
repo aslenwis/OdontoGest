@@ -13,9 +13,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<!-- Formulario de paciente: se usa en el panel lateral (nuevo) y en la pestaña Datos de la ficha (edición). -->
 <VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.odontogest.ui.controlador.PacienteFormController" spacing="14">
+      fx:controller="com.odontogest.ui.controlador.PacienteFormControllerASEJ" spacing="14">
 
     <GridPane hgap="12" vgap="10">
         <columnConstraints>
@@ -25,49 +24,48 @@
 
         <Label text="Documento de identidad" styleClass="formulario-seccion" GridPane.rowIndex="0" GridPane.columnSpan="2"/>
         <Label text="Tipo de documento *" GridPane.rowIndex="1"/>
-        <ComboBox fx:id="cmbTipoDocumento" maxWidth="Infinity" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+        <ComboBox fx:id="cmbTipoDocumentoASEJ" maxWidth="Infinity" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
         <Label text="N° de documento *" GridPane.rowIndex="2"/>
         <HBox spacing="8" GridPane.rowIndex="2" GridPane.columnIndex="1">
-            <TextField fx:id="txtNumeroDocumento" HBox.hgrow="ALWAYS" minWidth="110"/>
-            <Button fx:id="btnConsultarDni" text="Consultar" minWidth="-Infinity" onAction="#onConsultarDni">
+            <TextField fx:id="txtNumeroDocumentoASEJ" HBox.hgrow="ALWAYS" minWidth="110"/>
+            <Button fx:id="btnConsultarDniASEJ" text="Consultar" minWidth="-Infinity" onAction="#onConsultarDniASEJ">
                 <graphic><FontIcon iconLiteral="fth-download-cloud"/></graphic>
             </Button>
         </HBox>
 
         <Label text="Datos personales" styleClass="formulario-seccion" GridPane.rowIndex="3" GridPane.columnSpan="2"/>
         <Label text="Nombres *" GridPane.rowIndex="4"/>
-        <TextField fx:id="txtNombres" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+        <TextField fx:id="txtNombresASEJ" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
         <Label text="Apellido paterno *" GridPane.rowIndex="5"/>
-        <TextField fx:id="txtApellidoPaterno" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+        <TextField fx:id="txtApellidoPaternoASEJ" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
         <Label text="Apellido materno" GridPane.rowIndex="6"/>
-        <TextField fx:id="txtApellidoMaterno" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+        <TextField fx:id="txtApellidoMaternoASEJ" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
         <Label text="Fecha de nacimiento *" GridPane.rowIndex="7"/>
         <HBox spacing="10" alignment="CENTER_LEFT" GridPane.rowIndex="7" GridPane.columnIndex="1">
-            <DatePicker fx:id="dpFechaNacimiento" prefWidth="160"/>
-            <Label fx:id="lblEdad" styleClass="text-muted"/>
+            <DatePicker fx:id="dpFechaNacimientoASEJ" prefWidth="160"/>
+            <Label fx:id="lblEdadASEJ" styleClass="text-muted"/>
         </HBox>
         <Label text="Sexo *" GridPane.rowIndex="8"/>
-        <ComboBox fx:id="cmbSexo" maxWidth="Infinity" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
+        <ComboBox fx:id="cmbSexoASEJ" maxWidth="Infinity" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
         <Label text="Ocupación" GridPane.rowIndex="9"/>
-        <TextField fx:id="txtOcupacion" GridPane.rowIndex="9" GridPane.columnIndex="1"/>
+        <TextField fx:id="txtOcupacionASEJ" GridPane.rowIndex="9" GridPane.columnIndex="1"/>
 
         <Label text="Contacto" styleClass="formulario-seccion" GridPane.rowIndex="10" GridPane.columnSpan="2"/>
         <Label text="Teléfono" GridPane.rowIndex="11"/>
-        <TextField fx:id="txtTelefono" promptText="987654321" GridPane.rowIndex="11" GridPane.columnIndex="1"/>
+        <TextField fx:id="txtTelefonoASEJ" promptText="987654321" GridPane.rowIndex="11" GridPane.columnIndex="1"/>
         <Label text="Correo electrónico" GridPane.rowIndex="12"/>
-        <TextField fx:id="txtEmail" GridPane.rowIndex="12" GridPane.columnIndex="1"/>
+        <TextField fx:id="txtEmailASEJ" GridPane.rowIndex="12" GridPane.columnIndex="1"/>
         <Label text="Dirección" GridPane.rowIndex="13"/>
-        <TextField fx:id="txtDireccion" GridPane.rowIndex="13" GridPane.columnIndex="1"/>
+        <TextField fx:id="txtDireccionASEJ" GridPane.rowIndex="13" GridPane.columnIndex="1"/>
         <Label text="Emergencia: nombre" GridPane.rowIndex="14"/>
-        <TextField fx:id="txtContactoNombre" promptText="Familiar o persona de contacto" GridPane.rowIndex="14" GridPane.columnIndex="1"/>
+        <TextField fx:id="txtContactoNombreASEJ" promptText="Familiar o persona de contacto" GridPane.rowIndex="14" GridPane.columnIndex="1"/>
         <Label text="Emergencia: teléfono" GridPane.rowIndex="15"/>
-        <TextField fx:id="txtContactoTelefono" GridPane.rowIndex="15" GridPane.columnIndex="1"/>
-        <CheckBox fx:id="chkRecordatorios" text="Acepta recordatorios de citas por correo" selected="true"
+        <TextField fx:id="txtContactoTelefonoASEJ" GridPane.rowIndex="15" GridPane.columnIndex="1"/>
+        <CheckBox fx:id="chkRecordatoriosASEJ" text="Acepta recordatorios de citas por correo" selected="true"
                   GridPane.rowIndex="16" GridPane.columnIndex="1"/>
     </GridPane>
 
-    <!-- Solo visible si el paciente es menor de edad (RF-PAC-03) -->
-    <VBox fx:id="seccionApoderado" spacing="10" styleClass="seccion-apoderado">
+    <VBox fx:id="seccionApoderadoASEJ" spacing="10" styleClass="seccion-apoderado">
         <padding><Insets top="10" right="12" bottom="12" left="12"/></padding>
         <Label text="Apoderado (paciente menor de edad)" styleClass="formulario-seccion">
             <graphic><FontIcon iconLiteral="fth-shield"/></graphic>
@@ -78,17 +76,17 @@
                 <ColumnConstraints hgrow="ALWAYS" fillWidth="true"/>
             </columnConstraints>
             <Label text="Nombre completo *" GridPane.rowIndex="0"/>
-            <TextField fx:id="txtApoderadoNombre" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+            <TextField fx:id="txtApoderadoNombreASEJ" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
             <Label text="Documento *" GridPane.rowIndex="1"/>
-            <TextField fx:id="txtApoderadoDocumento" promptText="DNI 12345678" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+            <TextField fx:id="txtApoderadoDocumentoASEJ" promptText="DNI 12345678" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
             <Label text="Parentesco *" GridPane.rowIndex="2"/>
-            <ComboBox fx:id="cmbParentesco" editable="true" maxWidth="Infinity" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+            <ComboBox fx:id="cmbParentescoASEJ" editable="true" maxWidth="Infinity" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
         </GridPane>
     </VBox>
 
-    <HBox fx:id="pie" spacing="8" alignment="CENTER_RIGHT">
-        <Button fx:id="btnCancelar" text="Cancelar" cancelButton="true" onAction="#onCancelar"/>
-        <Button fx:id="btnGuardar" text="Guardar" styleClass="accent" onAction="#onGuardar">
+    <HBox fx:id="pieASEJ" spacing="8" alignment="CENTER_RIGHT">
+        <Button fx:id="btnCancelarASEJ" text="Cancelar" cancelButton="true" onAction="#onCancelarASEJ"/>
+        <Button fx:id="btnGuardarASEJ" text="Guardar" styleClass="accent" onAction="#onGuardarASEJ">
             <graphic><FontIcon iconLiteral="fth-save"/></graphic>
         </Button>
     </HBox>

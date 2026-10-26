@@ -16,40 +16,38 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<!-- Caja (PLAN §6.1): a la izquierda el cobro con vista previa FIFO; a la derecha los pagos del día y los totales
-     por medio de pago. -->
 <SplitPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="com.odontogest.ui.controlador.CajaController" dividerPositions="0.54">
+           fx:controller="com.odontogest.ui.controlador.CajaControllerASEJ" dividerPositions="0.54">
     <VBox spacing="10" minWidth="460">
         <padding><Insets top="16" right="14" bottom="16" left="20"/></padding>
         <Label text="Cobrar" styleClass="title-4"/>
-        <CustomTextField fx:id="txtPaciente" promptText="Buscar paciente por nombre, documento o N° de historia">
+        <CustomTextField fx:id="txtPacienteASEJ" promptText="Buscar paciente por nombre, documento o N° de historia">
             <left><FontIcon iconLiteral="fth-search"/></left>
         </CustomTextField>
         <HBox spacing="10" alignment="CENTER_LEFT">
-            <Label fx:id="lblPaciente" styleClass="text-bold" text="Elija un paciente"/>
+            <Label fx:id="lblPacienteASEJ" styleClass="text-bold" text="Elija un paciente"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Label fx:id="lblSaldo" styleClass="caja-saldo"/>
+            <Label fx:id="lblSaldoASEJ" styleClass="caja-saldo"/>
         </HBox>
         <Label text="Cuotas pendientes (se cobran en orden: primero la que vence antes)" styleClass="text-muted, text-small"/>
-        <TableView fx:id="tblPendientes" prefHeight="210" minHeight="90" VBox.vgrow="ALWAYS"/>
+        <TableView fx:id="tblPendientesASEJ" prefHeight="210" minHeight="90" VBox.vgrow="ALWAYS"/>
         <GridPane hgap="10" vgap="8">
             <Label text="Monto S/ *" GridPane.rowIndex="0"/>
             <HBox spacing="8" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                <TextField fx:id="txtMonto" prefWidth="130" promptText="0.00"/>
-                <Button fx:id="btnTodo" text="Todo el saldo" onAction="#onTodo"/>
-                <Button fx:id="btnVencido" text="Lo vencido" onAction="#onVencido"/>
+                <TextField fx:id="txtMontoASEJ" prefWidth="130" promptText="0.00"/>
+                <Button fx:id="btnTodoASEJ" text="Todo el saldo" onAction="#onTodoASEJ"/>
+                <Button fx:id="btnVencidoASEJ" text="Lo vencido" onAction="#onVencidoASEJ"/>
             </HBox>
             <Label text="Medio de pago *" GridPane.rowIndex="1"/>
-            <ChoiceBox fx:id="chMedio" prefWidth="160" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+            <ChoiceBox fx:id="chMedioASEJ" prefWidth="160" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
             <Label text="Referencia" GridPane.rowIndex="2"/>
-            <TextField fx:id="txtReferencia" promptText="N° de operación o voucher" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+            <TextField fx:id="txtReferenciaASEJ" promptText="N° de operación o voucher" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
         </GridPane>
         <Label text="Vista previa del reparto" styleClass="text-bold"/>
-        <Label fx:id="lblPrevia" styleClass="text-muted, text-small" wrapText="true"/>
-        <TableView fx:id="tblPrevia" VBox.vgrow="ALWAYS" minHeight="72"/>
+        <Label fx:id="lblPreviaASEJ" styleClass="text-muted, text-small" wrapText="true"/>
+        <TableView fx:id="tblPreviaASEJ" VBox.vgrow="ALWAYS" minHeight="72"/>
         <HBox alignment="CENTER_RIGHT">
-            <Button fx:id="btnCobrar" text="Cobrar" styleClass="accent, large" onAction="#onCobrar">
+            <Button fx:id="btnCobrarASEJ" text="Cobrar" styleClass="accent, large" onAction="#onCobrarASEJ">
                 <graphic><FontIcon iconLiteral="fth-check-circle"/></graphic>
             </Button>
         </HBox>
@@ -60,23 +58,23 @@
         <HBox spacing="8" alignment="CENTER_LEFT">
             <Label text="Caja del día" styleClass="title-4"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <DatePicker fx:id="dpFecha" prefWidth="140"/>
-            <Button text="Hoy" onAction="#onHoy"/>
+            <DatePicker fx:id="dpFechaASEJ" prefWidth="140"/>
+            <Button text="Hoy" onAction="#onHoyASEJ"/>
         </HBox>
-        <TableView fx:id="tblDia" VBox.vgrow="ALWAYS"/>
+        <TableView fx:id="tblDiaASEJ" VBox.vgrow="ALWAYS"/>
         <HBox spacing="8">
-            <Button fx:id="btnRecibo" text="Recibo PDF" onAction="#onRecibo">
+            <Button fx:id="btnReciboASEJ" text="Recibo PDF" onAction="#onReciboASEJ">
                 <graphic><FontIcon iconLiteral="fth-printer"/></graphic>
             </Button>
-            <Button fx:id="btnAnular" text="Anular…" onAction="#onAnular">
+            <Button fx:id="btnAnularASEJ" text="Anular…" onAction="#onAnularASEJ">
                 <graphic><FontIcon iconLiteral="fth-x-circle"/></graphic>
             </Button>
-            <Button fx:id="btnFicha" text="Ver ficha" onAction="#onFicha">
+            <Button fx:id="btnFichaASEJ" text="Ver ficha" onAction="#onFichaASEJ">
                 <graphic><FontIcon iconLiteral="fth-user"/></graphic>
             </Button>
         </HBox>
         <Label text="Totales del día (sin anulados)" styleClass="text-bold"/>
-        <FlowPane fx:id="boxTotales" hgap="18" vgap="6"/>
-        <Label fx:id="lblTotalDia" styleClass="caja-saldo"/>
+        <FlowPane fx:id="boxTotalesASEJ" hgap="18" vgap="6"/>
+        <Label fx:id="lblTotalDiaASEJ" styleClass="caja-saldo"/>
     </VBox>
 </SplitPane>

@@ -13,49 +13,47 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<!-- Pestaña Atenciones (RF-ATE): línea de tiempo a la izquierda y detalle de la atención a la derecha, con los
-     procedimientos del plan que se marcan como realizados (RF-ATE-02). -->
 <SplitPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="com.odontogest.ui.controlador.AtencionesController" dividerPositions="0.32">
+           fx:controller="com.odontogest.ui.controlador.AtencionesControllerASEJ" dividerPositions="0.32">
     <VBox spacing="8" minWidth="260">
         <padding><Insets top="12" right="10" bottom="12" left="12"/></padding>
-        <Button fx:id="btnNueva" text="Nueva atención" styleClass="accent" maxWidth="Infinity" onAction="#onNueva">
+        <Button fx:id="btnNuevaASEJ" text="Nueva atención" styleClass="accent" maxWidth="Infinity" onAction="#onNuevaASEJ">
             <graphic><FontIcon iconLiteral="fth-plus"/></graphic>
         </Button>
-        <ListView fx:id="lstAtenciones" VBox.vgrow="ALWAYS" styleClass="lista-ajustable"/>
+        <ListView fx:id="lstAtencionesASEJ" VBox.vgrow="ALWAYS" styleClass="lista-ajustable"/>
     </VBox>
     <BorderPane>
     <center>
     <ScrollPane fitToWidth="true" styleClass="edge-to-edge">
-        <VBox fx:id="panelDetalle" spacing="10">
+        <VBox fx:id="panelDetalleASEJ" spacing="10">
             <padding><Insets top="14" right="18" bottom="14" left="18"/></padding>
-            <Label fx:id="lblTitulo" styleClass="title-4"/>
-            <Label fx:id="lblDetalle" styleClass="text-muted"/>
+            <Label fx:id="lblTituloASEJ" styleClass="title-4"/>
+            <Label fx:id="lblDetalleASEJ" styleClass="text-muted"/>
             <Label text="Motivo de consulta *" styleClass="text-bold"/>
-            <TextArea fx:id="txtMotivo" prefRowCount="2" wrapText="true"/>
+            <TextArea fx:id="txtMotivoASEJ" prefRowCount="2" wrapText="true"/>
             <Label text="Examen clínico" styleClass="text-bold"/>
-            <TextArea fx:id="txtExamen" prefRowCount="3" wrapText="true"/>
+            <TextArea fx:id="txtExamenASEJ" prefRowCount="3" wrapText="true"/>
             <Label text="Diagnóstico" styleClass="text-bold"/>
-            <TextArea fx:id="txtDiagnostico" prefRowCount="3" wrapText="true"/>
+            <TextArea fx:id="txtDiagnosticoASEJ" prefRowCount="3" wrapText="true"/>
             <Label text="Observaciones" styleClass="text-bold"/>
-            <TextArea fx:id="txtObservaciones" prefRowCount="2" wrapText="true"/>
+            <TextArea fx:id="txtObservacionesASEJ" prefRowCount="2" wrapText="true"/>
             <Label text="Procedimientos del plan realizados en esta atención" styleClass="text-bold"/>
-            <Label fx:id="lblItems" styleClass="text-muted, text-small" wrapText="true"/>
-            <VBox fx:id="boxItems" spacing="6"/>
+            <Label fx:id="lblItemsASEJ" styleClass="text-muted, text-small" wrapText="true"/>
+            <VBox fx:id="boxItemsASEJ" spacing="6"/>
         </VBox>
     </ScrollPane>
     </center>
     <bottom>
             <HBox fx:id="barraAcciones" spacing="8" alignment="CENTER_LEFT" styleClass="barra-acciones">
                 <padding><Insets top="8" right="18" bottom="8" left="18"/></padding>
-                <Button fx:id="btnOdontograma" text="Ir al odontograma" onAction="#onIrOdontograma">
+                <Button fx:id="btnOdontogramaASEJ" text="Ir al odontograma" onAction="#onIrOdontogramaASEJ">
                     <graphic><FontIcon iconLiteral="fth-grid"/></graphic>
                 </Button>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button fx:id="btnCerrar" text="Cerrar atención" onAction="#onCerrar">
+                <Button fx:id="btnCerrarASEJ" text="Cerrar atención" onAction="#onCerrarASEJ">
                     <graphic><FontIcon iconLiteral="fth-lock"/></graphic>
                 </Button>
-                <Button fx:id="btnGuardar" text="Guardar" styleClass="accent" onAction="#onGuardar">
+                <Button fx:id="btnGuardarASEJ" text="Guardar" styleClass="accent" onAction="#onGuardarASEJ">
                     <graphic><FontIcon iconLiteral="fth-save"/></graphic>
                 </Button>
             </HBox>

@@ -21,44 +21,42 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<!-- Pestaña Plan (PLAN §6.1): arriba el plan (selector, estado y transiciones), las acciones de edición y los
-     procedimientos agrupados por fase; abajo totales, observaciones y cronograma de cuotas. -->
-<SplitPane fx:id="raiz" orientation="VERTICAL" dividerPositions="0.62" xmlns="http://javafx.com/javafx/21"
-           xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.odontogest.ui.controlador.PlanTratamientoController">
+<SplitPane fx:id="raizASEJ" orientation="VERTICAL" dividerPositions="0.62" xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.odontogest.ui.controlador.PlanTratamientoControllerASEJ">
     <VBox minHeight="220">
         <ToolBar>
-            <ComboBox fx:id="cmbPlanes" prefWidth="300" promptText="Sin planes"/>
-            <Button fx:id="btnNuevo" text="Nuevo plan" onAction="#onNuevo">
+            <ComboBox fx:id="cmbPlanesASEJ" prefWidth="300" promptText="Sin planes"/>
+            <Button fx:id="btnNuevoASEJ" text="Nuevo plan" onAction="#onNuevoASEJ">
                 <graphic><FontIcon iconLiteral="fth-file-plus"/></graphic>
             </Button>
             <Separator/>
-            <Label fx:id="lblEstado" styleClass="plan-estado"/>
-            <HBox fx:id="boxTransiciones" spacing="6"/>
+            <Label fx:id="lblEstadoASEJ" styleClass="plan-estado"/>
+            <HBox fx:id="boxTransicionesASEJ" spacing="6"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button fx:id="btnPresupuesto" text="Presupuesto" onAction="#onPresupuesto">
+            <Button fx:id="btnPresupuestoASEJ" text="Presupuesto" onAction="#onPresupuestoASEJ">
                 <graphic><FontIcon iconLiteral="fth-printer"/></graphic>
             </Button>
-            <Button fx:id="btnConsentimiento" text="Consentimiento" onAction="#onConsentimiento">
+            <Button fx:id="btnConsentimientoASEJ" text="Consentimiento" onAction="#onConsentimientoASEJ">
                 <graphic><FontIcon iconLiteral="fth-file-text"/></graphic>
             </Button>
         </ToolBar>
         <HBox spacing="8" alignment="CENTER_LEFT">
             <padding><Insets top="8" right="10" bottom="2" left="10"/></padding>
-            <Button fx:id="btnSugerir" text="Sugerir desde odontograma" minWidth="-Infinity" onAction="#onSugerir">
+            <Button fx:id="btnSugerirASEJ" text="Sugerir desde odontograma" minWidth="-Infinity" onAction="#onSugerirASEJ">
                 <graphic><FontIcon iconLiteral="fth-zap"/></graphic>
             </Button>
-            <Button fx:id="btnAgregar" text="Agregar procedimiento" minWidth="-Infinity" onAction="#onAgregar">
+            <Button fx:id="btnAgregarASEJ" text="Agregar procedimiento" minWidth="-Infinity" onAction="#onAgregarASEJ">
                 <graphic><FontIcon iconLiteral="fth-plus"/></graphic>
             </Button>
-            <Button fx:id="btnQuitar" text="Quitar" minWidth="-Infinity" onAction="#onQuitar">
+            <Button fx:id="btnQuitarASEJ" text="Quitar" minWidth="-Infinity" onAction="#onQuitarASEJ">
                 <graphic><FontIcon iconLiteral="fth-trash-2"/></graphic>
             </Button>
-            <Label fx:id="lblInfo" styleClass="text-muted, text-small" wrapText="true" HBox.hgrow="ALWAYS"
+            <Label fx:id="lblInfoASEJ" styleClass="text-muted, text-small" wrapText="true" HBox.hgrow="ALWAYS"
                    maxWidth="Infinity">
                 <HBox.margin><Insets left="8"/></HBox.margin>
             </Label>
         </HBox>
-        <TreeTableView fx:id="tabla" VBox.vgrow="ALWAYS" showRoot="false" editable="true">
+        <TreeTableView fx:id="tablaASEJ" VBox.vgrow="ALWAYS" showRoot="false" editable="true">
             <VBox.margin><Insets top="6" right="10" bottom="8" left="10"/></VBox.margin>
         </TreeTableView>
     </VBox>
@@ -69,37 +67,37 @@
             <Label text="Totales" styleClass="text-bold"/>
             <GridPane hgap="10" vgap="6">
                 <Label text="Subtotal" GridPane.rowIndex="0"/>
-                <Label fx:id="lblSubtotal" styleClass="text-bold" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                <Label fx:id="lblSubtotalASEJ" styleClass="text-bold" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
                 <Label text="Descuento" GridPane.rowIndex="1"/>
-                <TextField fx:id="txtDescuento" prefWidth="100" promptText="0.00" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                <TextField fx:id="txtDescuentoASEJ" prefWidth="100" promptText="0.00" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
                 <Label text="Total" styleClass="text-bold" GridPane.rowIndex="2"/>
-                <Label fx:id="lblTotal" styleClass="plan-total" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                <Label fx:id="lblTotalASEJ" styleClass="plan-total" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
             </GridPane>
-            <Label fx:id="lblLetras" styleClass="text-muted, text-small" wrapText="true"/>
+            <Label fx:id="lblLetrasASEJ" styleClass="text-muted, text-small" wrapText="true"/>
         </VBox>
         <VBox spacing="6" prefWidth="290" minWidth="240">
             <Label text="Observaciones" styleClass="text-bold"/>
-            <TextArea fx:id="txtObservaciones" prefRowCount="2" wrapText="true" VBox.vgrow="ALWAYS"/>
-            <Button fx:id="btnGuardarCabecera" text="Guardar descuento y observaciones" onAction="#onGuardarCabecera">
+            <TextArea fx:id="txtObservacionesASEJ" prefRowCount="2" wrapText="true" VBox.vgrow="ALWAYS"/>
+            <Button fx:id="btnGuardarCabeceraASEJ" text="Guardar descuento y observaciones" onAction="#onGuardarCabeceraASEJ">
                 <graphic><FontIcon iconLiteral="fth-save"/></graphic>
             </Button>
         </VBox>
-        <VBox fx:id="panelCronograma" spacing="6" HBox.hgrow="ALWAYS">
+        <VBox fx:id="panelCronogramaASEJ" spacing="6" HBox.hgrow="ALWAYS">
             <Label text="Cronograma de pagos" styleClass="text-bold"/>
             <FlowPane hgap="8" vgap="6" alignment="CENTER_LEFT">
                 <Label text="Inicial S/"/>
-                <TextField fx:id="txtInicial" prefWidth="80" promptText="0.00"/>
+                <TextField fx:id="txtInicialASEJ" prefWidth="80" promptText="0.00"/>
                 <Label text="Cuotas"/>
-                <Spinner fx:id="spnCuotas" prefWidth="75" editable="true"/>
+                <Spinner fx:id="spnCuotasASEJ" prefWidth="75" editable="true"/>
                 <Label text="1.er vencimiento"/>
-                <DatePicker fx:id="dpPrimerVencimiento" prefWidth="145"/>
-                <ChoiceBox fx:id="chFrecuencia"/>
-                <Button fx:id="btnGenerar" text="Generar" onAction="#onGenerar">
+                <DatePicker fx:id="dpPrimerVencimientoASEJ" prefWidth="145"/>
+                <ChoiceBox fx:id="chFrecuenciaASEJ"/>
+                <Button fx:id="btnGenerarASEJ" text="Generar" onAction="#onGenerarASEJ">
                     <graphic><FontIcon iconLiteral="fth-calendar"/></graphic>
                 </Button>
             </FlowPane>
-            <Label fx:id="lblCronograma" styleClass="text-muted, text-small" wrapText="true"/>
-            <TableView fx:id="tblCuotas" VBox.vgrow="ALWAYS" minHeight="90"/>
+            <Label fx:id="lblCronogramaASEJ" styleClass="text-muted, text-small" wrapText="true"/>
+            <TableView fx:id="tblCuotasASEJ" VBox.vgrow="ALWAYS" minHeight="90"/>
         </VBox>
     </HBox>
 </SplitPane>

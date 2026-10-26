@@ -14,45 +14,45 @@
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.odontogest.ui.controlador.PacienteFichaController">
+            fx:controller="com.odontogest.ui.controlador.PacienteFichaControllerASEJ">
     <top>
         <HBox styleClass="ficha-cabecera" spacing="16" alignment="CENTER_LEFT">
             <padding><Insets top="8" right="20" bottom="8" left="20"/></padding>
-            <Button styleClass="button-icon, flat" onAction="#onVolver">
+            <Button styleClass="button-icon, flat" onAction="#onVolverASEJ">
                 <graphic><FontIcon iconLiteral="fth-arrow-left"/></graphic>
             </Button>
             <StackPane styleClass="avatar">
-                <Label fx:id="lblIniciales" styleClass="avatar-texto"/>
+                <Label fx:id="lblInicialesASEJ" styleClass="avatar-texto"/>
             </StackPane>
             <VBox spacing="4">
-                <Label fx:id="lblNombre" styleClass="title-3"/>
-                <Label fx:id="lblDetalle" styleClass="text-muted"/>
+                <Label fx:id="lblNombreASEJ" styleClass="title-3"/>
+                <Label fx:id="lblDetalleASEJ" styleClass="text-muted"/>
                 <FlowPane hgap="8" vgap="4">
-                    <Label fx:id="lblAlergias" styleClass="etiqueta-alerta">
+                    <Label fx:id="lblAlergiasASEJ" styleClass="etiqueta-alerta">
                         <graphic><FontIcon iconLiteral="fth-alert-triangle"/></graphic>
                     </Label>
-                    <Label fx:id="lblConsentimiento" styleClass="etiqueta-aviso">
+                    <Label fx:id="lblConsentimientoASEJ" styleClass="etiqueta-aviso">
                         <graphic><FontIcon iconLiteral="fth-file-text"/></graphic>
                     </Label>
-                    <Label fx:id="lblInactivo" text="Paciente inactivo" styleClass="etiqueta-aviso"/>
-                    <Label fx:id="lblDemo" text="Paciente demo" styleClass="etiqueta-demo"/>
+                    <Label fx:id="lblInactivoASEJ" text="Paciente inactivo" styleClass="etiqueta-aviso"/>
+                    <Label fx:id="lblDemoASEJ" text="Paciente demo" styleClass="etiqueta-demo"/>
                 </FlowPane>
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
             <VBox alignment="CENTER_RIGHT" spacing="2">
                 <Label text="Saldo pendiente" styleClass="text-muted, text-small"/>
-                <Label fx:id="lblSaldo" styleClass="ficha-saldo"/>
+                <Label fx:id="lblSaldoASEJ" styleClass="ficha-saldo"/>
             </VBox>
-            <Button fx:id="btnNuevaCita" text="Nueva cita" onAction="#onNuevaCita">
+            <Button fx:id="btnNuevaCitaASEJ" text="Nueva cita" onAction="#onNuevaCitaASEJ">
                 <graphic><FontIcon iconLiteral="fth-calendar"/></graphic>
             </Button>
-            <Button fx:id="btnNuevaAtencion" text="Nueva atención" styleClass="accent" onAction="#onNuevaAtencion">
+            <Button fx:id="btnNuevaAtencionASEJ" text="Nueva atención" styleClass="accent" onAction="#onNuevaAtencionASEJ">
                 <graphic><FontIcon iconLiteral="fth-clipboard"/></graphic>
             </Button>
         </HBox>
     </top>
     <center>
-        <TabPane fx:id="pestanas" tabClosingPolicy="UNAVAILABLE">
+        <TabPane fx:id="pestanasASEJ" tabClosingPolicy="UNAVAILABLE">
             <Tab text="Datos" id="datos">
                 <fx:include source="paciente-datos-tab.fxml"/>
             </Tab>

@@ -10,24 +10,23 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<!-- Reglas de sugerencia hallazgo → procedimiento (RF-CAT-03) -->
 <VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.odontogest.ui.controlador.ReglasTabController" spacing="12">
+      fx:controller="com.odontogest.ui.controlador.ReglasTabControllerASEJ" spacing="12">
     <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
     <HBox spacing="8" alignment="CENTER_LEFT">
         <Label text="Para cada hallazgo se aplica la primera regla que coincide, por prioridad (menor primero)." styleClass="text-muted" wrapText="true"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="btnEliminar" text="Eliminar" styleClass="danger" onAction="#onEliminar">
+        <Button fx:id="btnEliminarASEJ" text="Eliminar" styleClass="danger" onAction="#onEliminarASEJ">
             <graphic><FontIcon iconLiteral="fth-trash-2"/></graphic>
         </Button>
-        <Button fx:id="btnEditar" text="Editar" onAction="#onEditar">
+        <Button fx:id="btnEditarASEJ" text="Editar" onAction="#onEditarASEJ">
             <graphic><FontIcon iconLiteral="fth-edit-2"/></graphic>
         </Button>
-        <Button text="Nueva regla" styleClass="accent" onAction="#onNuevo">
+        <Button text="Nueva regla" styleClass="accent" onAction="#onNuevoASEJ">
             <graphic><FontIcon iconLiteral="fth-plus"/></graphic>
         </Button>
     </HBox>
-    <TableView fx:id="tabla" VBox.vgrow="ALWAYS">
+    <TableView fx:id="tablaASEJ" VBox.vgrow="ALWAYS">
         <placeholder><Label text="Sin registros."/></placeholder>
     </TableView>
 </VBox>

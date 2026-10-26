@@ -1,9 +1,3 @@
--- =====================================================================
--- OdontoGest - Esquema SQLite v1
--- Ejecutado en cada arranque por spring.sql.init (idempotente).
--- =====================================================================
-
--- ------------------------------------------------------------ SISTEMA
 CREATE TABLE IF NOT EXISTS configuracion (
     clave           TEXT PRIMARY KEY,
     valor           TEXT,
@@ -16,17 +10,16 @@ CREATE TABLE IF NOT EXISTS configuracion (
 );
 
 CREATE TABLE IF NOT EXISTS correlativo (
-    serie   TEXT PRIMARY KEY,                      -- 'HC', 'RECIBO'
+    serie   TEXT PRIMARY KEY,
     ultimo  INTEGER NOT NULL DEFAULT 0 CHECK (ultimo >= 0)
 );
 
--- ------------------------------------------------------------ PERSONAL
 CREATE TABLE IF NOT EXISTS odontologo (
     id              INTEGER PRIMARY KEY,
     nombres         TEXT NOT NULL,
     apellidos       TEXT NOT NULL,
-    cop             TEXT NOT NULL UNIQUE,          -- N° colegiatura (Colegio Odontológico del Perú)
-    rne             TEXT,                          -- registro de especialidad
+    cop             TEXT NOT NULL UNIQUE,
+    rne             TEXT,
     especialidad    TEXT NOT NULL DEFAULT 'Odontología general',
     telefono        TEXT,
     email           TEXT,
@@ -37,7 +30,7 @@ CREATE TABLE IF NOT EXISTS odontologo (
 CREATE TABLE IF NOT EXISTS horario_atencion (
     id              INTEGER PRIMARY KEY,
     odontologo_id   INTEGER NOT NULL REFERENCES odontologo(id) ON DELETE CASCADE,
-    dia_semana      INTEGER NOT NULL CHECK (dia_semana BETWEEN 1 AND 7),   -- 1 = lunes (ISO)
+    dia_semana      INTEGER NOT NULL CHECK (dia_semana BETWEEN 1 AND 7),
     hora_inicio     TEXT NOT NULL,
     hora_fin        TEXT NOT NULL,
     CHECK (hora_fin > hora_inicio)
@@ -59,10 +52,9 @@ CREATE TABLE IF NOT EXISTS usuario (
     CHECK (rol <> 'ODONTOLOGO' OR odontologo_id IS NOT NULL)
 );
 
--- ------------------------------------------------------------ PACIENTES
 CREATE TABLE IF NOT EXISTS paciente (
     id                          INTEGER PRIMARY KEY,
-    numero_historia             TEXT NOT NULL UNIQUE,              -- HC-000001
+    numero_historia             TEXT NOT NULL UNIQUE,
     tipo_documento              TEXT NOT NULL CHECK (tipo_documento IN ('DNI','CE','PASAPORTE','SIN_DOCUMENTO')),
     numero_documento            TEXT,
     nombres                     TEXT NOT NULL,
@@ -96,11 +88,11 @@ CREATE TABLE IF NOT EXISTS anamnesis (
     antecedentes_medicos    TEXT,
     alergias                TEXT,
     medicacion_actual       TEXT,
-    enfermedades_json       TEXT NOT NULL DEFAULT '{}',   -- {"diabetes":true,"hipertension":false,...}
+    enfermedades_json       TEXT NOT NULL DEFAULT '{}',
     habitos                 TEXT,
     fuma                    INTEGER NOT NULL DEFAULT 0 CHECK (fuma IN (0,1)),
     gestante                INTEGER NOT NULL DEFAULT 0 CHECK (gestante IN (0,1)),
-    presion_arterial        TEXT,                          -- "120/80"
+    presion_arterial        TEXT,
     observaciones           TEXT,
     actualizado_por         INTEGER REFERENCES usuario(id),
     actualizado_en          TEXT NOT NULL
@@ -112,7 +104,7 @@ CREATE TABLE IF NOT EXISTS consentimiento (
     tipo            TEXT NOT NULL CHECK (tipo IN ('DATOS_PERSONALES','TRATAMIENTO')),
     plan_id         INTEGER REFERENCES plan_tratamiento(id) ON DELETE SET NULL,
     aceptado_en     TEXT NOT NULL,
-    firmado_por     TEXT NOT NULL,                 -- paciente o apoderado
+    firmado_por     TEXT NOT NULL,
     registrado_por  INTEGER NOT NULL REFERENCES usuario(id)
 );
 CREATE INDEX IF NOT EXISTS ix_consentimiento_paciente ON consentimiento(paciente_id, tipo);
@@ -123,7 +115,7 @@ CREATE TABLE IF NOT EXISTS adjunto (
     atencion_id     INTEGER REFERENCES atencion(id) ON DELETE SET NULL,
     tipo            TEXT NOT NULL CHECK (tipo IN ('RADIOGRAFIA','FOTO','DOCUMENTO')),
     nombre_original TEXT NOT NULL,
-    ruta_relativa   TEXT NOT NULL UNIQUE,          -- adjuntos/<pacienteId>/<uuid>.<ext>
+    ruta_relativa   TEXT NOT NULL UNIQUE,
     sha256          TEXT NOT NULL,
     tamano_bytes    INTEGER NOT NULL,
     descripcion     TEXT,
@@ -131,7 +123,6 @@ CREATE TABLE IF NOT EXISTS adjunto (
 );
 CREATE INDEX IF NOT EXISTS ix_adjunto_paciente ON adjunto(paciente_id);
 
--- ------------------------------------------------------------ ATENCIÓN CLÍNICA
 CREATE TABLE IF NOT EXISTS atencion (
     id                  INTEGER PRIMARY KEY,
     paciente_id         INTEGER NOT NULL REFERENCES paciente(id),
@@ -147,7 +138,6 @@ CREATE TABLE IF NOT EXISTS atencion (
 );
 CREATE INDEX IF NOT EXISTS ix_atencion_paciente ON atencion(paciente_id, fecha);
 
--- ------------------------------------------------------------ ODONTOGRAMA
 CREATE TABLE IF NOT EXISTS odontograma (
     id                  INTEGER PRIMARY KEY,
     paciente_id         INTEGER NOT NULL REFERENCES paciente(id),
@@ -160,8 +150,8 @@ CREATE TABLE IF NOT EXISTS odontograma (
     creado_en           TEXT NOT NULL,
     cerrado_en          TEXT,
     cerrado_por         INTEGER REFERENCES usuario(id),
-    hash_anterior       TEXT,                      -- hash del odontograma cerrado previo ('GENESIS' si es el primero)
-    hash_cierre         TEXT,                      -- SHA-256 hex
+    hash_anterior       TEXT,
+    hash_cierre         TEXT,
     CHECK (estado = 'BORRADOR' OR (cerrado_en IS NOT NULL AND hash_cierre IS NOT NULL))
 );
 CREATE UNIQUE INDEX IF NOT EXISTS ux_odontograma_inicial ON odontograma(paciente_id) WHERE tipo = 'INICIAL';
@@ -172,18 +162,18 @@ CREATE TABLE IF NOT EXISTS hallazgo_tipo (
     id                  INTEGER PRIMARY KEY,
     codigo              TEXT NOT NULL UNIQUE,
     nombre              TEXT NOT NULL,
-    sigla               TEXT,                      -- se dibuja en el recuadro de la pieza
-    siglas_opciones     TEXT,                      -- JSON ["AM","R","IV"] si el usuario debe elegir
+    sigla               TEXT,
+    siglas_opciones     TEXT,
     representacion      TEXT NOT NULL CHECK (representacion IN ('SUPERFICIE','PIEZA','ENTRE_PIEZAS','RANGO_PIEZAS')),
     simbolo             TEXT NOT NULL CHECK (simbolo IN (
                             'RELLENO','CONTORNO_SUPERFICIE','TRAZO_FOSAS','LINEA_DESGASTE','ASPA','CUADRADO_CORONA',
                             'LINEA_RAIZ','ESPIGO_MUNON','PULPA_CORONAL','FLECHA_EXTRUSION','FLECHA_INTRUSION',
                             'FLECHA_GIRO','FLECHA_ZIGZAG','LINEA_FRACTURA','TRIANGULO_RAIZ','CIRCULO_NUMERO',
                             'CIRCULOS_NUMEROS','CIRCULO_S','FLECHAS_CRUZADAS','PARENTESIS','PUENTE','LINEAS_PARALELAS',
-                            'CUADROS_APICES','ZIGZAG_APICES','LINEA_CORONAS','SOLO_SIGLA')),   -- formas de la NTS 188 §6.1
+                            'CUADROS_APICES','ZIGZAG_APICES','LINEA_CORONAS','SOLO_SIGLA')),
     regla_color         TEXT NOT NULL CHECK (regla_color IN ('POR_ESTADO','SIEMPRE_ROJO','SIEMPRE_AZUL')),
-    grupo_exclusion     TEXT NOT NULL,             -- capa: un nuevo hallazgo de la misma capa reemplaza al anterior
-    oculta_superficies  INTEGER NOT NULL DEFAULT 0 CHECK (oculta_superficies IN (0,1)),  -- p. ej. pieza ausente
+    grupo_exclusion     TEXT NOT NULL,
+    oculta_superficies  INTEGER NOT NULL DEFAULT 0 CHECK (oculta_superficies IN (0,1)),
     conteo_cpod         TEXT NOT NULL DEFAULT 'NINGUNO' CHECK (conteo_cpod IN ('C','P','O','NINGUNO')),
     conteo_ceod         TEXT NOT NULL DEFAULT 'NINGUNO' CHECK (conteo_ceod IN ('C','E','O','NINGUNO')),
     activo              INTEGER NOT NULL DEFAULT 1 CHECK (activo IN (0,1)),
@@ -195,10 +185,10 @@ CREATE TABLE IF NOT EXISTS hallazgo (
     odontograma_id      INTEGER NOT NULL REFERENCES odontograma(id) ON DELETE CASCADE,
     hallazgo_tipo_id    INTEGER NOT NULL REFERENCES hallazgo_tipo(id),
     pieza_fdi           INTEGER NOT NULL,
-    pieza_fdi_fin       INTEGER,                   -- solo ENTRE_PIEZAS / RANGO_PIEZAS
+    pieza_fdi_fin       INTEGER,
     superficies         INTEGER NOT NULL DEFAULT 0 CHECK (superficies BETWEEN 0 AND 31),
     estado              TEXT CHECK (estado IN ('BUENO','MALO')),
-    sigla               TEXT,                      -- sigla elegida (si el tipo tiene opciones)
+    sigla               TEXT,
     nota                TEXT,
     registrado_por      INTEGER NOT NULL REFERENCES usuario(id),
     registrado_en       TEXT NOT NULL,
@@ -219,7 +209,6 @@ CREATE TABLE IF NOT EXISTS hallazgo_anulacion (
     anulado_en      TEXT NOT NULL
 );
 
--- ------------------------------------------------------------ TARIFARIO Y PLAN
 CREATE TABLE IF NOT EXISTS procedimiento (
     id              INTEGER PRIMARY KEY,
     codigo          TEXT NOT NULL UNIQUE,
@@ -234,14 +223,14 @@ CREATE TABLE IF NOT EXISTS procedimiento (
 
 CREATE TABLE IF NOT EXISTS regla_sugerencia (
     id                  INTEGER PRIMARY KEY,
-    hallazgo_tipo_id    INTEGER REFERENCES hallazgo_tipo(id) ON DELETE CASCADE,  -- NULL = regla general (toda la boca)
-    estado              TEXT CHECK (estado IN ('BUENO','MALO')),                 -- NULL = cualquiera
+    hallazgo_tipo_id    INTEGER REFERENCES hallazgo_tipo(id) ON DELETE CASCADE,
+    estado              TEXT CHECK (estado IN ('BUENO','MALO')),
     tipo_radicular      TEXT CHECK (tipo_radicular IN ('UNIRRADICULAR','BIRRADICULAR','MULTIRRADICULAR')),
     min_superficies     INTEGER NOT NULL DEFAULT 0,
     max_superficies     INTEGER NOT NULL DEFAULT 5,
     procedimiento_id    INTEGER NOT NULL REFERENCES procedimiento(id),
     fase                INTEGER NOT NULL CHECK (fase BETWEEN 1 AND 4),
-    prioridad           INTEGER NOT NULL DEFAULT 100,                            -- menor = se evalúa primero
+    prioridad           INTEGER NOT NULL DEFAULT 100,
     activo              INTEGER NOT NULL DEFAULT 1 CHECK (activo IN (0,1)),
     CHECK (min_superficies <= max_superficies)
 );
@@ -250,7 +239,7 @@ CREATE TABLE IF NOT EXISTS plan_tratamiento (
     id                  INTEGER PRIMARY KEY,
     paciente_id         INTEGER NOT NULL REFERENCES paciente(id),
     odontologo_id       INTEGER NOT NULL REFERENCES odontologo(id),
-    odontograma_id      INTEGER REFERENCES odontograma(id),   -- odontograma que originó las sugerencias
+    odontograma_id      INTEGER REFERENCES odontograma(id),
     fecha               TEXT NOT NULL,
     estado              TEXT NOT NULL DEFAULT 'BORRADOR'
                         CHECK (estado IN ('BORRADOR','PROPUESTO','ACEPTADO','EN_CURSO','FINALIZADO','ANULADO')),
@@ -277,7 +266,7 @@ CREATE TABLE IF NOT EXISTS plan_item (
     total_cent          INTEGER NOT NULL CHECK (total_cent >= 0),
     estado              TEXT NOT NULL DEFAULT 'PENDIENTE'
                         CHECK (estado IN ('PENDIENTE','EN_PROCESO','REALIZADO','CANCELADO')),
-    atencion_id         INTEGER REFERENCES atencion(id),      -- dónde se realizó
+    atencion_id         INTEGER REFERENCES atencion(id),
     realizado_en        TEXT,
     orden               INTEGER NOT NULL DEFAULT 0,
     CHECK (pieza_fdi IS NULL
@@ -287,11 +276,10 @@ CREATE TABLE IF NOT EXISTS plan_item (
 );
 CREATE INDEX IF NOT EXISTS ix_plan_item_plan ON plan_item(plan_id, fase, orden);
 
--- ------------------------------------------------------------ CAJA
 CREATE TABLE IF NOT EXISTS cuota (
     id              INTEGER PRIMARY KEY,
     plan_id         INTEGER NOT NULL REFERENCES plan_tratamiento(id) ON DELETE CASCADE,
-    numero          INTEGER NOT NULL CHECK (numero >= 0),            -- 0 = cuota inicial
+    numero          INTEGER NOT NULL CHECK (numero >= 0),
     vencimiento     TEXT NOT NULL,
     monto_cent      INTEGER NOT NULL CHECK (monto_cent > 0),
     pagado_cent     INTEGER NOT NULL DEFAULT 0 CHECK (pagado_cent >= 0),
@@ -302,7 +290,7 @@ CREATE INDEX IF NOT EXISTS ix_cuota_vencimiento ON cuota(vencimiento) WHERE paga
 
 CREATE TABLE IF NOT EXISTS pago (
     id                  INTEGER PRIMARY KEY,
-    numero_recibo       TEXT NOT NULL UNIQUE,                        -- R-00000001
+    numero_recibo       TEXT NOT NULL UNIQUE,
     paciente_id         INTEGER NOT NULL REFERENCES paciente(id),
     plan_id             INTEGER REFERENCES plan_tratamiento(id),
     fecha               TEXT NOT NULL,
@@ -326,7 +314,6 @@ CREATE TABLE IF NOT EXISTS pago_aplicacion (
     UNIQUE (pago_id, cuota_id)
 );
 
--- ------------------------------------------------------------ AGENDA
 CREATE TABLE IF NOT EXISTS cita (
     id                      INTEGER PRIMARY KEY,
     paciente_id             INTEGER NOT NULL REFERENCES paciente(id),
@@ -358,14 +345,13 @@ CREATE TABLE IF NOT EXISTS notificacion_log (
     fecha       TEXT NOT NULL
 );
 
--- ------------------------------------------------------------ AUDITORÍA
 CREATE TABLE IF NOT EXISTS auditoria (
     id          INTEGER PRIMARY KEY,
     usuario_id  INTEGER REFERENCES usuario(id),
-    accion      TEXT NOT NULL,              -- LOGIN, HALLAZGO_CREAR, HALLAZGO_ANULAR, ODONTOGRAMA_CERRAR, PAGO_REGISTRAR...
+    accion      TEXT NOT NULL,
     entidad     TEXT,
     entidad_id  INTEGER,
-    detalle     TEXT,                       -- JSON (Gson)
+    detalle     TEXT,
     fecha       TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS ix_auditoria_fecha ON auditoria(fecha);

@@ -16,9 +16,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<!-- Anamnesis: campos desplazables y el botón Guardar en una barra fija abajo. -->
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.odontogest.ui.controlador.AnamnesisController">
+            fx:controller="com.odontogest.ui.controlador.AnamnesisControllerASEJ">
 <center>
 <ScrollPane fitToWidth="true" styleClass="edge-to-edge">
     <VBox spacing="14" maxWidth="900">
@@ -30,39 +29,39 @@
                 <ColumnConstraints percentWidth="50"/>
             </columnConstraints>
             <Label text="Alergias" styleClass="text-bold" GridPane.rowIndex="0"/>
-            <TextArea fx:id="txtAlergias" prefRowCount="3" wrapText="true"
+            <TextArea fx:id="txtAlergiasASEJ" prefRowCount="3" wrapText="true"
                       promptText="Medicamentos, látex, anestésicos…" GridPane.rowIndex="1"/>
             <Label text="Medicación actual" styleClass="text-bold" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-            <TextArea fx:id="txtMedicacion" prefRowCount="3" wrapText="true" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+            <TextArea fx:id="txtMedicacionASEJ" prefRowCount="3" wrapText="true" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
             <Label text="Antecedentes médicos" styleClass="text-bold" GridPane.rowIndex="2"/>
-            <TextArea fx:id="txtAntecedentes" prefRowCount="3" wrapText="true" GridPane.rowIndex="3"/>
+            <TextArea fx:id="txtAntecedentesASEJ" prefRowCount="3" wrapText="true" GridPane.rowIndex="3"/>
             <Label text="Hábitos" styleClass="text-bold" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-            <TextArea fx:id="txtHabitos" prefRowCount="3" wrapText="true"
+            <TextArea fx:id="txtHabitosASEJ" prefRowCount="3" wrapText="true"
                       promptText="Bruxismo, onicofagia, respiración bucal…" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
         </GridPane>
 
         <Label text="Enfermedades sistémicas" styleClass="text-bold"/>
-        <FlowPane fx:id="panelEnfermedades" hgap="18" vgap="10"/>
+        <FlowPane fx:id="panelEnfermedadesASEJ" hgap="18" vgap="10"/>
 
         <HBox spacing="24" alignment="CENTER_LEFT">
-            <CheckBox fx:id="chkFuma" text="Fuma"/>
-            <CheckBox fx:id="chkGestante" text="Gestante"/>
+            <CheckBox fx:id="chkFumaASEJ" text="Fuma"/>
+            <CheckBox fx:id="chkGestanteASEJ" text="Gestante"/>
             <Label text="Presión arterial"/>
-            <TextField fx:id="txtPresion" promptText="120/80" prefWidth="100"/>
+            <TextField fx:id="txtPresionASEJ" promptText="120/80" prefWidth="100"/>
             <Label text="mmHg" styleClass="text-muted"/>
         </HBox>
 
         <Label text="Observaciones" styleClass="text-bold"/>
-        <TextArea fx:id="txtObservaciones" prefRowCount="3" wrapText="true"/>
+        <TextArea fx:id="txtObservacionesASEJ" prefRowCount="3" wrapText="true"/>
     </VBox>
 </ScrollPane>
 </center>
 <bottom>
     <HBox spacing="8" alignment="CENTER_LEFT" styleClass="barra-acciones">
         <padding><Insets top="8" right="20" bottom="8" left="20"/></padding>
-        <Label fx:id="lblActualizado" styleClass="text-muted, text-small"/>
+        <Label fx:id="lblActualizadoASEJ" styleClass="text-muted, text-small"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="btnGuardar" text="Guardar anamnesis" styleClass="accent" onAction="#onGuardar">
+        <Button fx:id="btnGuardarASEJ" text="Guardar anamnesis" styleClass="accent" onAction="#onGuardarASEJ">
             <graphic><FontIcon iconLiteral="fth-save"/></graphic>
         </Button>
     </HBox>

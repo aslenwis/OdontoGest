@@ -26,7 +26,7 @@ Proyecto del curso de Ingeniería de Software, destinado a registro ante INDECOP
 3. Si algo del plan es técnicamente inviable, dilo y propone la alternativa; no improvises en silencio.
 
 ## Convenciones de código (obligatorias)
-- Nombres de clases, métodos y variables **en español**, como el repo del docente (`PacienteService`, `registrarHallazgo`).
+- Nombres de clases, métodos y variables **en español**, como el repo del docente (`PacienteServiceASEJ`, `registrarHallazgoASEJ`; ver el sufijo `ASEJ` más abajo).
 - Capas: `ui` → `servicio` → `persistencia`. Los controladores **nunca** usan repositorios ni entidades JPA: reciben y envían `record` DTO de `servicio.dto`. Hay un test ArchUnit que lo verifica.
 - El paquete `dominio` es Java puro: **prohibido** importar `javafx.*`, `org.springframework.*`, `jakarta.persistence.*`. Ahí viven los algoritmos (odontograma, índices, cronogramas, agenda) y sus tests unitarios.
 - **Nada de BD, archivos ni red en el JavaFX Application Thread.** Todo pasa por `TareaUi.ejecutar(...)`. La UI se actualiza solo en los callbacks de éxito/error.
@@ -35,7 +35,11 @@ Proyecto del curso de Ingeniería de Software, destinado a registro ante INDECOP
 - Fechas: `TEXT` ISO-8601 en BD (`yyyy-MM-dd`, `yyyy-MM-dd'T'HH:mm:ss`) mediante `AttributeConverter` con `autoApply = true`.
 - Errores de negocio: lanzar `NegocioException` con mensaje para el usuario; `TareaUi` lo muestra con `Notificador.advertencia`.
 - Los hallazgos del odontograma son **inmutables** una vez cerrado el odontograma; las correcciones se hacen con anulación (tabla `hallazgo_anulacion`). No escribir métodos `update` para `hallazgo`.
-- Cada clase pública lleva cabecera Javadoc con propósito; los archivos fuente llevan la cabecera de autoría definida en `docs/PLAN.md` §7 (requisito para INDECOPI).
+- **Sin comentarios en el código fuente** (ni Javadoc ni cabeceras de autoría; tampoco en FXML, CSS, SQL, propiedades ni `pom.xml`). Reemplaza la regla anterior de cabeceras; decisión de los autores para el registro ante INDECOPI. No agregar comentarios nuevos.
+- **Sufijo `ASEJ`** (iniciales de los autores) en todo identificador que se declare en el proyecto, pruebas incluidas: clases, interfaces, enums, records, métodos, campos, parámetros y variables locales (`PacienteServiceASEJ`, `registrarHallazgoASEJ`, `pacienteIdASEJ`). Las pruebas terminan en `TestASEJ` (el `pom.xml` configura Surefire con `**/*TestASEJ.java`). Los archivos `.java` se llaman igual que su clase.
+  - Excepciones obligadas, que **no** llevan sufijo: constantes de enum (se guardan por nombre en la base), `main` e `initialize()` de los controladores FXML, métodos que sobrescriben o implementan librerías (`run`, `start`, `toString`, `updateItem`, `convertToDatabaseColumn`…), `log` de Lombok (es `logASEJ` por `lombok.config`) y los parámetros genéricos `<T>`.
+  - Spring Data: en los métodos derivados el sufijo va después de cada propiedad (`findByPacienteASEJIdASEJOrderByFechaASEJDesc`). Los atributos JPA terminan en `ASEJ`; `EstrategiaNombresASEJ` lo quita para que las columnas de la base de datos no cambien. En `@Query`, los nombres de entidad, atributos y parámetros llevan el sufijo; las clases completas dentro del JPQL también.
+  - FXML: `fx:id`, `fx:controller`, `onAction="#…"` y los atributos de componentes propios (`tituloASEJ`) deben coincidir con los nombres con sufijo.
 
 ## Datos de la aplicación
 - Carpeta de datos: `${user.home}/OdontoGest/` (sobrescribible con `-Dodontogest.home=...`). Ahí van `odontogest.db`, `adjuntos/`, `respaldos/`, `logs/`, `clave.key`.

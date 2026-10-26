@@ -13,7 +13,7 @@
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <StackPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="com.odontogest.ui.controlador.LoginController"
+           fx:controller="com.odontogest.ui.controlador.LoginControllerASEJ"
            styleClass="login-fondo">
 
     <VBox styleClass="login-tarjeta" spacing="10" maxWidth="380" maxHeight="-Infinity">
@@ -25,22 +25,22 @@
         <Label text="Gestión de consultorio odontológico" styleClass="text-muted"/>
 
         <Label text="Usuario" styleClass="login-etiqueta"/>
-        <TextField fx:id="txtUsuario" promptText="Nombre de usuario"/>
+        <TextField fx:id="txtUsuarioASEJ" promptText="Nombre de usuario"/>
 
         <Label text="Contraseña" styleClass="login-etiqueta"/>
-        <PasswordField fx:id="txtPassword" promptText="Contraseña"/>
+        <PasswordField fx:id="txtPasswordASEJ" promptText="Contraseña"/>
 
-        <Label fx:id="lblError" styleClass="danger" wrapText="true"/>
+        <Label fx:id="lblErrorASEJ" styleClass="danger" wrapText="true"/>
 
-        <Button fx:id="btnIngresar" text="Ingresar" defaultButton="true" maxWidth="Infinity"
-                styleClass="accent" onAction="#onIngresar">
+        <Button fx:id="btnIngresarASEJ" text="Ingresar" defaultButton="true" maxWidth="Infinity"
+                styleClass="accent" onAction="#onIngresarASEJ">
             <VBox.margin><Insets top="8"/></VBox.margin>
         </Button>
 
         <HBox alignment="CENTER_LEFT">
-            <Label fx:id="lblDemo" text="Demo: admin / Admin123*" styleClass="text-muted, text-small"/>
+            <Label fx:id="lblDemoASEJ" text="Demo: admin / Admin123*" styleClass="text-muted, text-small"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Hyperlink text="Acerca de" styleClass="text-small" onAction="#onAcercaDe"/>
+            <Hyperlink text="Acerca de" styleClass="text-small" onAction="#onAcercaDeASEJ"/>
         </HBox>
     </VBox>
 </StackPane>

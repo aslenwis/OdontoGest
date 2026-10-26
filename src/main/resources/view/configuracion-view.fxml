@@ -10,13 +10,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<!-- Configuración (PLAN §6.1): un panel por grupo de claves, generado desde la tabla configuracion; los secretos
-     son campos de contraseña. Botones en una barra fija abajo. -->
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.odontogest.ui.controlador.ConfiguracionController">
+            fx:controller="com.odontogest.ui.controlador.ConfiguracionControllerASEJ">
     <center>
         <ScrollPane fitToWidth="true" styleClass="edge-to-edge">
-            <VBox fx:id="grupos" spacing="12" maxWidth="900">
+            <VBox fx:id="gruposASEJ" spacing="12" maxWidth="900">
                 <padding><Insets top="16" right="20" bottom="16" left="20"/></padding>
             </VBox>
         </ScrollPane>
@@ -24,13 +22,13 @@
     <bottom>
         <HBox spacing="8" alignment="CENTER_LEFT" styleClass="barra-acciones">
             <padding><Insets top="8" right="20" bottom="8" left="20"/></padding>
-            <Label fx:id="lblConexion" styleClass="text-small"/>
+            <Label fx:id="lblConexionASEJ" styleClass="text-small"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Label fx:id="lblCambios" styleClass="text-muted, text-small"/>
-            <Button fx:id="btnDescartar" text="Descartar cambios" onAction="#onDescartar">
+            <Label fx:id="lblCambiosASEJ" styleClass="text-muted, text-small"/>
+            <Button fx:id="btnDescartarASEJ" text="Descartar cambios" onAction="#onDescartarASEJ">
                 <graphic><FontIcon iconLiteral="fth-rotate-ccw"/></graphic>
             </Button>
-            <Button fx:id="btnGuardar" text="Guardar cambios" styleClass="accent" onAction="#onGuardar">
+            <Button fx:id="btnGuardarASEJ" text="Guardar cambios" styleClass="accent" onAction="#onGuardarASEJ">
                 <graphic><FontIcon iconLiteral="fth-save"/></graphic>
             </Button>
         </HBox>

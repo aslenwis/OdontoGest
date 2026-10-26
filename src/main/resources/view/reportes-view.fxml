@@ -3,13 +3,11 @@
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 
-<!-- Reportes (PLAN §6.1, RF-REP-02 a RF-REP-05). ReportesController arma el contenido de cada pestaña (rango de
-     fechas, resumen, gráfico, tabla y "Exportar Excel") y quita las que el rol del usuario no puede ver. -->
-<TabPane fx:id="pestanas" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-         fx:controller="com.odontogest.ui.controlador.ReportesController" tabClosingPolicy="UNAVAILABLE">
-    <Tab fx:id="tabIngresos" id="INGRESOS" text="Ingresos"/>
-    <Tab fx:id="tabProduccion" id="PRODUCCION" text="Producción por odontólogo"/>
-    <Tab fx:id="tabMorosidad" id="MOROSIDAD" text="Morosidad"/>
-    <Tab fx:id="tabEpidemiologico" id="EPIDEMIOLOGICO" text="Epidemiológico"/>
-    <Tab fx:id="tabAuditoria" id="AUDITORIA" text="Auditoría"/>
+<TabPane fx:id="pestanasASEJ" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+         fx:controller="com.odontogest.ui.controlador.ReportesControllerASEJ" tabClosingPolicy="UNAVAILABLE">
+    <Tab fx:id="tabIngresosASEJ" id="INGRESOS" text="Ingresos"/>
+    <Tab fx:id="tabProduccionASEJ" id="PRODUCCION" text="Producción por odontólogo"/>
+    <Tab fx:id="tabMorosidadASEJ" id="MOROSIDAD" text="Morosidad"/>
+    <Tab fx:id="tabEpidemiologicoASEJ" id="EPIDEMIOLOGICO" text="Epidemiológico"/>
+    <Tab fx:id="tabAuditoriaASEJ" id="AUDITORIA" text="Auditoría"/>
 </TabPane>

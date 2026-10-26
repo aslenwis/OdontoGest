@@ -1877,6 +1877,9 @@ Cada fase termina con `mvn test` en verde, la app ejecutándose con `mvn javafx:
 | **F9 — Datos demo, empaquetado y documentación** | `DatabaseSeeder` completo (§3.5), `README.md`, `docs/manual-usuario.md` con capturas, cabeceras de autoría, perfil `empaquetar` probado en Windows, ZIP final. | En una PC Windows **sin Java**: descomprimir, abrir `OdontoGest.exe`, iniciar sesión con `admin` y recorrer todos los módulos con datos demo. |
 
 ### 7.1 Cabecera de autoría (todos los `.java`)
+> **Reemplazado.** El código fuente ya no lleva comentarios ni cabeceras, y todos los identificadores declarados llevan el sufijo `ASEJ` (iniciales de los autores). Este documento conserva los nombres sin sufijo (`PacienteService`, `registrarHallazgo`…) como descripción del diseño: en el código son `PacienteServiceASEJ`, `registrarHallazgoASEJ`, etc. Reglas y excepciones en `CLAUDE.md`.
+
+Cabecera original (ya no se usa):
 ```java
 /*
  * OdontoGest - Sistema de gestión de consultorio odontológico con odontograma interactivo

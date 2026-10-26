@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.odontogest.ui.componente.TarjetaKpi?>
+<?import com.odontogest.ui.componente.TarjetaKpiASEJ?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.chart.BarChart?>
 <?import javafx.scene.chart.CategoryAxis?>
@@ -18,28 +18,26 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<!-- Tablero de inicio (PLAN §6.1, RF-REP-01): cuatro indicadores, ingresos (o producción) de los últimos seis meses,
-     citas de hoy y los diez pacientes con mayor deuda vencida. -->
 <ScrollPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.odontogest.ui.controlador.DashboardController" fitToWidth="true" styleClass="edge-to-edge">
+            fx:controller="com.odontogest.ui.controlador.DashboardControllerASEJ" fitToWidth="true" styleClass="edge-to-edge">
     <VBox spacing="14">
         <padding><Insets top="16" right="20" bottom="20" left="20"/></padding>
         <HBox spacing="10" alignment="CENTER_LEFT">
             <VBox>
-                <Label fx:id="lblSaludo" styleClass="title-3"/>
-                <Label fx:id="lblFecha" styleClass="text-muted"/>
+                <Label fx:id="lblSaludoASEJ" styleClass="title-3"/>
+                <Label fx:id="lblFechaASEJ" styleClass="text-muted"/>
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button fx:id="btnActualizar" text="Actualizar" onAction="#onActualizar">
+            <Button fx:id="btnActualizarASEJ" text="Actualizar" onAction="#onActualizarASEJ">
                 <graphic><FontIcon iconLiteral="fth-refresh-cw"/></graphic>
             </Button>
         </HBox>
 
         <FlowPane hgap="14" vgap="14">
-            <TarjetaKpi fx:id="kpiCitas" titulo="Citas de hoy" icono="fth-calendar"/>
-            <TarjetaKpi fx:id="kpiMonto" titulo="Ingresos del mes" icono="fth-dollar-sign"/>
-            <TarjetaKpi fx:id="kpiPacientes" titulo="Pacientes nuevos" icono="fth-user-plus"/>
-            <TarjetaKpi fx:id="kpiVencidas" titulo="Cuotas vencidas" icono="fth-alert-circle"/>
+            <TarjetaKpiASEJ fx:id="kpiCitasASEJ" tituloASEJ="Citas de hoy" iconoASEJ="fth-calendar"/>
+            <TarjetaKpiASEJ fx:id="kpiMontoASEJ" tituloASEJ="Ingresos del mes" iconoASEJ="fth-dollar-sign"/>
+            <TarjetaKpiASEJ fx:id="kpiPacientesASEJ" tituloASEJ="Pacientes nuevos" iconoASEJ="fth-user-plus"/>
+            <TarjetaKpiASEJ fx:id="kpiVencidasASEJ" tituloASEJ="Cuotas vencidas" iconoASEJ="fth-alert-circle"/>
         </FlowPane>
 
         <GridPane hgap="14" vgap="14">
@@ -48,35 +46,35 @@
                 <ColumnConstraints percentWidth="44"/>
             </columnConstraints>
             <VBox styleClass="panel-tablero" GridPane.columnIndex="0">
-                <Label fx:id="lblGrafico" text="Ingresos de los últimos 6 meses (S/)" styleClass="text-bold"/>
-                <BarChart fx:id="grafico" legendVisible="false" animated="false" minHeight="230" prefHeight="270"
+                <Label fx:id="lblGraficoASEJ" text="Ingresos de los últimos 6 meses (S/)" styleClass="text-bold"/>
+                <BarChart fx:id="graficoASEJ" legendVisible="false" animated="false" minHeight="230" prefHeight="270"
                           styleClass="grafico-montos" VBox.vgrow="ALWAYS">
                     <xAxis><CategoryAxis/></xAxis>
-                    <yAxis><NumberAxis fx:id="ejeMonto" forceZeroInRange="true"/></yAxis>
+                    <yAxis><NumberAxis fx:id="ejeMontoASEJ" forceZeroInRange="true"/></yAxis>
                 </BarChart>
             </VBox>
             <VBox styleClass="panel-tablero" GridPane.columnIndex="1">
                 <HBox alignment="CENTER_LEFT" spacing="8">
-                    <Label fx:id="lblCitas" text="Citas de hoy" styleClass="text-bold"/>
+                    <Label fx:id="lblCitasASEJ" text="Citas de hoy" styleClass="text-bold"/>
                     <Region HBox.hgrow="ALWAYS"/>
-                    <Button fx:id="btnAgenda" text="Ir a la agenda" styleClass="flat, small" onAction="#onAgenda">
+                    <Button fx:id="btnAgendaASEJ" text="Ir a la agenda" styleClass="flat, small" onAction="#onAgendaASEJ">
                         <graphic><FontIcon iconLiteral="fth-arrow-right"/></graphic>
                     </Button>
                 </HBox>
-                <ListView fx:id="lstCitas" minHeight="200" prefHeight="270" VBox.vgrow="ALWAYS"/>
+                <ListView fx:id="lstCitasASEJ" minHeight="200" prefHeight="270" VBox.vgrow="ALWAYS"/>
             </VBox>
         </GridPane>
 
-        <VBox fx:id="panelMorosos" styleClass="panel-tablero">
+        <VBox fx:id="panelMorososASEJ" styleClass="panel-tablero">
             <HBox alignment="CENTER_LEFT" spacing="8">
                 <Label text="Pacientes con mayor deuda vencida" styleClass="text-bold"/>
                 <Label text="(doble clic para abrir la ficha en Pagos)" styleClass="text-muted, text-small"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button fx:id="btnMorosidad" text="Reporte de morosidad" styleClass="flat, small" onAction="#onMorosidad">
+                <Button fx:id="btnMorosidadASEJ" text="Reporte de morosidad" styleClass="flat, small" onAction="#onMorosidadASEJ">
                     <graphic><FontIcon iconLiteral="fth-arrow-right"/></graphic>
                 </Button>
             </HBox>
-            <TableView fx:id="tblMorosos" minHeight="160" prefHeight="300"/>
+            <TableView fx:id="tblMorososASEJ" minHeight="160" prefHeight="300"/>
         </VBox>
     </VBox>
 </ScrollPane>

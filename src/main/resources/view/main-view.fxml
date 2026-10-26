@@ -13,8 +13,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<StackPane fx:id="raiz" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="com.odontogest.ui.controlador.MainController">
+<StackPane fx:id="raizASEJ" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.odontogest.ui.controlador.MainControllerASEJ">
 
     <BorderPane>
         <left>
@@ -26,52 +26,50 @@
                 </Label>
                 <Separator/>
 
-                <!-- Lo llena MainController según los permisos del usuario -->
-                <VBox fx:id="menu" spacing="4" VBox.vgrow="ALWAYS"/>
+                <VBox fx:id="menuASEJ" spacing="4" VBox.vgrow="ALWAYS"/>
 
                 <Separator/>
-                <Button fx:id="btnTema" maxWidth="Infinity" alignment="CENTER_LEFT" styleClass="flat"
-                        onAction="#onAlternarTema"/>
+                <Button fx:id="btnTemaASEJ" maxWidth="Infinity" alignment="CENTER_LEFT" styleClass="flat"
+                        onAction="#onAlternarTemaASEJ"/>
             </VBox>
         </left>
 
         <top>
             <HBox styleClass="barra-superior" alignment="CENTER_LEFT" spacing="12">
                 <padding><Insets top="10" right="16" bottom="10" left="20"/></padding>
-                <Label fx:id="lblTitulo" text="Inicio" styleClass="title-4"/>
+                <Label fx:id="lblTituloASEJ" text="Inicio" styleClass="title-4"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Label fx:id="lblSinInternet" text="Sin internet: DNI y correo no disponibles" styleClass="etiqueta-aviso"
+                <Label fx:id="lblSinInternetASEJ" text="Sin internet: DNI y correo no disponibles" styleClass="etiqueta-aviso"
                        visible="false" managed="false">
                     <graphic><FontIcon iconLiteral="fth-wifi-off"/></graphic>
                 </Label>
                 <FontIcon iconLiteral="fth-user" iconSize="18"/>
                 <VBox alignment="CENTER_LEFT">
-                    <Label fx:id="lblUsuario" styleClass="text-bold"/>
-                    <Label fx:id="lblRol" styleClass="text-muted, text-small"/>
+                    <Label fx:id="lblUsuarioASEJ" styleClass="text-bold"/>
+                    <Label fx:id="lblRolASEJ" styleClass="text-muted, text-small"/>
                 </VBox>
-                <Button styleClass="flat, button-icon" onAction="#onAcercaDe">
+                <Button styleClass="flat, button-icon" onAction="#onAcercaDeASEJ">
                     <graphic><FontIcon iconLiteral="fth-info"/></graphic>
                     <tooltip><Tooltip text="Acerca de OdontoGest"/></tooltip>
                 </Button>
-                <Button text="Contraseña" styleClass="flat" onAction="#onCambiarPassword">
+                <Button text="Contraseña" styleClass="flat" onAction="#onCambiarPasswordASEJ">
                     <graphic><FontIcon iconLiteral="fth-key"/></graphic>
                 </Button>
-                <Button text="Cerrar sesión" styleClass="flat" onAction="#onCerrarSesion">
+                <Button text="Cerrar sesión" styleClass="flat" onAction="#onCerrarSesionASEJ">
                     <graphic><FontIcon iconLiteral="fth-log-out"/></graphic>
                 </Button>
             </HBox>
         </top>
 
         <center>
-            <!-- MainController muestra aquí el tablero de inicio y las demás vistas del menú -->
-            <StackPane fx:id="contenido" styleClass="contenido"/>
+            <StackPane fx:id="contenidoASEJ" styleClass="contenido"/>
         </center>
     </BorderPane>
 
-    <VBox fx:id="zonaToasts" spacing="8" maxWidth="380" maxHeight="-Infinity" pickOnBounds="false"
+    <VBox fx:id="zonaToastsASEJ" spacing="8" maxWidth="380" maxHeight="-Infinity" pickOnBounds="false"
           StackPane.alignment="TOP_RIGHT">
         <StackPane.margin><Insets top="64" right="16"/></StackPane.margin>
     </VBox>
 
-    <ModalPane fx:id="modal"/>
+    <ModalPane fx:id="modalASEJ"/>
 </StackPane>
