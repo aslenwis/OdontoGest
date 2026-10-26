@@ -6,11 +6,11 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import org.kordamp.ikonli.feather.Feather;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 public class PantallaCargaASEJ extends Preloader {
 
@@ -19,9 +19,11 @@ public class PantallaCargaASEJ extends Preloader {
     @Override
     public void start(Stage stageASEJ) {
         ventanaASEJ = stageASEJ;
-        FontIcon iconoASEJ = new FontIcon(Feather.ACTIVITY);
-        iconoASEJ.setIconSize(40);
-        iconoASEJ.setStyle("-fx-icon-color: #2563EB;");
+        ImageView iconoASEJ = new ImageView(new Image(PantallaCargaASEJ.class.getResourceAsStream("/img/icono.png")));
+        iconoASEJ.setFitWidth(56);
+        iconoASEJ.setFitHeight(56);
+        iconoASEJ.setSmooth(true);
+        stageASEJ.getIcons().add(iconoASEJ.getImage());
         Label nombreASEJ = new Label("OdontoGest");
         nombreASEJ.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1F2937;");
         Label mensajeASEJ = new Label("Iniciando… La primera vez se preparan los datos de demostración.");
